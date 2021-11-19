@@ -1,12 +1,12 @@
 const express = require("express")
-const appConfig = require("../appConfig")
+const cors = require("cors")
+const myRouter = require("./myRouter")
 
 const app = express()
+app.use(cors())
+app.use("/api", myRouter)
 
-app.get("/", (req, res) => {
-  res.send("Hello from server powered by node")
-})
-
-app.listen(appConfig.server.PORT, () => {
-  console.log(`Server has been started on port ${appConfig.server.PORT}...`)
+const PORT = require("../appConfig").server.PORT || 5000
+app.listen(PORT, () => {
+  console.log(`Server has been started on port ${PORT}...`)
 })
