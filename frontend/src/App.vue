@@ -1,16 +1,22 @@
 <template>
-  <Sidebar/>
-  <div :style="{ 'margin-left:': sidebarWidth }">
-    <router-view/>
+  <div v-if="this.$store.state.authorization.authorizationStatus">
+    <Sidebar/>
+    <div id="page-body" :style="{'margin-left': sidebarWidth}">
+      <router-view/>
+    </div>
+  </div>
+  <div v-else>
+    <Authorization/>
   </div>
 </template>
 
 <script>
 import Sidebar from "@/components/Sidebar/Sidebar";
 import {sidebarWidth} from "@/components/Sidebar/state";
+import Authorization from "@/views/Authorization"
 
 export default {
-  components: {Sidebar},
+  components: {Sidebar, Authorization},
   setup() {
     return {sidebarWidth}
   }
@@ -26,7 +32,11 @@ export default {
   -webkit-box-sizing: border-box;
 }
 
-#app {
+#app, button, input {
   font-family: 'Montserrat', Arial, sans-serif;
+}
+
+#page-body {
+  transition: var(--sidebar-transition)
 }
 </style>
