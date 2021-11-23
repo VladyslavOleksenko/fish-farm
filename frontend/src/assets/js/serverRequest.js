@@ -36,7 +36,6 @@ export async function register(body) {
     "http://localhost:5000/api/user/register",
     body
   )
-  requestParams.responseType = "text"
 
   console.log("request params:", requestParams)
 
@@ -49,7 +48,6 @@ export async function login(body) {
     "http://localhost:5000/api/user/login",
     body
   )
-  requestParams.responseType = "text"
 
   console.log("request params:", requestParams)
 
