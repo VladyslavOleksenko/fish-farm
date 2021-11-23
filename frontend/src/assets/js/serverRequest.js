@@ -32,9 +32,9 @@ async function sendServerRequest(requestParams) {
 
 export async function register(body) {
   const requestParams = new RequestParams(
-    "GET",
-    "http://localhost:5000/api/user",
-    null
+    "POST",
+    "http://localhost:5000/api/user/register",
+    body
   )
   requestParams.responseType = "text"
 
@@ -45,9 +45,9 @@ export async function register(body) {
 
 export async function login(body) {
   const requestParams = new RequestParams(
-    "GET",
-    "http://localhost:5000/api/user",
-    null
+    "POST",
+    "http://localhost:5000/api/user/login",
+    body
   )
   requestParams.responseType = "text"
 
