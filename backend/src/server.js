@@ -1,10 +1,14 @@
 const express = require("express")
 const cors = require("cors")
-const myRouter = require("./myRouter")
+
+const userRouter = require("./controllers/user").router
+
 
 const app = express()
-app.use(cors())
-app.use("/api", myRouter)
+  .use(cors())
+  .use(express.json())
+  .use(express.urlencoded({extended: true}))
+  .use("/api/user", userRouter)
 
 const PORT = require("../appConfig").server.PORT || 5000
 app.listen(PORT, () => {
