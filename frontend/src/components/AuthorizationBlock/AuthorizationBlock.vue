@@ -18,18 +18,31 @@
           method="post"
           v-if="mode === 'register'">
       <div class="form__input-fields-row">
-        <input class="form__input" type="text" placeholder="First name">
-        <input class="form__input" type="text" placeholder="Last name">
+        <input class="form__input"
+               type="text"
+               placeholder="First name"
+               v-model="registerData.firstName">
+        <input class="form__input"
+               type="text"
+               placeholder="Last name"
+               v-model="registerData.lastName">
       </div>
       <div class="form__input-fields-row">
-        <input class="form__input" type="email" placeholder="Email">
+        <input class="form__input"
+               type="email"
+               placeholder="Email"
+               v-model="registerData.email">
       </div>
       <div class="form__input-fields-row">
-        <input class="form__input" type="password" placeholder="Password">
+        <input class="form__input"
+               type="password"
+               placeholder="Password"
+               v-model="registerData.password">
       </div>
 
       <div class="form__submit-wrapper">
-        <button class="form__submit">
+        <button class="form__submit"
+                @click.prevent="sendRegisterRequest">
           Register
         </button>
       </div>
@@ -39,16 +52,22 @@
           action=""
           v-else-if="mode === 'login'">
       <div class="form__input-fields-row">
-        <input class="form__input" type="email" placeholder="Email">
+        <input class="form__input"
+               type="email"
+               placeholder="Email"
+               v-model="loginData.email">
       </div>
       <div class="form__input-fields-row">
-        <input class="form__input" type="password" placeholder="Password">
+        <input class="form__input"
+               type="password"
+               placeholder="Password"
+               v-model="loginData.password">
       </div>
 
       <div class="form__submit-wrapper">
         <button class="form__submit"
                 disabled
-                @click.prevent>
+                @click.prevent="sendLoginRequest">
           Login
         </button>
       </div>
@@ -57,11 +76,33 @@
 </template>
 
 <script>
+import {register, login} from "@/assets/js/serverRequest"
+
 export default {
   name: "AuthorizationBlock",
   data: () => ({
-    mode: "register"
-  })
+    mode: "register",
+    registerData: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: ""
+    },
+    loginData: {
+      email: "",
+      password: ""
+    }
+  }),
+  methods: {
+    async sendRegisterRequest() {
+      const serverResponse = await register(this.registerData)
+      console.log(serverResponse)
+    },
+    async sendLoginRequest() {
+      const serverResponse = await login(this.loginData)
+      console.log(serverResponse)
+    }
+  }
 }
 </script>
 
