@@ -30,6 +30,7 @@ export default {
   --sidebar-item-hover: #38a169;
   --sidebar-item-active: #276749;
   --sidebar-text-color: #efefef;
+  --sidebar-transition: .3s ease;
 }
 </style>
 
@@ -48,7 +49,7 @@ export default {
 
   background-color: var(--sidevar-bg-color);
 
-  transition: .3s ease;
+  transition: var(--sidebar-transition);
 }
 
 .sidebar__title {
