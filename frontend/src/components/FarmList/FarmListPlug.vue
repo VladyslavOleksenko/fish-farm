@@ -120,5 +120,7 @@ export default {
 
   text-align: center;
   font-size: 25px;
+
+  color: #333;
 }
 </style>
