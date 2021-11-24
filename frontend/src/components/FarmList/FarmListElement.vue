@@ -55,6 +55,7 @@ export default {
   width: 100%;
 
   display: flex;
+  align-items: center;
 
   background-color: var(--blue-color);
   box-shadow: 0 5px 10px 3px var(--light-purple-color);
@@ -63,6 +64,7 @@ export default {
 
 
 .farm-list-element__general-info {
+  padding: 0 15px 0 0;
   width: 40%;
 }
 
@@ -75,13 +77,13 @@ export default {
 .farm-list-element__description {
   margin: 0 0 15px 0;
 
-  font-size: 20px;
+  font-size: 19px;
   color: #cccccc;
 }
 
 
 .farm-list-element__additional-info {
-  width: 25%;
+  flex: 1 1 auto;
 }
 
 .farm-list-element__info-row {
@@ -102,14 +104,6 @@ export default {
   font-weight: 500;
 }
 
-
-.farm-list-element__button-wrapper {
-  flex: 1 1 auto;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
 .farm-list-element__button {
   height: 60px;
