@@ -14,7 +14,7 @@
 import Sidebar from "@/components/Sidebar/Sidebar";
 import {sidebarWidth} from "@/components/Sidebar/state";
 import Authorization from "@/views/Authorization"
-import {mapGetters} from "vuex"
+import {mapGetters, mapMutations} from "vuex"
 
 
 export default {
@@ -24,13 +24,23 @@ export default {
       authorizationStatus: "authorization/getAuthorizationStatus"
     })
   },
+  methods: {
+    ...mapMutations({
+      setToken: "authorization/setToken",
+      setUser: "user/setUser"
+    })
+  },
   setup() {
     return {sidebarWidth}
   },
   mounted() {
-    if (localStorage.token) {
-      this.$store.commit('authorization/setToken', localStorage.token)
+    if (!localStorage.token || !localStorage.user) {
+      console.log("No correct info in localStorage")
+      return
     }
+
+    this.setToken(localStorage.token)
+    this.setUser(JSON.parse(localStorage.user))
   }
 }
 </script>
