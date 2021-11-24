@@ -4,9 +4,12 @@
               :left-option="'my own farms'"
               :right-option="'other farms'"
               @option-selected="switcherOptionSelected"/>
-    <FarmListPlug class="home__own-farms-plug"
+    <FarmListPlug class="home__farm-list-plug"
+                  v-if="farmListIsEmptyStatus"
                   :farms-filter="farmsFilter"/>
-    <FarmList/>
+    <FarmList class="home__farm-list"
+              v-else
+              :farm-info-array="currentFarmList"/>
   </div>
 </template>
 
@@ -14,6 +17,7 @@
 import Switcher from "@/components/Switcher/Switcher";
 import FarmList from "@/components/FarmList/FarmList";
 import FarmListPlug from "@/components/FarmList/FarmListPlug";
+import {mapState} from "vuex";
 
 export default {
   name: "Home",
@@ -21,6 +25,19 @@ export default {
   data: () => ({
     farmsFilter: "own"
   }),
+  computed: {
+    ...mapState({
+      ownFarms: state => state.farms.ownFarms
+    }),
+    farmListIsEmptyStatus() {
+      return (
+        this.farmsFilter === 'own' && !this.ownFarms.length ||
+        this.farmsFilter === 'other')
+    },
+    currentFarmList() {
+      return this.ownFarms
+    }
+  },
   methods: {
     switcherOptionSelected(selectedOptionPosition) {
       this.farmsFilter = selectedOptionPosition === "left" ? "own" : "other"
@@ -40,13 +57,18 @@ export default {
 
 
 .home__switcher {
-  margin: 0 0 30px 0;
+  margin: 0 0 70px 0;
   width: 35vw;
   height: 60px;
 }
 
 
-.home__own-farms-plug {
+.home__farm-list-plug {
   width: 90%;
+}
+
+
+.home__farm-list {
+  width: 75%;
 }
 </style>
