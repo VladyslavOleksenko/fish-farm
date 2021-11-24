@@ -1,15 +1,21 @@
 <template>
   <div class="home">
+    <MyModal v-if="createFarmModalVisibilityStatus"
+             @hide="createFarmModalVisibilityStatus = false">
+      <CreateFarmForm/>
+    </MyModal>
     <Switcher class="home__switcher"
               :left-option="'my own farms'"
               :right-option="'other farms'"
               @option-selected="switcherOptionSelected"/>
     <FarmListPlug class="home__farm-list-plug"
                   v-if="farmListIsEmptyStatus"
-                  :farms-filter="farmsFilter"/>
+                  :farms-filter="farmsFilter"
+                  @open-create-farm-modal="createFarmModalVisibilityStatus = true"/>
     <FarmList class="home__farm-list"
               v-else
-              :farm-info-array="currentFarmList"/>
+              :farm-info-array="currentFarmList"
+              @open-create-farm-modal="createFarmModalVisibilityStatus = true"/>
   </div>
 </template>
 
@@ -18,12 +24,15 @@ import Switcher from "@/components/Switcher/Switcher";
 import FarmList from "@/components/FarmList/FarmList";
 import FarmListPlug from "@/components/FarmList/FarmListPlug";
 import {mapState, mapActions} from "vuex";
+import MyModal from "@/components/UI/MyModal";
+import CreateFarmForm from "@/components/CreateFarm/CreateFarmForm";
 
 export default {
   name: "Home",
-  components: {FarmListPlug, FarmList, Switcher},
+  components: {CreateFarmForm, MyModal, FarmListPlug, FarmList, Switcher},
   data: () => ({
-    farmsFilter: "own"
+    farmsFilter: "own",
+    createFarmModalVisibilityStatus: false
   }),
   computed: {
     ...mapState({
