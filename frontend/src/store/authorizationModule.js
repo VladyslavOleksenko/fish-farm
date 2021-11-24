@@ -14,5 +14,10 @@ export default {
       localStorage.token = token
     }
   },
-  actions: {}
+  actions: {
+    logout({commit}) {
+      commit('setToken', "")
+      localStorage.clear()
+    }
+  }
 }
