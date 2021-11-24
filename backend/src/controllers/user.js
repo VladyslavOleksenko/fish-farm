@@ -9,35 +9,44 @@ router.post("/login", login)
 
 
 async function register(request, response) {
-  const candidate = findUserByEmail(request.body.email)
+  const candidate = await findUserByEmail(request.body.email)
   if (candidate) {
     return response.status(409).json({
       message: `User with email ${request.body.email} already exists`
     })
   }
 
-  const tableName = "user"
-  const fieldNames = [
-    "user_id",
-    "email",
-    "password",
-    "first_name",
-    "last_name",
-    "avatar"
-  ]
-  const fieldValues = [
-    null,
-    request.body.email,
-    request.body.password,
-    request.body.firstName,
-    request.body.lastName,
-    null
-  ]
+  try {
+    const tableName = "user"
+    const fieldNames = [
+      "user_id",
+      "email",
+      "password",
+      "first_name",
+      "last_name",
+      "avatar"
+    ]
+    const fieldValues = [
+      null,
+      request.body.email,
+      request.body.password,
+      request.body.firstName,
+      request.body.lastName,
+      null
+    ]
 
-  const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
-  await sendDataBaseQuery(sqlCommand)
+    const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
+    await sendDataBaseQuery(sqlCommand)
 
-  response.status(200).json({message: "success registration"})
+    const newUser = await findUserByEmail(request.body.email)
+    const token = generateToken({
+      userId: newUser.userId,
+      email: newUser.email
+    })
+    response.status(200).json({token})
+  } catch (exception) {
+    response.status(500).json({message: exception.message})
+  }
 }
 
 async function login(request, response) {
@@ -56,22 +65,24 @@ async function login(request, response) {
     })
   }
 
-  const tokenExpiresIn = 60 * 60
-  const token = jsonwebtoken.sign({
+  const token = generateToken({
     userId: candidate.userId,
     email: candidate.email
-  }, jsonwebtokenKey, {expiresIn: tokenExpiresIn})
-
-  response.status(200).json({
-    token: `Bearer ${token}`
   })
+
+  response.status(200).json({token})
+}
+
+function generateToken(payload) {
+  const expiresIn = 60 * 60
+  return "Bearer " + jsonwebtoken.sign(payload, jsonwebtokenKey, {expiresIn})
 }
 
 async function findUserByEmail(email) {
   const sqlCommand = `SELECT * FROM user WHERE email LIKE '${email}'`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
 
-  if (dataBaseResponse.rows.length) {
+  if (dataBaseResponse && dataBaseResponse.rows && dataBaseResponse.rows.length) {
     return dataBaseResponse.rows[0]
   }
   return null
