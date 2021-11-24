@@ -4,7 +4,7 @@ export default {
     token: "",
   }),
   getters: {
-    getAuthorizationStatus (state) {
+    getAuthorizationStatus(state) {
       return !!state.token
     }
   },
