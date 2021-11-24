@@ -1,13 +1,13 @@
 <template>
   <div class="farm-list-element">
     <div class="farm-list-element__general-info">
-      <div class="farm-list-element__name">Farm list element</div>
-      <div class="farm-list-element__description">Farm list element</div>
+      <div class="farm-list-element__name">{{farmInfo.name}}</div>
+      <div class="farm-list-element__description">{{farmInfo.description}}</div>
     </div>
     <div class="farm-list-element__additional-info">
       <div class="farm-list-element__info-row">
         <div class="farm-list-element__info-parameter">owner:</div>
-        <div class="farm-list-element__info-value">You</div>
+        <div class="farm-list-element__info-value">{{owner}}</div>
       </div>
       <div class="farm-list-element__info-row">
         <div class="farm-list-element__info-parameter">administrators:</div>
@@ -27,10 +27,24 @@
 </template>
 
 <script>
+import {mapState} from "vuex";
+
 export default {
   name: "FarmListElement",
   props: {
     farmInfo: {type: Object, required: true}
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    owner() {
+      if (this.farmInfo.ownerId === this.user.userId) {
+        return "You"
+      } else {
+        return "smb else"
+      }
+    }
   }
 }
 </script>
