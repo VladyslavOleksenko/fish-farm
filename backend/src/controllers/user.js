@@ -43,7 +43,7 @@ async function register(request, response) {
       userId: newUser.userId,
       email: newUser.email
     })
-    response.status(200).json({token, user: newUser})
+    response.status(200).json({token, user: createUserObject(newUser)})
   } catch (exception) {
     response.status(500).json({message: exception.message})
   }
@@ -70,7 +70,7 @@ async function login(request, response) {
     email: candidate.email
   })
 
-  response.status(200).json({token, user: candidate})
+  response.status(200).json({token, user: createUserObject(candidate)})
 }
 
 function generateToken(payload) {
@@ -86,6 +86,22 @@ async function findUserByEmail(email) {
     return dataBaseResponse.rows[0]
   }
   return null
+}
+
+function createUserObject(dataBaseUser) {
+  try {
+    return {
+      userId: dataBaseUser["user_id"],
+      email: dataBaseUser.email,
+      password: dataBaseUser.password,
+      firstName: dataBaseUser["first_name"],
+      lastName: dataBaseUser["last_name"],
+      avatar: dataBaseUser["avatar"]
+    }
+  } catch (exception) {
+    console.log("Can't create user object")
+    console.log(exception)
+  }
 }
 
 
