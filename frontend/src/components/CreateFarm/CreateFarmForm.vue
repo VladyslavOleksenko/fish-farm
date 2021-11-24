@@ -13,17 +13,34 @@
            type="submit"
            value="Create farm"
            :disabled="!farmName"
-           @click.prevent>
+           @click.prevent="sendRequest">
   </form>
 </template>
 
 <script>
+import {mapState} from "vuex";
+import {createFarm} from "@/assets/js/serverRequest";
+
 export default {
   name: "CreateFarmForm",
   data: () => ({
     farmName: "",
     farmDescription: ""
-  })
+  }),
+  computed: {
+    ...mapState({
+      userId: state => state.user.user.userId
+    })
+  },
+  methods: {
+    async sendRequest() {
+      const serverResponse =
+        await createFarm(this.userId, this.farmName, this.farmDescription)
+
+      const newFarmId = serverResponse.newFarmId
+      console.log(newFarmId)
+    }
+  }
 }
 </script>
 
