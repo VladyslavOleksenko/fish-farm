@@ -1,0 +1,106 @@
+<template>
+  <form action="" class="create-farm-from">
+    <div class="create-farm-form__slogan">Let`s create your farm!</div>
+
+    <input class="create-farm-form__input"
+           type="text"
+           placeholder="Farm name *"
+           v-model="farmName">
+    <textarea class="create-farm-form__textarea"
+              placeholder="Farm description"
+              v-model="farmDescription"></textarea>
+    <input class="create-farm-form__submit"
+           type="submit"
+           value="Create farm"
+           :disabled="!farmName"
+           @click.prevent>
+  </form>
+</template>
+
+<script>
+export default {
+  name: "CreateFarmForm",
+  data: () => ({
+    farmName: "",
+    farmDescription: ""
+  })
+}
+</script>
+
+<style scoped>
+.create-farm-from {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.create-farm-form__slogan {
+  margin: 0 0 40px 0;
+
+  font-size: 25px;
+
+  color: #eeeeee;
+}
+
+
+.create-farm-form__input, .create-farm-form__textarea {
+  width: 100%;
+  margin: 0 0 15px 0;
+
+  font-size: 22px;
+
+  color: #fff;
+  background-color: var(--light-purple-color);
+  border-radius: 5px;
+  border: none;
+  outline: none;
+}
+
+.create-farm-form__input::placeholder, .create-farm-form__textarea::placeholder {
+  color: var(--light-gray-color);
+}
+
+.create-farm-form__input {
+  padding: 0 15px;
+  height: 53px;
+}
+
+.create-farm-form__textarea {
+  padding: 8px 15px;
+  height: 150px;
+}
+
+
+.create-farm-form__submit {
+  margin: 25px 0 0 0;
+  height: 50px;
+  padding: 0 50px;
+
+  font-size: 22px;
+  font-weight: 500;
+
+  color: #eee;
+  background-color: var(--blue-color);
+
+  border: none;
+  border-radius: 4px;
+  outline: none;
+
+  transition: background-color .2s ease;
+  cursor: pointer;
+}
+
+.create-farm-form__submit:hover {
+  background-color: #6fa360;
+}
+
+.create-farm-form__submit:active {
+  background-color: #5e8b52;
+}
+
+.create-farm-form__submit[disabled] {
+  color: #7f7f7f;
+  background: var(--light-purple-color);
+}
+</style>
