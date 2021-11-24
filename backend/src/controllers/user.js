@@ -43,7 +43,7 @@ async function register(request, response) {
       userId: newUser.userId,
       email: newUser.email
     })
-    response.status(200).json({token})
+    response.status(200).json({token, user: newUser})
   } catch (exception) {
     response.status(500).json({message: exception.message})
   }
@@ -70,7 +70,7 @@ async function login(request, response) {
     email: candidate.email
   })
 
-  response.status(200).json({token})
+  response.status(200).json({token, user: candidate})
 }
 
 function generateToken(payload) {
