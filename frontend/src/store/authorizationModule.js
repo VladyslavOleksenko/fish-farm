@@ -1,4 +1,4 @@
-export const authorizationModule = {
+export default {
   namespaced: true,
   state: () => ({
     token: "",
