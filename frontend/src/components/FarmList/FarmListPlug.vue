@@ -10,9 +10,9 @@
 
       <div class="farm-list-plug__content-row"
            v-if="farmsFilter === 'own'">
-        <button class="farm-list-plug__create-button">
-          Create farm
-        </button>
+        <div class="farm-list-plug__create-button-wrapper">
+          <CreateFarmButton @open-create-farm-modal="$emit('openCreateFarmModal')"/>
+        </div>
         <img class="farm-list-plug__image" src="../../../public/owner.svg" alt="">
       </div>
 
@@ -32,8 +32,10 @@
 </template>
 
 <script>
+import CreateFarmButton from "@/components/CreateFarm/CreateFarmButton";
 export default {
   name: "OwnFarmsPlug",
+  components: {CreateFarmButton},
   props: {
     farmsFilter: {type: String, required: true}
   },
@@ -84,34 +86,9 @@ export default {
   opacity: .8;
 }
 
-.farm-list-plug__create-button {
+.farm-list-plug__create-button-wrapper {
   margin: 0 0 0 30%;
   transform: translateX(-50%);
-  padding: 0 40px;
-  height: 70px;
-
-  font-size: 30px;
-  font-weight: 500;
-
-  color: #ccc;
-  background-color: var(--dark-purple-color);
-
-  border: none;
-  border-radius: 5px;
-  outline: none;
-
-  transition: background-color .2s ease,
-  color .2s ease;
-  cursor: pointer;
-}
-
-.farm-list-plug__create-button:hover {
-  background-color: var(--light-purple-color);
-  color: #ffffff;
-}
-
-.farm-list-plug__create-button:active {
-  color: #cccccc;
 }
 
 
