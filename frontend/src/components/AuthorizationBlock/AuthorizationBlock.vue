@@ -154,6 +154,7 @@ export default {
         this.setToken(serverResponse.token)
         this.setUser(serverResponse.user)
         this.registerServerError = ""
+        await this.$router.push("/profile")
       } catch (exception) {
         console.error(exception)
         this.registerServerError = exception.message
@@ -165,6 +166,7 @@ export default {
         this.setToken(serverResponse.token)
         this.setUser(serverResponse.user)
         this.loginServerError = ""
+        await this.$router.push("/profile")
       } catch (exception) {
         console.error(exception)
         this.loginServerError = exception.message
