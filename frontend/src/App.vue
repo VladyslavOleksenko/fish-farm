@@ -49,6 +49,9 @@ export default {
 }
 
 #page-body {
-  transition: var(--sidebar-transition)
+  min-height: 100vh;
+
+  transition: var(--sidebar-transition);
+  background-color: var(--light-gray-color);
 }
 </style>
