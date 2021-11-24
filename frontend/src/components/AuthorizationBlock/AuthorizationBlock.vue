@@ -94,7 +94,7 @@
 
 <script>
 import {register, login} from "@/assets/js/serverRequest"
-import {mapMutations} from "vuex"
+import {mapMutations, mapState} from "vuex"
 
 
 export default {
@@ -138,29 +138,35 @@ export default {
         return "Enter your password"
       }
       return null
-    }
+    },
+    ...mapState({
+      userInfo: state => state.user.userInfo
+    })
   },
   methods: {
     ...mapMutations({
-      setToken: "authorization/setToken"
+      setToken: "authorization/setToken",
+      setUser: "user/setUser"
     }),
     async sendRegisterRequest() {
-      let serverResponse
       try {
-        serverResponse = await register(this.registerData)
+        const serverResponse = await register(this.registerData)
         this.setToken(serverResponse.token)
+        this.setUser(serverResponse.user)
         this.registerServerError = ""
       } catch (exception) {
+        console.error(exception)
         this.registerServerError = exception.message
       }
     },
     async sendLoginRequest() {
-      let serverResponse
       try {
-        serverResponse = await login(this.loginData)
+        const serverResponse = await login(this.loginData)
         this.setToken(serverResponse.token)
+        this.setUser(serverResponse.user)
         this.loginServerError = ""
       } catch (exception) {
+        console.error(exception)
         this.loginServerError = exception.message
       }
     }
