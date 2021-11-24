@@ -17,7 +17,7 @@
 import Switcher from "@/components/Switcher/Switcher";
 import FarmList from "@/components/FarmList/FarmList";
 import FarmListPlug from "@/components/FarmList/FarmListPlug";
-import {mapState} from "vuex";
+import {mapState, mapActions} from "vuex";
 
 export default {
   name: "Home",
@@ -27,7 +27,8 @@ export default {
   }),
   computed: {
     ...mapState({
-      ownFarms: state => state.farms.ownFarms
+      ownFarms: state => state.farms.ownFarms,
+      user: state => state.user.user
     }),
     farmListIsEmptyStatus() {
       return (
@@ -39,9 +40,15 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      updateOwnFarms: "farms/updateOwnFarms"
+    }),
     switcherOptionSelected(selectedOptionPosition) {
       this.farmsFilter = selectedOptionPosition === "left" ? "own" : "other"
     }
+  },
+  mounted() {
+    this.updateOwnFarms(this.user.userId)
   }
 }
 </script>
