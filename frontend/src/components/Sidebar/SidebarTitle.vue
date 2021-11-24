@@ -38,7 +38,7 @@ export default {
 }
 
 .title:hover {
-  background-color: var(--sidebar-item-hover);
+  background-color: var(--light-purple-color);
 }
 
 .title__icon {

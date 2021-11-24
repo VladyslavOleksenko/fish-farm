@@ -60,12 +60,16 @@ export default {
   transition: background-color .2s ease;
 }
 
-.link-active {
-  background-color: var(--sidebar-item-active);
+.link:hover {
+  background-color: var(--light-purple-color);
 }
 
-.link:hover {
-  background-color: var(--sidebar-item-hover);
+.link-active {
+  background-color: var(--blue-color);
+}
+
+.link-active:hover {
+  background-color: var(--blue-color);
 }
 
 .link__icon {

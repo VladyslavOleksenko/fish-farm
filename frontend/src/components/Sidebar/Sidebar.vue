@@ -47,7 +47,7 @@ export default {
   display: flex;
   flex-direction: column;
 
-  background-color: var(--sidevar-bg-color);
+  background-color: var(--dark-purple-color);
 
   transition: var(--sidebar-transition);
 }
