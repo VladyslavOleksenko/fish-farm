@@ -37,8 +37,6 @@ export async function register(body) {
     body
   )
 
-  console.log("request params:", requestParams)
-
   return await sendServerRequest(requestParams)
 }
 
@@ -48,8 +46,6 @@ export async function login(body) {
     "http://localhost:5000/api/user/login",
     body
   )
-
-  console.log("request params:", requestParams)
 
   return await sendServerRequest(requestParams)
 }
