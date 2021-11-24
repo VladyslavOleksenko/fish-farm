@@ -88,6 +88,16 @@ async function findUserByEmail(email) {
   return null
 }
 
+async function findUserByUserId(userId) {
+  const sqlCommand = `SELECT * FROM user WHERE user_id LIKE '${userId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+
+  if (dataBaseResponse && dataBaseResponse.rows && dataBaseResponse.rows.length) {
+    return dataBaseResponse.rows[0]
+  }
+  return null
+}
+
 function createUserObject(dataBaseUser) {
   try {
     return {
@@ -106,5 +116,7 @@ function createUserObject(dataBaseUser) {
 
 
 module.exports = {
-  router: router
+  router,
+  findUserByEmail,
+  findUserByUserId
 }
