@@ -1,5 +1,5 @@
 <template>
-  <div v-if="this.$store.state.authorization.authorizationStatus">
+  <div v-if="authorizationStatus">
     <Sidebar/>
     <div id="page-body" :style="{'margin-left': sidebarWidth}">
       <router-view/>
@@ -14,11 +14,23 @@
 import Sidebar from "@/components/Sidebar/Sidebar";
 import {sidebarWidth} from "@/components/Sidebar/state";
 import Authorization from "@/views/Authorization"
+import {mapGetters} from "vuex"
+
 
 export default {
   components: {Sidebar, Authorization},
+  computed: {
+    ...mapGetters({
+      authorizationStatus: "authorization/getAuthorizationStatus"
+    })
+  },
   setup() {
     return {sidebarWidth}
+  },
+  mounted() {
+    if (localStorage.token) {
+      this.$store.commit('authorization/setToken', localStorage.token)
+    }
   }
 }
 </script>

@@ -1,19 +1,18 @@
 export const authorizationModule = {
+  namespaced: true,
   state: () => ({
-    authorizationStatus: false
+    token: "",
   }),
-  getters: {},
-  mutations: {
-    setAuthorizeStatus(state, authorizeStatus) {
-      state.authorizeStatus = authorizeStatus
+  getters: {
+    getAuthorizationStatus (state) {
+      return !!state.token
     }
   },
-  actions: {
-    authorize({commit}) {
-      commit('setAuthorizeStatus', true)
-    },
-    disAuthorize({commit}) {
-      commit('setAuthorizeStatus', false)
+  mutations: {
+    setToken(state, token) {
+      state.token = token
+      localStorage.token = token
     }
-  }
+  },
+  actions: {}
 }
