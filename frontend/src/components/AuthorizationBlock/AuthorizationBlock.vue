@@ -17,6 +17,14 @@
           action="http://localhost:5000/api/user"
           method="post"
           v-if="mode === 'register'">
+      <div class="form__error"
+           v-if="registerServerError">
+        {{ registerServerError }}
+      </div>
+      <div class="form__advice"
+           v-if="registerDataValidationError">
+        Fill all the fields
+      </div>
       <div class="form__input-fields-row">
         <input class="form__input"
                type="text"
@@ -42,6 +50,7 @@
 
       <div class="form__submit-wrapper">
         <button class="form__submit"
+                :disabled="registerDataValidationError"
                 @click.prevent="sendRegisterRequest">
           Register
         </button>
@@ -51,6 +60,14 @@
     <form class="wrapper__login-form form"
           action=""
           v-else-if="mode === 'login'">
+      <div class="form__error"
+           v-if="loginServerError">
+        {{ loginServerError }}
+      </div>
+      <div class="form__advice"
+           v-if="loginDataValidationError">
+        Fill all the fields
+      </div>
       <div class="form__input-fields-row">
         <input class="form__input"
                type="email"
@@ -66,7 +83,7 @@
 
       <div class="form__submit-wrapper">
         <button class="form__submit"
-                disabled
+                :disabled="loginDataValidationError"
                 @click.prevent="sendLoginRequest">
           Login
         </button>
@@ -77,6 +94,8 @@
 
 <script>
 import {register, login} from "@/assets/js/serverRequest"
+import {mapMutations} from "vuex"
+
 
 export default {
   name: "AuthorizationBlock",
@@ -91,16 +110,59 @@ export default {
     loginData: {
       email: "",
       password: ""
-    }
+    },
+    registerServerError: "",
+    loginServerError: ""
   }),
+  computed: {
+    registerDataValidationError() {
+      if (!this.registerData.firstName) {
+        return "Enter your first name"
+      }
+      if (!this.registerData.lastName) {
+        return "Enter your last name"
+      }
+      if (!this.registerData.email) {
+        return "Enter your email"
+      }
+      if (!this.registerData.password) {
+        return "Create your password"
+      }
+      return null
+    },
+    loginDataValidationError() {
+      if (!this.loginData.email) {
+        return "Enter your email"
+      }
+      if (!this.loginData.password) {
+        return "Enter your password"
+      }
+      return null
+    }
+  },
   methods: {
+    ...mapMutations({
+      setToken: "authorization/setToken"
+    }),
     async sendRegisterRequest() {
-      const serverResponse = await register(this.registerData)
-      console.log(serverResponse)
+      let serverResponse
+      try {
+        serverResponse = await register(this.registerData)
+        this.setToken(serverResponse.token)
+        this.registerServerError = ""
+      } catch (exception) {
+        this.registerServerError = exception.message
+      }
     },
     async sendLoginRequest() {
-      const serverResponse = await login(this.loginData)
-      console.log(serverResponse)
+      let serverResponse
+      try {
+        serverResponse = await login(this.loginData)
+        this.setToken(serverResponse.token)
+        this.loginServerError = ""
+      } catch (exception) {
+        this.loginServerError = exception.message
+      }
     }
   }
 }
@@ -166,6 +228,24 @@ export default {
 
 .switcher__button-right {
   left: 50%;
+}
+
+
+.form__error, .form__advice {
+  margin: 0 0 20px;
+  padding: 0 20px;
+
+  text-align: center;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.form__error {
+  color: #ff2c2c;
+}
+
+.form__advice {
+  color: #8ddd72;
 }
 
 
