@@ -4,6 +4,7 @@ const {findUserByUserId} = require("./user")
 
 const router = express.Router()
 router.get("/ownFarms", getOwnFarms)
+router.post("/create", createFarm)
 
 
 async function getOwnFarms(request, response) {
@@ -22,6 +23,40 @@ async function getOwnFarms(request, response) {
     throwError(exception)
   }
 }
+
+async function createFarm(request, response) {
+  try {
+    const user = await findUserByUserId(request.body.userId)
+    if (!user) {
+      return throwError(`No user with id ${request.query.userId}`)
+    }
+
+    const tableName = "farm"
+    const fieldNames = [
+      "farm_id",
+      "name",
+      "description",
+      "owner_id"
+    ]
+    const fieldValues = [
+      null,
+      request.body.name,
+      request.body.description,
+      request.body.userId
+    ]
+
+    const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
+    const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+    const newFarmId = dataBaseResponse.rows.insertId
+
+    response.status(200).json({newFarmId})
+  } catch (exception) {
+    response.status(500).json({message: exception})
+    throwError("Can't create a farm")
+    throwError(exception)
+  }
+}
+
 
 async function findFarmsByOwnerId(ownerId) {
   const sqlCommand = `SELECT *
