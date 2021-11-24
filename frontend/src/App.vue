@@ -54,7 +54,7 @@ export default {
   -webkit-box-sizing: border-box;
 }
 
-#app, button, input {
+#app, button, input, textarea {
   font-family: 'Montserrat', Arial, sans-serif;
 }
 
