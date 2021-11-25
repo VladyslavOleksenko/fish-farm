@@ -20,7 +20,7 @@
     </div>
     <div class="farm-list-element__button-wrapper">
       <button class="farm-list-element__button"
-              @click="$router.push({name: 'Farm', params: {farmId: farmInfo.farmId}})">
+              @click="$router.push({name: 'Farm', params: {farmId: this.farmInfo.farmId}})">
         See more
       </button>
     </div>
