@@ -1,48 +1,7 @@
-const express = require("express")
-const {sendDataBaseQuery} = require("./../dataBase");
-const {getFarmByFarmId} = require("./farm")
-const {getUserByUserId, formatUser} = require("./user");
-const logError = require("../errorHandler")
-
-
-const router = express.Router()
-router.get("/byFarm", getAdministratorArrayRequest)
-router.delete("/byFarm", deleteAllFarmAdministratorsRequest)
-
-
-async function getAdministratorArrayRequest(request, response) {
-  try {
-    const farmId = request.query.farmId
-    const administratorArray = await getAdministratorArray(farmId)
-    const administratorArrayFormatted =
-      await formatAdministratorArray(administratorArray)
-    response.status(200).json(administratorArrayFormatted)
-  } catch (exception) {
-    const message = "Can't get administrator array"
-    response.status(500).json({message})
-    logError(message)
-    logError(exception)
-  }
-}
-
-async function deleteAllFarmAdministratorsRequest(request, response) {
-  try {
-    const farmId = request.query.farmId
-    await deleteAllFarmAdministrators(farmId)
-    response.status(200).json({message: "done"})
-  } catch (exception) {
-    const message = "Can't delete all farm administrators"
-    response.status(500).json(message)
-    logError(message)
-    logError(exception)
-  }
-}
-
-
-async function getAdministratorArray(farmId) {
+const getAdministratorArray = module.exports.getAdministratorArray = async function(farmId) {
   const farm = await getFarmByFarmId(farmId)
   if (!farm) {
-     throw new Error(`No farm with id ${farmId}`)
+    throw new Error(`No farm with id ${farmId}`)
   }
 
   const sqlCommand = `SELECT *
@@ -52,14 +11,7 @@ async function getAdministratorArray(farmId) {
   return dataBaseResponse.rows
 }
 
-async function deleteAllFarmAdministrators(farmId) {
-  const farmAdministratorsIdArray = await getAdministratorsIdArray(farmId)
-  for (let farmAdministratorId of farmAdministratorsIdArray) {
-    await deleteFarmAdministrator(farmAdministratorId)
-  }
-}
-
-async function getAdministratorsIdArray(farmId) {
+const getAdministratorsIdArray = module.exports.getAdministratorsIdArray = async function(farmId) {
   const administratorArray = await getAdministratorArray(farmId)
   if (!administratorArray) {
     throw new Error(`Can't get administrator array ${farmId}`)
@@ -72,7 +24,14 @@ async function getAdministratorsIdArray(farmId) {
   return administratorsIdArray
 }
 
-async function deleteFarmAdministrator(farmAdministratorId) {
+const deleteAllFarmAdministrators = module.exports.deleteAllFarmAdministrators = async function(farmId) {
+  const farmAdministratorsIdArray = await getAdministratorsIdArray(farmId)
+  for (let farmAdministratorId of farmAdministratorsIdArray) {
+    await deleteFarmAdministrator(farmAdministratorId)
+  }
+}
+
+const deleteFarmAdministrator = module.exports.deleteFarmAdministrator = async function(farmAdministratorId) {
   const sqlCommand = `DELETE
                       FROM farm_administrator
                       WHERE farm_administrator_id = ${farmAdministratorId}`
@@ -80,7 +39,7 @@ async function deleteFarmAdministrator(farmAdministratorId) {
 }
 
 
-async function formatAdministratorArray(administratorArray) {
+const formatAdministratorArray = module.exports.formatAdministratorArray = async function(administratorArray) {
   let newAdministratorArray = []
   for (let administrator of administratorArray) {
     newAdministratorArray.push(await formatAdministrator(administrator))
@@ -88,7 +47,7 @@ async function formatAdministratorArray(administratorArray) {
   return newAdministratorArray
 }
 
-async function formatAdministrator(administrator) {
+const formatAdministrator = module.exports.formatAdministrator = async function(administrator) {
   const dbUser = await getUserByUserId(administrator["user_id"])
   const dbUserFormatted = formatUser(dbUser)
   return {
@@ -106,6 +65,6 @@ async function formatAdministrator(administrator) {
 }
 
 
-module.exports = {
-  router,
-}
+const {sendDataBaseQuery} = require("./../dataBase");
+const {getFarmByFarmId} = require("./farm")
+const {getUserByUserId, formatUser} = require("./user");

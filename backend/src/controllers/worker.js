@@ -1,42 +1,45 @@
-const express = require("express")
-const {sendDataBaseQuery} = require("./../dataBase");
-const {getUserByUserId, formatUser} = require("./user")
-const {getFarmByFarmId} = require("./farm");
-const logError = require("../errorHandler")
-
-const router = express.Router()
-router.get("/byFarm", getWorkerArrayRequest)
-
-
-async function getWorkerArrayRequest(request, response) {
-  try {
-    const farmId = request.query.farmId
-    const workerArray = await getWorkerArray(farmId)
-    const workerArrayFormatted = await formatWorkerArray(workerArray)
-    response.status(200).json(workerArrayFormatted)
-  } catch (exception) {
-    const message = "Can't get worker array"
-    response.status(500).json({message})
-    logError(message, exception)
-  }
-}
-
-
-async function getWorkerArray(farmId) {
+const getWorkerArray = module.exports.getWorkerArray = async function(farmId) {
   const farm = await getFarmByFarmId(farmId)
   if (!farm) {
     throw new Error(`No farm with id ${farmId}`)
   }
 
   const sqlCommand = `SELECT *
-                    FROM farm_worker
-                    WHERE farm_id LIKE '${farmId}'`
+                      FROM farm_worker
+                      WHERE farm_id LIKE '${farmId}'`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows
 }
 
+const getWorkersIdArray = module.exports.getWorkersIdArray = async function(farmId) {
+  const workerArray = await getWorkerArray(farmId)
+  if (!workerArray) {
+    throw new Error(`Can't get worker array ${farmId}`)
+  }
 
-async function formatWorkerArray(workerArray) {
+  let workersIdArray = []
+  for (let worker of workerArray) {
+    workersIdArray.push(worker["farm_worker_id"])
+  }
+  return workersIdArray
+}
+
+const deleteAllFarmWorkers = module.exports.deleteAllFarmWorkers = async function(farmId) {
+  const farmWorkersIdArray = await getWorkersIdArray(farmId)
+  for (let farmWorkerId of farmWorkersIdArray) {
+    await deleteFarmWorker(farmWorkerId)
+  }
+}
+
+const deleteFarmWorker = module.exports.deleteFarmWorker = async function(farmWorkerId) {
+  const sqlCommand = `DELETE
+                      FROM farm_worker
+                      WHERE farm_worker_id = ${farmWorkerId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
+
+const formatWorkerArray = module.exports.formatWorkerArray = async function(workerArray) {
   let newWorkerArray = []
   for (let worker of workerArray) {
     newWorkerArray.push(await formatWorker(worker))
@@ -44,7 +47,7 @@ async function formatWorkerArray(workerArray) {
   return newWorkerArray
 }
 
-async function formatWorker(worker) {
+const formatWorker = module.exports.formatWorker = async function(worker) {
   const dbUser = await getUserByUserId(worker["user_id"])
   const dbUserFormatted = formatUser(dbUser)
   return {
@@ -59,6 +62,6 @@ async function formatWorker(worker) {
 }
 
 
-module.exports = {
-  router,
-}
+const {sendDataBaseQuery} = require("./../dataBase");
+const {getUserByUserId, formatUser} = require("./user")
+const {getFarmByFarmId} = require("./farm");

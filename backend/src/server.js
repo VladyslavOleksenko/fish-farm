@@ -1,10 +1,10 @@
 const express = require("express")
 const cors = require("cors")
 
-const userRouter = require("./controllers/user").router
-const farmRouter = require("./controllers/farm").router
-const administratorRouter = require("./controllers/administrator").router
-const workerRouter = require("./controllers/worker").router
+const userRouter = require("./routers/user")
+const farmRouter = require("./routers/farm")
+const administratorRouter = require("./routers/administrator")
+const workerRouter = require("./routers/worker")
 
 
 const app = express()

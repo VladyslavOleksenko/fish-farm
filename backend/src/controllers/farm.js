@@ -1,67 +1,4 @@
-const express = require("express")
-const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
-const {getUserByUserId, formatUser} = require("./user")
-const throwError = require("../errorHandler")
-
-const router = express.Router()
-router.get("/", getFarmRequest)
-router.get("/ownFarms", getFarmArrayByOwnerIdRequest)
-router.post("/create", createFarmRequest)
-router.get("/owner", getFarmOwnerRequest)
-
-
-async function getFarmRequest(request, response) {
-  try {
-    const farmId = request.query.farmId
-    const farm = await getFarmByFarmId(farmId)
-    response.json(farm)
-  } catch (exception) {
-    const message = "Can't get farm"
-    response.status(500).json({message})
-    throwError(message, exception)
-  }
-}
-
-async function getFarmArrayByOwnerIdRequest(request, response) {
-  try {
-    const ownerId = request.query.userId
-    const farmArray = await getFarmArrayByOwnerId(ownerId)
-    const farmArrayFormatted = formatFarmArray(farmArray)
-    response.json(farmArrayFormatted)
-  } catch (exception) {
-    const message = "Can't get farm array by owner id"
-    response.status(500).json({message})
-    throwError(message, exception)
-  }
-}
-
-async function createFarmRequest(request, response) {
-  try {
-    const newFarmData = request.body
-    const newFarmId = await createFarm(newFarmData)
-    response.status(200).json({newFarmId})
-  } catch (exception) {
-    const message = "Can't create a farm"
-    response.status(500).json({message})
-    throwError(message, exception)
-  }
-}
-
-async function getFarmOwnerRequest(request, response) {
-  try {
-    const farmId = request.query.farmId
-    const farmOwner = await getFarmOwner(farmId)
-    const farmOwnerFormatted = formatUser(farmOwner)
-    response.status(200).json(farmOwnerFormatted)
-  } catch (exception) {
-    const message = "Can't get farm owner"
-    response.status(500).json({message})
-    throwError(message, exception)
-  }
-}
-
-
-async function getFarmArrayByOwnerId(ownerId) {
+const getFarmArrayByOwnerId = module.exports.getFarmArrayByOwnerId = async function(ownerId) {
   const sqlCommand = `SELECT *
                       FROM farm
                       WHERE owner_id LIKE '${ownerId}'`
@@ -69,7 +6,7 @@ async function getFarmArrayByOwnerId(ownerId) {
   return dataBaseResponse.rows
 }
 
-async function getFarmByFarmId(farmId) {
+const getFarmByFarmId = module.exports.getFarmByFarmId = async function(farmId) {
   const sqlCommand = `SELECT *
                       FROM farm
                       WHERE farm_id LIKE '${farmId}'`
@@ -77,7 +14,7 @@ async function getFarmByFarmId(farmId) {
   return dataBaseResponse.rows[0]
 }
 
-async function getFarmOwner(farmId) {
+const getFarmOwner = module.exports.getFarmOwner = async function(farmId) {
   const farm = await getFarmByFarmId(farmId)
   if (!farm) {
     throw new Error(`No farm with id ${farmId}`)
@@ -91,7 +28,7 @@ async function getFarmOwner(farmId) {
   return farmOwner
 }
 
-async function createFarm(newFarmData) {
+const createFarm = module.exports.createFarm = async function(newFarmData) {
   const user = await getUserByUserId(newFarmData.userId)
   if (!user) {
     throw new Error(`No user with id ${newFarmData.userId}`)
@@ -116,8 +53,23 @@ async function createFarm(newFarmData) {
   return dataBaseResponse.rows.insertId
 }
 
+const deleteFarm = module.exports.deleteFarm = async function(farmId) {
+  const farm = getFarmByFarmId(farmId)
+  if (!farm) {
+    throw new Error(`No farm with id ${farmId}`)
+  }
 
-function formatFarmArray(farmArray) {
+  await deleteAllFarmAdministrators(farmId)
+  await deleteAllFarmWorkers(farmId)
+
+  const sqlCommand = `DELETE
+                      FROM farm
+                      WHERE farm_id = ${farmId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
+
+const formatFarmArray = module.exports.formatFarmArray = function(farmArray) {
   let farmArrayFormatted = []
   for (let farm of farmArray) {
     farmArrayFormatted.push(formatFarm(farm))
@@ -125,7 +77,7 @@ function formatFarmArray(farmArray) {
   return farmArrayFormatted
 }
 
-function formatFarm(farm) {
+const formatFarm = module.exports.formatFarm = function(farm) {
   return {
     farmId: farm["farm_id"],
     name: farm.name,
@@ -135,7 +87,7 @@ function formatFarm(farm) {
 }
 
 
-module.exports = {
-  router: router,
-  getFarmByFarmId
-}
+const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
+const {getUserByUserId} = require("./user")
+const {deleteAllFarmWorkers} = require("./worker");
+const {deleteAllFarmAdministrators} = require("./administrator");
