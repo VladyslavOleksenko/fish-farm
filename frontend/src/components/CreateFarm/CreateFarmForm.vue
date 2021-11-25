@@ -38,7 +38,7 @@ export default {
         await createFarm(this.userId, this.farmName, this.farmDescription)
 
       const newFarmId = serverResponse.newFarmId
-      console.log(newFarmId)
+      await this.$router.push({name: 'Farm', params: {farmId: newFarmId}})
     }
   }
 }
