@@ -1,11 +1,12 @@
 const express = require("express")
 const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
-const {findUserByUserId} = require("./user")
+const {findUserByUserId, createUserObject} = require("./user")
 
 const router = express.Router()
 router.get("/", getFarm)
 router.get("/ownFarms", getOwnFarms)
 router.post("/create", createFarm)
+router.get("/owner", getFarmOwner)
 
 
 async function getOwnFarms(request, response) {
@@ -64,17 +65,41 @@ async function createFarm(request, response) {
 
 async function getFarm(request, response) {
   try {
-    const farm = await findFarmById(request.query.farmId)
+    const farm = await findFarmByFarmId(request.query.farmId)
     if (!farm) {
       const errorMessage = `No farm with id ${request.query.farmId}`
       response.status(404).json({message: errorMessage})
       throwError(errorMessage)
     }
-
-    response.json({farm})
+    response.json(farm)
   } catch (exception) {
     response.status(500).json({message: exception})
     throwError("Can't get farm")
+    throwError(exception)
+  }
+}
+
+async function getFarmOwner(request, response) {
+  try {
+    const farm = await findFarmByFarmId(request.query.farmId)
+    if (!farm) {
+      const errorMessage = `No farm with id ${request.query.farmId}`
+      response.status(404).json({message: errorMessage})
+      return throwError(errorMessage)
+    }
+
+    const owner = await findUserByUserId(farm.ownerId)
+    if (!owner) {
+      const errorMessage = `No user with id ${farm.ownerId}`
+      response.status(404).json({message: errorMessage})
+      return throwError(errorMessage)
+    }
+
+    const ownerFormatted = createUserObject(owner)
+    response.status(200).json(ownerFormatted)
+  } catch (exception) {
+    response.status(500).json({message: exception})
+    throwError("Can't get farm owner")
     throwError(exception)
   }
 }
@@ -92,7 +117,7 @@ async function findFarmsByOwnerId(ownerId) {
   return null
 }
 
-async function findFarmById(farmId) {
+async function findFarmByFarmId(farmId) {
   const sqlCommand = `SELECT *
                       FROM farm
                       WHERE farm_id LIKE '${farmId}'`
@@ -132,5 +157,6 @@ function throwError(error) {
 
 
 module.exports = {
-  router: router
+  router: router,
+  findFarmByFarmId
 }
