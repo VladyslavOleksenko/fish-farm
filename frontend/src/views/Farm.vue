@@ -11,17 +11,23 @@
       <div class="farm__description">{{ farmInfo.description }}</div>
     </div>
 
-    <Staff class="farm__staff"
-           category="owner"
-           :user-array="[owner]"/>
+    <div class="farm__info-block">
+      <div class="farm__staff-block">
+        <Staff class="farm__staff"
+               category="owner"
+               :user-array="[owner]"/>
 
-    <Staff class="farm__staff"
-           category="administrators"
-           :user-array="administratorArray"/>
+        <Staff class="farm__staff"
+               category="administrators"
+               :user-array="administratorArray"/>
 
-    <Staff class="farm__staff"
-           category="workers"
-           :user-array="workerArray"/>
+        <Staff class="farm__staff"
+               category="workers"
+               :user-array="workerArray"/>
+      </div>
+
+      <Pools class="farm__pools" :farm-id="farmId"/>
+    </div>
 
     <MyModal v-if="deleteModalVisibilityStatus"
              @hide="deleteModalVisibilityStatus = false">
@@ -54,10 +60,11 @@ import {
   deleteFarm
 } from "@/assets/js/serverRequest";
 import MyModal from "@/components/UI/MyModal";
+import Pools from "@/components/PoolsBlock/Pools";
 
 export default {
   name: "Farm.vue",
-  components: {MyModal, Staff},
+  components: {Pools, MyModal, Staff},
   data: () => ({
     farmInfo: {},
     owner: {},
@@ -149,8 +156,23 @@ export default {
 }
 
 
+.farm__info-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+
+.farm__staff-block {
+  width: 40%;
+}
+
 .farm__staff {
   margin: 0 0 45px 0;
+}
+
+
+.farm__pools {
   width: 40%;
 }
 
