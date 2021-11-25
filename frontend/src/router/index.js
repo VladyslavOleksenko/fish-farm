@@ -22,6 +22,12 @@ const routes = [
     component: () => import("@/views/Profile")
   },
   {
+    path: "/farm/:farmId",
+    name: "Farm",
+    component: () => import("@/views/Farm"),
+    params: true
+  },
+  {
     path: "/logout",
     name: "Logout",
     redirect: "/"
