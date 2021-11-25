@@ -8,28 +8,42 @@
     </div>
 
     <Staff class="farm__staff"
-           category="administrators"/>
+           category="owner"
+           :user-array="[owner]"/>
 
     <Staff class="farm__staff"
-           category="workers"/>
+           category="administrators"
+           :user-array="administratorArray"/>
+
+    <Staff class="farm__staff"
+           category="workers"
+           :user-array="workerArray"/>
   </div>
 </template>
 
 <script>
 import Staff from "@/components/StaffBlock/Staff";
-import {getFarm} from "@/assets/js/serverRequest";
+import {getFarm, getFarmOwner, getFarmAdministrators, getFarmWorkers} from "@/assets/js/serverRequest";
 
 export default {
   name: "Farm.vue",
   components: {Staff},
   data: () => ({
-    farmInfo: {}
+    farmInfo: {},
+    owner: {},
+    workerArray: [],
+    administratorArray: []
   }),
+  computed: {
+    farmId() {
+      return this.$route.params.farmId
+    }
+  },
   async mounted() {
-    const farmId = this.$route.params.farmId
-    const serverResponse = await getFarm(farmId)
-
-    this.farmInfo = serverResponse.farm
+    this.farmInfo = await getFarm(this.farmId)
+    this.owner = await getFarmOwner(this.farmId)
+    this.workerArray = await getFarmWorkers(this.farmId)
+    this.administratorArray = await getFarmAdministrators(this.farmId)
   },
 }
 </script>
@@ -38,7 +52,7 @@ export default {
 .farm {
   position: relative;
   min-height: 100vh;
-  padding: 30px 30px 50px;
+  padding: 30px 50px 50px;
 }
 
 
@@ -71,7 +85,7 @@ export default {
 
 
 .farm__staff {
-  margin: 0 0 60px 0;
+  margin: 0 0 45px 0;
   width: 40%;
 }
 </style>
