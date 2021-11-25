@@ -34,7 +34,8 @@ export default {
 .my-modal__content {
   padding: 20px;
   min-width: 30%;
-  min-height: 30%;
+  min-height: 10%;
+  max-width: 45%;
 
   background-color: var(--dark-purple-color);
   border-radius: 9px;
