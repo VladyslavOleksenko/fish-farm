@@ -117,3 +117,14 @@ export async function getFarmAdministrators(farmId) {
 
   return await sendServerRequest(requestParams)
 }
+
+
+export async function createPool(farmId, name) {
+  const requestParams = new RequestParams(
+    "POST",
+    "http://localhost:5000/api/pool/create",
+    {farmId, name}
+  )
+
+  return await sendServerRequest(requestParams)
+}
