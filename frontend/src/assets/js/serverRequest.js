@@ -50,6 +50,16 @@ export async function login(body) {
   return await sendServerRequest(requestParams)
 }
 
+
+export async function getFarm(farmId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/farm?farmId=" + farmId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
 export async function getOwnFarms(userId) {
   const requestParams = new RequestParams(
     "GET",
