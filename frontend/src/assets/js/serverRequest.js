@@ -78,3 +78,32 @@ export async function createFarm(userId, name, description) {
 
   return await sendServerRequest(requestParams)
 }
+
+export async function getFarmOwner(farmId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/farm/owner?farmId=" + farmId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+
+export async function getFarmWorkers(farmId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/worker/byFarm?farmId=" + farmId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+
+export async function getFarmAdministrators(farmId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/administrator/byFarm?farmId=" + farmId
+  )
+
+  return await sendServerRequest(requestParams)
+}
