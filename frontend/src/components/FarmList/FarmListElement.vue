@@ -1,13 +1,13 @@
 <template>
   <div class="farm-list-element">
     <div class="farm-list-element__general-info">
-      <div class="farm-list-element__name">{{farmInfo.name}}</div>
-      <div class="farm-list-element__description">{{farmInfo.description}}</div>
+      <div class="farm-list-element__name">{{ farmInfo.name }}</div>
+      <div class="farm-list-element__description">{{ farmInfo.description }}</div>
     </div>
     <div class="farm-list-element__additional-info">
       <div class="farm-list-element__info-row">
         <div class="farm-list-element__info-parameter">owner:</div>
-        <div class="farm-list-element__info-value">{{owner}}</div>
+        <div class="farm-list-element__info-value">{{ owner }}</div>
       </div>
       <div class="farm-list-element__info-row">
         <div class="farm-list-element__info-parameter">administrators:</div>
@@ -19,7 +19,8 @@
       </div>
     </div>
     <div class="farm-list-element__button-wrapper">
-      <button class="farm-list-element__button">
+      <button class="farm-list-element__button"
+              @click="$router.push({name: 'Farm', params: {farmId: farmInfo.farmId}})">
         See more
       </button>
     </div>
