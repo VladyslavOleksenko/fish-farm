@@ -16,10 +16,7 @@
            v-if="avatar"
            :src="avatar"
            alt="">
-      <MyIcon class="profile__no-avatar"
-              v-else
-              icon-name="profile"
-              path-color="#eee"/>
+      <NoAvatar class="profile__no-avatar" v-else/>
       <div class="profile__personal-data-row">
         <div class="profile__data-parameter">First name:</div>
         <div class="profile__data-value">{{ user.firstName }}</div>
@@ -44,10 +41,11 @@
 <script>
 import MyIcon from "@/components/UI/MyIcon";
 import {mapState, mapActions} from "vuex";
+import NoAvatar from "@/components/NoAvatar/NoAvatar";
 
 export default {
   name: "Profile",
-  components: {MyIcon},
+  components: {NoAvatar, MyIcon},
   computed: {
     ...mapState({
       user: state => state.user.user
@@ -160,11 +158,7 @@ export default {
 .profile__no-avatar {
   width: 80px;
   height: 80px;
-  padding: 15px;
   margin: 0 0 20px 0;
-
-  border: 2px solid #eeeeee;
-  border-radius: 40px;
 }
 
 
