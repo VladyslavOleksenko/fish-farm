@@ -98,6 +98,7 @@ async function findUserByUserId(userId) {
   return null
 }
 
+
 function createUserObject(dataBaseUser) {
   try {
     return {
@@ -118,5 +119,6 @@ function createUserObject(dataBaseUser) {
 module.exports = {
   router,
   findUserByEmail,
-  findUserByUserId
+  findUserByUserId,
+  createUserObject
 }
