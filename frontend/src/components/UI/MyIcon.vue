@@ -1,5 +1,11 @@
 <template>
-  <svg v-if="iconName === 'dashboard'" :fill="pathColor"
+  <svg v-if="iconName === 'add'" :fill="pathColor"
+       xmlns="http://www.w3.org/2000/svg"
+       id="Outline" viewBox="0 0 24 24" width="512" height="512">
+    <path
+      d="M23,11H13V1a1,1,0,0,0-1-1h0a1,1,0,0,0-1,1V11H1a1,1,0,0,0-1,1H0a1,1,0,0,0,1,1H11V23a1,1,0,0,0,1,1h0a1,1,0,0,0,1-1V13H23a1,1,0,0,0,1-1h0A1,1,0,0,0,23,11Z"/>
+  </svg>
+  <svg v-else-if="iconName === 'dashboard'" :fill="pathColor"
        xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1"
        viewBox="0 0 24 24" width="64" height="64">
     <path
@@ -58,14 +64,15 @@
     <path
       d="M12,14a9.01,9.01,0,0,0-9,9,1,1,0,0,0,2,0,7,7,0,0,1,14,0,1,1,0,0,0,2,0A9.01,9.01,0,0,0,12,14Z"/>
   </svg>
-  <svg v-else-if="iconName === 'tasks'" :fill="pathColor" id="Layer_1" height="64"
-       viewBox="0 0 24 24"
-       width="64" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1">
+  <svg v-else-if="iconName === 'tasks'" :fill="pathColor"
+       id="Layer_1" height="64" viewBox="0 0 24 24" width="64"
+       xmlns="http://www.w3.org/2000/svg" data-name="Layer 1">
     <path
       d="m4 6a2.982 2.982 0 0 1 -2.122-.879l-1.544-1.374a1 1 0 0 1 1.332-1.494l1.585 1.414a1 1 0 0 0 1.456.04l3.604-3.431a1 1 0 0 1 1.378 1.448l-3.589 3.414a2.964 2.964 0 0 1 -2.1.862zm20-2a1 1 0 0 0 -1-1h-10a1 1 0 0 0 0 2h10a1 1 0 0 0 1-1zm-17.9 9.138 3.589-3.414a1 1 0 1 0 -1.378-1.448l-3.6 3.431a1.023 1.023 0 0 1 -1.414 0l-1.59-1.585a1 1 0 0 0 -1.414 1.414l1.585 1.585a3 3 0 0 0 4.226.017zm17.9-1.138a1 1 0 0 0 -1-1h-10a1 1 0 0 0 0 2h10a1 1 0 0 0 1-1zm-17.9 9.138 3.585-3.414a1 1 0 1 0 -1.378-1.448l-3.6 3.431a1 1 0 0 1 -1.456-.04l-1.585-1.414a1 1 0 0 0 -1.332 1.494l1.544 1.374a3 3 0 0 0 4.226.017zm17.9-1.138a1 1 0 0 0 -1-1h-10a1 1 0 0 0 0 2h10a1 1 0 0 0 1-1z"/>
   </svg>
-  <svg v-else :fill="pathColor" xmlns="http://www.w3.org/2000/svg" id="Outline"
-       viewBox="0 0 24 24" width="64" height="64">
+  <svg v-else :fill="pathColor"
+       xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" width="64"
+       height="64">
     <path
       d="M12,0A12,12,0,1,0,24,12,12.013,12.013,0,0,0,12,0Zm0,22A10,10,0,1,1,22,12,10.011,10.011,0,0,1,12,22Z"/>
     <path d="M12,5a1,1,0,0,0-1,1v8a1,1,0,0,0,2,0V6A1,1,0,0,0,12,5Z"/>
