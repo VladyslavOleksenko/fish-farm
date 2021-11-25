@@ -1,6 +1,5 @@
 <template>
   <div class="farm">
-    <img class="farm__image" src="../../public/fishBowl.svg" alt="">
     <button class="farm__delete-farm-button delete-farm-button"
             @click="deleteModalVisibilityStatus = true">
       Delete farm
@@ -28,6 +27,8 @@
 
       <Pools class="farm__pools" :farm-id="farmId"/>
     </div>
+
+    <img class="farm__image" src="../../public/fishBowl.svg" alt="">
 
     <MyModal v-if="deleteModalVisibilityStatus"
              @hide="deleteModalVisibilityStatus = false">
@@ -101,11 +102,13 @@ export default {
 
 
 .farm__image {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 40%;
+  margin: 100px auto 0 auto;
+
+  display: block;
+  width: 50%;
   transform: scale(-1, 1);
+
+  opacity: .8;
 }
 
 
