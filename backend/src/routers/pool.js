@@ -1,9 +1,15 @@
 const express = require("express")
 const logError = require("../errorHandler")
-const {createPool, getPoolArray, formatPoolArray} = require("../controllers/pool");
+const {
+  createPool,
+  getPoolArray,
+  formatPoolArray,
+  deletePool
+} = require("../controllers/pool");
 
 const router = express.Router()
 router.get("/", getPoolArrayRequest)
+router.delete("/", deletePoolRequest)
 router.post("/create", createPoolRequest)
 
 
@@ -15,6 +21,18 @@ async function getPoolArrayRequest(request, response) {
     response.status(200).json(poolArrayFormatted)
   } catch (exception) {
     const message = "Can't get pool array by farmId"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function deletePoolRequest(request, response) {
+  try {
+    const poolId = request.query.poolId
+    await deletePool(poolId)
+    response.json({message: "pool deleted"})
+  } catch (exception) {
+    const message = "Can't delete pool"
     response.status(500).json({message})
     logError(message, exception)
   }

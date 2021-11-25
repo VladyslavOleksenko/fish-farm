@@ -42,6 +42,13 @@ const getPoolByPoolId = module.exports.getPoolByPoolId = async function(poolId) 
   return dataBaseResponse.rows[0]
 }
 
+const deletePool = module.exports.deletePool = async function(poolId) {
+  const sqlCommand = `DELETE
+                      FROM pool
+                      WHERE pool_id = ${poolId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
 
 const formatPoolArray = module.exports.formatPoolArray = function(poolArray) {
   let poolArrayFormatted = []
