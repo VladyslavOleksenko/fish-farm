@@ -24,17 +24,6 @@ export default {
 }
 </script>
 
-
-<style>
-:root {
-  --dark-purple-color: #2C2E43;
-  --light-purple-color: #595260;
-  --blue-color: #494b6c;
-  --light-gray-color: #B2B1B9;
-
-}
-</style>
-
 <style scoped>
 .authorization {
   position: relative;

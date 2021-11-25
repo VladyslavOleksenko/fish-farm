@@ -46,6 +46,16 @@ export default {
 </script>
 
 <style>
+:root {
+  --dark-purple-color: #2C2E43;
+  --light-purple-color: #595260;
+  --blue-color: #494b6c;
+  --light-gray-color: #B2B1B9;
+
+  --sidebar-text-color: #efefef;
+  --sidebar-transition: .3s ease;
+}
+
 * {
   margin: 0;
   padding: 0;
