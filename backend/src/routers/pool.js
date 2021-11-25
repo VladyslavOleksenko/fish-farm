@@ -1,10 +1,24 @@
 const express = require("express")
 const logError = require("../errorHandler")
-const {createPool} = require("../controllers/pool");
+const {createPool, getPoolArray, formatPoolArray} = require("../controllers/pool");
 
 const router = express.Router()
+router.get("/", getPoolArrayRequest)
 router.post("/create", createPoolRequest)
 
+
+async function getPoolArrayRequest(request, response) {
+  try {
+    const farmId = request.query.farmId
+    const poolArray = await getPoolArray(farmId)
+    const poolArrayFormatted = formatPoolArray(poolArray)
+    response.status(200).json(poolArrayFormatted)
+  } catch (exception) {
+    const message = "Can't get pool array by farmId"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
 
 async function createPoolRequest(request, response) {
   try {
