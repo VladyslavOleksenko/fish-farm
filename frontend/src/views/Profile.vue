@@ -22,15 +22,15 @@
               path-color="#eee"/>
       <div class="profile__personal-data-row">
         <div class="profile__data-parameter">First name:</div>
-        <div class="profile__data-value">Vladyslav</div>
+        <div class="profile__data-value">{{ user.firstName }}</div>
       </div>
       <div class="profile__personal-data-row">
         <div class="profile__data-parameter">Last name:</div>
-        <div class="profile__data-value">Vladyslav</div>
+        <div class="profile__data-value">{{ user.lastName }}</div>
       </div>
       <div class="profile__personal-data-row">
         <div class="profile__data-parameter">Email:</div>
-        <div class="profile__data-value">Vladyslav</div>
+        <div class="profile__data-value">{{ user.email }}</div>
       </div>
       <div class="profile__change-data-button-wrapper">
         <button class="profile__change-data-button">
@@ -43,12 +43,15 @@
 
 <script>
 import MyIcon from "@/components/UI/MyIcon";
-import {mapActions} from "vuex";
+import {mapState, mapActions} from "vuex";
 
 export default {
   name: "Profile",
   components: {MyIcon},
   computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
     avatar() {
       return null
     }
