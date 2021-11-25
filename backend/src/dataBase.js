@@ -1,8 +1,9 @@
 const mysql = require("mysql2/promise")
 const dataBaseConfig = require("./../appConfig").dataBaseConfig
+const throwError = require("./errorHandler")
 
 
-module.exports.createInsertSqlCommand = (tableName, fieldNames, fieldValues) => {
+function createInsertSqlCommand(tableName, fieldNames, fieldValues) {
   if (fieldNames.length !== fieldValues.length) {
     throw new Error("fieldNames.length != fieldValues.length")
   }
@@ -37,7 +38,7 @@ module.exports.createInsertSqlCommand = (tableName, fieldNames, fieldValues) => 
 }
 
 
-module.exports.sendDataBaseQuery = async (sqlCommand) => {
+async function sendDataBaseQuery(sqlCommand) {
   try {
     const connection = await mysql.createConnection(dataBaseConfig);
     const [rows, fields] = await connection.execute(sqlCommand);
@@ -45,8 +46,14 @@ module.exports.sendDataBaseQuery = async (sqlCommand) => {
 
     return {rows, fields}
   }
-  catch (error) {
-    console.log("DataBase error")
-    console.log(error)
+  catch (exception) {
+    const message = "DataBase error: " + exception
+    throwError(message)
   }
+}
+
+
+module.exports = {
+  createInsertSqlCommand,
+  sendDataBaseQuery
 }
