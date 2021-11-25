@@ -2,75 +2,105 @@ const express = require("express")
 const jsonwebtoken = require("jsonwebtoken")
 const jsonwebtokenKey = require("./../../appConfig").jsonwebtokenKey
 const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
+const logError = require("../errorHandler")
 
 const router = express.Router()
-router.post("/register", register)
-router.post("/login", login)
+router.post("/register", registerRequest)
+router.post("/login", loginRequest)
 
 
-async function register(request, response) {
-  const candidate = await findUserByEmail(request.body.email)
-  if (candidate) {
-    return response.status(409).json({
-      message: `User with email ${request.body.email} already exists`
-    })
-  }
-
+async function registerRequest(request, response) {
   try {
-    const tableName = "user"
-    const fieldNames = [
-      "user_id",
-      "email",
-      "password",
-      "first_name",
-      "last_name",
-      "avatar"
-    ]
-    const fieldValues = [
-      null,
-      request.body.email,
-      request.body.password,
-      request.body.firstName,
-      request.body.lastName,
-      null
-    ]
-
-    const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
-    await sendDataBaseQuery(sqlCommand)
-
-    const newUser = await findUserByEmail(request.body.email)
+    const newUserData = request.body
+    const newUser = await register(newUserData)
     const token = generateToken({
       userId: newUser.userId,
       email: newUser.email
     })
-    response.status(200).json({token, user: createUserObject(newUser)})
+    response.status(200).json({token, user: formatUser(newUser)})
   } catch (exception) {
-    response.status(500).json({message: exception.message})
+    const message = "Can't register"
+    response.status(500).json({message})
+    logError(message, exception)
   }
 }
 
-async function login(request, response) {
-  const candidate = await findUserByEmail(request.body.email)
-
-  if (!candidate) {
-    return response.status(404).json({
-      message: `No user with email ${request.body.email}`
+async function loginRequest(request, response) {
+  try {
+    const userData = request.body
+    const user = await login(userData)
+    const token = generateToken({
+      userId: user.userId,
+      email: user.email
     })
+    const userFormatted = formatUser(user)
+    response.status(200).json({token, user: userFormatted})
+  } catch (exception) {
+    const message = "Can't login"
+    response.status(400).json({message})
+    logError(message, exception)
+  }
+}
+
+
+async function register(newUserData) {
+  const candidate = await getUserByEmail(newUserData.email)
+  if (candidate) {
+    throw new Error(`User with email ${newUserData.body.email} already exists`)
   }
 
-  const isPasswordCorrect = (request.body.password === candidate.password)
+  const tableName = "user"
+  const fieldNames = [
+    "user_id",
+    "email",
+    "password",
+    "first_name",
+    "last_name",
+    "avatar"
+  ]
+  const fieldValues = [
+    null,
+    newUserData.email,
+    newUserData.password,
+    newUserData.firstName,
+    newUserData.lastName,
+    null
+  ]
+
+  const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
+  await sendDataBaseQuery(sqlCommand)
+
+  return await getUserByEmail(newUserData.email)
+}
+
+async function login(userData) {
+  const user = await getUserByEmail(userData.email)
+  if (!user) {
+    throw new Error(`No user with email ${userData.email}`)
+  }
+
+  const isPasswordCorrect = (userData.password === user.password)
   if (!isPasswordCorrect) {
-    return response.status(401).json({
-      message: "Wrong password"
-    })
+    throw new Error("Wrong password")
   }
 
-  const token = generateToken({
-    userId: candidate.userId,
-    email: candidate.email
-  })
+  return user
+}
 
-  response.status(200).json({token, user: createUserObject(candidate)})
+async function getUserByUserId(userId) {
+  const sqlCommand = `SELECT *
+                      FROM user
+                      WHERE user_id LIKE '${userId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
+}
+
+async function getUserByEmail(email) {
+  const sqlCommand = `SELECT *
+                      FROM user
+                      WHERE email LIKE '${email}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
 }
 
 function generateToken(payload) {
@@ -78,47 +108,21 @@ function generateToken(payload) {
   return "Bearer " + jsonwebtoken.sign(payload, jsonwebtokenKey, {expiresIn})
 }
 
-async function findUserByEmail(email) {
-  const sqlCommand = `SELECT * FROM user WHERE email LIKE '${email}'`
-  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
 
-  if (dataBaseResponse && dataBaseResponse.rows && dataBaseResponse.rows.length) {
-    return dataBaseResponse.rows[0]
-  }
-  return null
-}
-
-async function findUserByUserId(userId) {
-  const sqlCommand = `SELECT * FROM user WHERE user_id LIKE '${userId}'`
-  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
-
-  if (dataBaseResponse && dataBaseResponse.rows && dataBaseResponse.rows.length) {
-    return dataBaseResponse.rows[0]
-  }
-  return null
-}
-
-
-function createUserObject(dataBaseUser) {
-  try {
-    return {
-      userId: dataBaseUser["user_id"],
-      email: dataBaseUser.email,
-      password: dataBaseUser.password,
-      firstName: dataBaseUser["first_name"],
-      lastName: dataBaseUser["last_name"],
-      avatar: dataBaseUser["avatar"]
-    }
-  } catch (exception) {
-    console.log("Can't create user object")
-    console.log(exception)
+function formatUser(user) {
+  return {
+    userId: user["user_id"],
+    email: user.email,
+    password: user.password,
+    firstName: user["first_name"],
+    lastName: user["last_name"],
+    avatar: user["avatar"]
   }
 }
 
 
 module.exports = {
   router,
-  findUserByEmail,
-  findUserByUserId,
-  createUserObject
+  getUserByUserId,
+  formatUser
 }

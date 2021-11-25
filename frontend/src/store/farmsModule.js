@@ -13,16 +13,8 @@ export default {
   },
   actions: {
     async updateOwnFarms({state, commit}, userId) {
-      try {
-        const serverResponse = await getOwnFarms(userId)
-        if (serverResponse.farms && serverResponse.farms.length) {
-          return commit('setOwnFarms', serverResponse.farms)
-        }
-        commit('setOwnFarms', [])
-      } catch (exception) {
-        console.log("Can't update own farms")
-        console.log(exception)
-      }
+      const farms = await getOwnFarms(userId)
+      commit('setOwnFarms', farms)
     }
   }
 }

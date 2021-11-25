@@ -1,135 +1,120 @@
 const express = require("express")
 const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
-const {findUserByUserId, createUserObject} = require("./user")
+const {getUserByUserId, formatUser} = require("./user")
+const throwError = require("../errorHandler")
 
 const router = express.Router()
-router.get("/", getFarm)
-router.get("/ownFarms", getOwnFarms)
-router.post("/create", createFarm)
-router.get("/owner", getFarmOwner)
+router.get("/", getFarmRequest)
+router.get("/ownFarms", getFarmArrayByOwnerIdRequest)
+router.post("/create", createFarmRequest)
+router.get("/owner", getFarmOwnerRequest)
 
 
-async function getOwnFarms(request, response) {
+async function getFarmRequest(request, response) {
   try {
-    const owner = await findUserByUserId(request.query.userId)
-    if (!owner) {
-      const errorMessage = `No user with id ${request.query.userId}`
-      response.status(404).json({message: errorMessage})
-      return throwError(errorMessage)
-    }
-
-    const farms = await findFarmsByOwnerId(owner["user_id"])
-
-    response.json({farms})
-  } catch (exception) {
-    response.status(500).json({message: exception})
-    throwError("Can't get own farms")
-    throwError(exception)
-  }
-}
-
-async function createFarm(request, response) {
-  try {
-    const user = await findUserByUserId(request.body.userId)
-    if (!user) {
-      const errorMessage = `No user with id ${request.body.userId}`
-      response.status(404).json({message: errorMessage})
-      return throwError(errorMessage)
-    }
-
-    const tableName = "farm"
-    const fieldNames = [
-      "farm_id",
-      "name",
-      "description",
-      "owner_id"
-    ]
-    const fieldValues = [
-      null,
-      request.body.name,
-      request.body.description,
-      request.body.userId
-    ]
-
-    const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
-    const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
-    const newFarmId = dataBaseResponse.rows.insertId
-
-    response.status(200).json({newFarmId})
-  } catch (exception) {
-    response.status(500).json({message: exception})
-    throwError("Can't create a farm")
-    throwError(exception)
-  }
-}
-
-async function getFarm(request, response) {
-  try {
-    const farm = await findFarmByFarmId(request.query.farmId)
-    if (!farm) {
-      const errorMessage = `No farm with id ${request.query.farmId}`
-      response.status(404).json({message: errorMessage})
-      throwError(errorMessage)
-    }
+    const farmId = request.query.farmId
+    const farm = await getFarmByFarmId(farmId)
     response.json(farm)
   } catch (exception) {
-    response.status(500).json({message: exception})
-    throwError("Can't get farm")
-    throwError(exception)
+    const message = "Can't get farm"
+    response.status(500).json({message})
+    throwError(message, exception)
   }
 }
 
-async function getFarmOwner(request, response) {
+async function getFarmArrayByOwnerIdRequest(request, response) {
   try {
-    const farm = await findFarmByFarmId(request.query.farmId)
-    if (!farm) {
-      const errorMessage = `No farm with id ${request.query.farmId}`
-      response.status(404).json({message: errorMessage})
-      return throwError(errorMessage)
-    }
-
-    const owner = await findUserByUserId(farm.ownerId)
-    if (!owner) {
-      const errorMessage = `No user with id ${farm.ownerId}`
-      response.status(404).json({message: errorMessage})
-      return throwError(errorMessage)
-    }
-
-    const ownerFormatted = createUserObject(owner)
-    response.status(200).json(ownerFormatted)
+    const ownerId = request.query.userId
+    const farmArray = await getFarmArrayByOwnerId(ownerId)
+    const farmArrayFormatted = formatFarmArray(farmArray)
+    response.json(farmArrayFormatted)
   } catch (exception) {
-    response.status(500).json({message: exception})
-    throwError("Can't get farm owner")
-    throwError(exception)
+    const message = "Can't get farm array by owner id"
+    response.status(500).json({message})
+    throwError(message, exception)
+  }
+}
+
+async function createFarmRequest(request, response) {
+  try {
+    const newFarmData = request.body
+    const newFarmId = await createFarm(newFarmData)
+    response.status(200).json({newFarmId})
+  } catch (exception) {
+    const message = "Can't create a farm"
+    response.status(500).json({message})
+    throwError(message, exception)
+  }
+}
+
+async function getFarmOwnerRequest(request, response) {
+  try {
+    const farmId = request.query.farmId
+    const farmOwner = await getFarmOwner(farmId)
+    const farmOwnerFormatted = formatUser(farmOwner)
+    response.status(200).json(farmOwnerFormatted)
+  } catch (exception) {
+    const message = "Can't get farm owner"
+    response.status(500).json({message})
+    throwError(message, exception)
   }
 }
 
 
-async function findFarmsByOwnerId(ownerId) {
+async function getFarmArrayByOwnerId(ownerId) {
   const sqlCommand = `SELECT *
                       FROM farm
                       WHERE owner_id LIKE '${ownerId}'`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
-
-  if (dataBaseResponse && dataBaseResponse.rows && dataBaseResponse.rows.length) {
-    return formatFarmArray(dataBaseResponse.rows)
-  }
-  return null
+  return dataBaseResponse.rows
 }
 
-async function findFarmByFarmId(farmId) {
+async function getFarmByFarmId(farmId) {
   const sqlCommand = `SELECT *
                       FROM farm
                       WHERE farm_id LIKE '${farmId}'`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
-
-  if (dataBaseResponse && dataBaseResponse.rows && dataBaseResponse.rows.length) {
-    return formatFarm(dataBaseResponse.rows[0])
-  }
-  return null
+  return dataBaseResponse.rows[0]
 }
 
+async function getFarmOwner(farmId) {
+  const farm = await getFarmByFarmId(farmId)
+  if (!farm) {
+    throw new Error(`No farm with id ${farmId}`)
+  }
 
+  const farmOwner = await getUserByUserId(farm["owner_id"])
+  if (!farmOwner) {
+    throw new Error(`No user with id ${farm["owner_id"]}`)
+  }
+
+  return farmOwner
+}
+
+async function createFarm(newFarmData) {
+  const user = await getUserByUserId(newFarmData.userId)
+  if (!user) {
+    throw new Error(`No user with id ${newFarmData.userId}`)
+  }
+
+  const tableName = "farm"
+  const fieldNames = [
+    "farm_id",
+    "name",
+    "description",
+    "owner_id"
+  ]
+  const fieldValues = [
+    null,
+    newFarmData.name,
+    newFarmData.description,
+    newFarmData.userId
+  ]
+
+  const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows.insertId
+}
 
 
 function formatFarmArray(farmArray) {
@@ -137,7 +122,6 @@ function formatFarmArray(farmArray) {
   for (let farm of farmArray) {
     farmArrayFormatted.push(formatFarm(farm))
   }
-
   return farmArrayFormatted
 }
 
@@ -151,12 +135,7 @@ function formatFarm(farm) {
 }
 
 
-function throwError(error) {
-  console.log("Error: ", error)
-}
-
-
 module.exports = {
   router: router,
-  findFarmByFarmId
+  getFarmByFarmId
 }

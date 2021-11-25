@@ -1,36 +1,38 @@
 const express = require("express")
-const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
-const {findFarmByFarmId} = require("./farm")
-const {findUserByUserId, createUserObject} = require("./user")
+const {sendDataBaseQuery} = require("./../dataBase");
+const {getUserByUserId, formatUser} = require("./user")
+const {getFarmByFarmId} = require("./farm");
+const logError = require("../errorHandler")
 
 const router = express.Router()
-router.get("/byFarm", getWorkersByFarmId)
+router.get("/byFarm", getWorkerArrayRequest)
 
 
-async function getWorkersByFarmId(request, response) {
+async function getWorkerArrayRequest(request, response) {
   try {
-    const farm = await findFarmByFarmId(request.query.farmId)
-    if (!farm) {
-      const errorMessage = `No farm with id ${request.query.farmId}`
-      response.status(404).json({message: errorMessage})
-      return throwError(errorMessage)
-    }
-
-    const sqlCommand = `SELECT *
-                      FROM farm_worker
-                      WHERE farm_id LIKE '${request.query.farmId}'`
-    const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
-
-    if (dataBaseResponse && dataBaseResponse.rows && dataBaseResponse.rows.length) {
-      const workerArray = await formatWorkerArray(dataBaseResponse.rows)
-      return response.status(200).json(workerArray)
-    }
-
-    response.status(200).json([])
+    const farmId = request.query.farmId
+    const workerArray = await getWorkerArray(farmId)
+    const workerArrayFormatted = await formatWorkerArray(workerArray)
+    response.status(200).json(workerArrayFormatted)
   } catch (exception) {
-    response.status(500).json({message: exception})
-    throwError(exception)
+    const message = "Can't get worker array"
+    response.status(500).json({message})
+    logError(message, exception)
   }
+}
+
+
+async function getWorkerArray(farmId) {
+  const farm = await getFarmByFarmId(farmId)
+  if (!farm) {
+    throw new Error(`No farm with id ${farmId}`)
+  }
+
+  const sqlCommand = `SELECT *
+                    FROM farm_worker
+                    WHERE farm_id LIKE '${farmId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows
 }
 
 
@@ -43,8 +45,8 @@ async function formatWorkerArray(workerArray) {
 }
 
 async function formatWorker(worker) {
-  const dbUser = await findUserByUserId(worker["user_id"])
-  const dbUserFormatted = createUserObject(dbUser)
+  const dbUser = await getUserByUserId(worker["user_id"])
+  const dbUserFormatted = formatUser(dbUser)
   return {
     farmWorkerId: worker["farm_worker_id"],
     farmId: worker["farm_id"],
@@ -54,11 +56,6 @@ async function formatWorker(worker) {
     lastName: dbUserFormatted.lastName,
     email: dbUserFormatted.email
   }
-}
-
-
-function throwError(error) {
-  console.log("Error: ", error)
 }
 
 

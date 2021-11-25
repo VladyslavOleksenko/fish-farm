@@ -1,37 +1,82 @@
 const express = require("express")
-const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
-const {findFarmByFarmId} = require("./farm")
-const {findUserByUserId, createUserObject} = require("./user");
+const {sendDataBaseQuery} = require("./../dataBase");
+const {getFarmByFarmId} = require("./farm")
+const {getUserByUserId, formatUser} = require("./user");
+const logError = require("../errorHandler")
+
 
 const router = express.Router()
-router.get("/byFarm", getAdministratorsByFarmId)
+router.get("/byFarm", getAdministratorArrayRequest)
+router.delete("/byFarm", deleteAllFarmAdministratorsRequest)
 
 
-async function getAdministratorsByFarmId(request, response) {
+async function getAdministratorArrayRequest(request, response) {
   try {
-    const farm = await findFarmByFarmId(request.query.farmId)
-    if (!farm) {
-      const errorMessage = `No farm with id ${request.query.farmId}`
-      response.status(404).json({message: errorMessage})
-      return throwError(errorMessage)
-    }
-
-    const sqlCommand = `SELECT *
-                      FROM farm_administrator
-                      WHERE farm_id LIKE '${request.query.farmId}'`
-    const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
-
-    if (dataBaseResponse && dataBaseResponse.rows && dataBaseResponse.rows.length) {
-      const administratorArray =
-        await formatAdministratorArray(dataBaseResponse.rows)
-      return response.status(200).json(administratorArray)
-    }
-
-    response.status(200).json([])
+    const farmId = request.query.farmId
+    const administratorArray = await getAdministratorArray(farmId)
+    const administratorArrayFormatted =
+      await formatAdministratorArray(administratorArray)
+    response.status(200).json(administratorArrayFormatted)
   } catch (exception) {
-    response.status(500).json({message: exception})
-    throwError(exception)
+    const message = "Can't get administrator array"
+    response.status(500).json({message})
+    logError(message)
+    logError(exception)
   }
+}
+
+async function deleteAllFarmAdministratorsRequest(request, response) {
+  try {
+    const farmId = request.query.farmId
+    await deleteAllFarmAdministrators(farmId)
+    response.status(200).json({message: "done"})
+  } catch (exception) {
+    const message = "Can't delete all farm administrators"
+    response.status(500).json(message)
+    logError(message)
+    logError(exception)
+  }
+}
+
+
+async function getAdministratorArray(farmId) {
+  const farm = await getFarmByFarmId(farmId)
+  if (!farm) {
+     throw new Error(`No farm with id ${farmId}`)
+  }
+
+  const sqlCommand = `SELECT *
+                      FROM farm_administrator
+                      WHERE farm_id LIKE '${farmId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows
+}
+
+async function deleteAllFarmAdministrators(farmId) {
+  const farmAdministratorsIdArray = await getAdministratorsIdArray(farmId)
+  for (let farmAdministratorId of farmAdministratorsIdArray) {
+    await deleteFarmAdministrator(farmAdministratorId)
+  }
+}
+
+async function getAdministratorsIdArray(farmId) {
+  const administratorArray = await getAdministratorArray(farmId)
+  if (!administratorArray) {
+    throw new Error(`Can't get administrator array ${farmId}`)
+  }
+
+  let administratorsIdArray = []
+  for (let administrator of administratorArray) {
+    administratorsIdArray.push(administrator["farm_administrator_id"])
+  }
+  return administratorsIdArray
+}
+
+async function deleteFarmAdministrator(farmAdministratorId) {
+  const sqlCommand = `DELETE
+                      FROM farm_administrator
+                      WHERE farm_administrator_id = ${farmAdministratorId}`
+  await sendDataBaseQuery(sqlCommand)
 }
 
 
@@ -44,8 +89,8 @@ async function formatAdministratorArray(administratorArray) {
 }
 
 async function formatAdministrator(administrator) {
-  const dbUser = await findUserByUserId(administrator["user_id"])
-  const dbUserFormatted = createUserObject(dbUser)
+  const dbUser = await getUserByUserId(administrator["user_id"])
+  const dbUserFormatted = formatUser(dbUser)
   return {
     farmAdministratorId: administrator["farm_administrator_id"],
     farmId: administrator["farm_id"],
@@ -58,11 +103,6 @@ async function formatAdministrator(administrator) {
     lastName: dbUserFormatted.lastName,
     email: dbUserFormatted.email
   }
-}
-
-
-function throwError(error) {
-  console.log("Error: ", error)
 }
 
 
