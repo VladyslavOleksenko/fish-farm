@@ -2,6 +2,13 @@
   <div class="pools">
     <div class="pools__title">Pools</div>
 
+    <div class="pools__pool-list">
+      <Pool class="pools__pool"
+            v-for="(poolInfo, i) of poolArray"
+            :key="i"
+            :pool-info="poolInfo"/>
+    </div>
+
     <div class="pools__add-button-wrapper">
       <div class="add-button"
            @click="addModalVisibilityStatus = true">
@@ -30,15 +37,17 @@
 <script>
 import MyIcon from "@/components/UI/MyIcon";
 import MyModal from "@/components/UI/MyModal";
-import {createPool} from "@/assets/js/serverRequest";
+import Pool from "@/components/PoolsBlock/Pool";
+import {createPool, getPoolArray} from "@/assets/js/serverRequest";
 
 export default {
   name: "Pools",
-  components: {MyModal, MyIcon},
+  components: {MyModal, MyIcon, Pool},
   props: {
     farmId: {type: String, required: true}
   },
   data: () => ({
+    poolArray: [],
     addModalData: {
       poolName: ""
     },
@@ -50,12 +59,18 @@ export default {
     }
   },
   methods: {
+    async updatePools() {
+      this.poolArray = await getPoolArray(this.farmId)
+    },
     async sendCreatePoolRequest() {
-      const serverResponse =
-        await createPool(this.farmId, this.addModalData.poolName)
-      const newPoolId = serverResponse.newPoolId
-      console.log(newPoolId)
+      await createPool(this.farmId, this.addModalData.poolName)
+      await this.updatePools()
+      this.addModalVisibilityStatus = false
+      this.addModalData.poolName = ""
     }
+  },
+  async mounted() {
+    await this.updatePools()
   }
 }
 </script>
@@ -75,6 +90,11 @@ export default {
   text-align: center;
 
   color: #eeeeee;
+}
+
+
+.pools__pool {
+  margin: 0 0 10px 0;
 }
 
 
