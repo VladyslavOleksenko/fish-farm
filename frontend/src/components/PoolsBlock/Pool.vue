@@ -2,7 +2,9 @@
   <div class="pool">
     <div class="pool__name">{{ poolInfo.name }}</div>
     <div class="pool__buttons">
-      <MyRoundButton class="pool__button" icon-name="delete"/>
+      <MyRoundButton class="pool__button"
+                     icon-name="delete"
+                     @click="sendDeletePoolRequest"/>
       <MyRoundButton class="pool__button" icon-name="edit"/>
     </div>
   </div>
@@ -10,11 +12,19 @@
 
 <script>
 import MyRoundButton from "@/components/UI/MyRoundButton";
+import {deletePool} from "@/assets/js/serverRequest";
+
 export default {
   name: "Pool",
   components: {MyRoundButton},
   props: {
     poolInfo: {type: Object, required: true}
+  },
+  methods: {
+    async sendDeletePoolRequest() {
+      await deletePool(this.poolInfo.poolId)
+      this.$emit("updated")
+    }
   }
 }
 </script>

@@ -6,7 +6,8 @@
       <Pool class="pools__pool"
             v-for="(poolInfo, i) of poolArray"
             :key="i"
-            :pool-info="poolInfo"/>
+            :pool-info="poolInfo"
+            @updated="updatePools"/>
     </div>
 
     <div class="pools__add-button-wrapper">
