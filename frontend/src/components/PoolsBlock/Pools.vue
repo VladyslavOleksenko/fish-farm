@@ -11,11 +11,10 @@
     </div>
 
     <div class="pools__add-button-wrapper">
-      <div class="add-button"
-           @click="addModalVisibilityStatus = true">
-        <MyIcon class="add-button__icon" icon-name="add" path-color="#eee"/>
-        <p class="add-button__text">Add pool</p>
-      </div>
+      <MyRectangleButton class="pools__add-button"
+                         icon-name="add"
+                         text="Add pool"
+                         @clicked="addModalVisibilityStatus = true"/>
     </div>
 
     <MyModal v-if="addModalVisibilityStatus"
@@ -40,10 +39,11 @@ import MyIcon from "@/components/UI/MyIcon";
 import MyModal from "@/components/UI/MyModal";
 import Pool from "@/components/PoolsBlock/Pool";
 import {createPool, getPoolArray} from "@/assets/js/serverRequest";
+import MyRectangleButton from "@/components/UI/MyRectangleButton";
 
 export default {
   name: "Pools",
-  components: {MyModal, MyIcon, Pool},
+  components: {MyRectangleButton, MyModal, MyIcon, Pool},
   props: {
     farmId: {type: String, required: true}
   },
@@ -106,40 +106,9 @@ export default {
   justify-content: center;
 }
 
-.add-button {
+.pools__add-button {
   width: 200px;
   height: 50px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  color: #eeeeee;
-  border: 2px solid #eeeeee;
-  border-radius: 4px;
-
-  cursor: pointer;
-  transition: background-color .2s ease,
-  color .2s ease;
-}
-
-.add-button__icon {
-  margin: 0 15px 0 0;
-  width: 20px;
-  height: 20px;
-}
-
-.add-button__text {
-  font-size: 22px;
-}
-
-.add-button:hover {
-  color: #ffffff;
-  background-color: var(--light-purple-color);
-}
-
-.add-button:active {
-  color: var(--light-gray-color);
 }
 
 
