@@ -18,11 +18,13 @@
 
         <Staff class="farm__staff"
                category="administrators"
-               :user-array="administratorArray"/>
+               :user-array="administratorArray"
+               :farm-id="farmId"/>
 
         <Staff class="farm__staff"
                category="workers"
-               :user-array="workerArray"/>
+               :user-array="workerArray"
+               :farm-id="farmId"/>
       </div>
 
       <Pools class="farm__pools" :farm-id="farmId"/>

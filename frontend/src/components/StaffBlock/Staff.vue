@@ -29,6 +29,7 @@
             <span>please enter his or her </span>
             <span class="invite-modal__bold-span">email</span>
           </div>
+          <div class="invite-modal__error">{{ inviteModalData.error }}</div>
           <input class="invite-modal__input"
                  type="email"
                  placeholder="Email *"
@@ -48,18 +49,21 @@
 import Employee from "@/components/StaffBlock/Employee";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import MyModal from "@/components/UI/MyModal";
+import {inviteAdministrator, inviteWorker} from "@/assets/js/serverRequest";
 
 export default {
   name: "Staff",
   components: {MyModal, MyRectangleButton, Employee},
   props: {
     category: {type: String, required: true},
-    userArray: {type: Array, default: []}
+    userArray: {type: Array, default: []},
+    farmId: {type: String}
   },
   data: () => ({
     inviteModalVisibilityStatus: false,
     inviteModalData: {
-      email: ""
+      email: "",
+      error: ""
     }
   }),
   computed: {
@@ -77,7 +81,34 @@ export default {
   },
   methods: {
     async sendInviteRequest() {
-      console.log(this.inviteModalData.email)
+      if (this.category === "administrators") {
+        const invitorData = {
+          email: this.inviteModalData.email,
+          farmId: this.farmId,
+          addAdministratorAccess: true,
+          deleteAdministratorAccess: false,
+          managePoolsAccess: true,
+          changeAccessesAccess: false
+        }
+        try {
+          await inviteAdministrator(invitorData)
+        } catch (exception) {
+          return this.inviteModalData.error = exception.details
+        }
+      }
+      if (this.category === "workers") {
+        const invitorData = {
+          email: this.inviteModalData.email,
+          farmId: this.farmId,
+          roleName: "some role"
+        }
+        try {
+          await inviteWorker(invitorData)
+        } catch (exception) {
+          return this.inviteModalData.error = exception.details
+        }
+      }
+
 
       this.inviteModalData.email = ""
       this.inviteModalVisibilityStatus = false
@@ -116,6 +147,8 @@ export default {
 
 
 .staff__add-button-wrapper {
+  margin: 50px 0 0 0;
+
   display: flex;
   justify-content: center;
 }
@@ -135,7 +168,7 @@ export default {
 
 
 .invite-modal__advice {
-  margin: 0 0 30px 0;
+  margin: 0 0 15px 0;
 
   font-size: 20px;
   text-align: center;
@@ -148,6 +181,17 @@ export default {
   font-weight: 500;
 
   color: #ffffff;
+}
+
+
+.invite-modal__error {
+  margin: 0 0 40px 0;
+
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+
+  color: #ff6060;
 }
 
 
