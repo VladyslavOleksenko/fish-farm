@@ -78,6 +78,19 @@ async function addAdministrator(userId, invitorData) {
   return dataBaseResponse.rows.insertId
 }
 
+
+async function inviteAdministrator(farm, invitorData) {
+  const inviteAvailability =
+    await checkInviteAvailability(invitorData.email, farm.farmId)
+  if (!inviteAvailability) {
+    throw new Error(`The administrator already invited to farm ${farm.farmId}`)
+  }
+
+  await createAdministratorInvite(invitorData)
+  await sendInviteAdministratorMail(invitorData.email, farm.name)
+  return "administrator invited"
+}
+
 async function createAdministratorInvite(invitorData) {
   const tableName = "administrator_invite"
   const fieldNames = [
@@ -111,21 +124,6 @@ async function checkInviteAvailability(email, farmId) {
                         AND farm_id = ${farmId}`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return !dataBaseResponse.rows.length
-}
-
-async function inviteAdministrator(farm, invitorData) {
-  const inviteAdministratorAvailability =
-    await checkInviteAvailability(
-      invitorData.email, invitorData.farmId)
-  if (!inviteAdministratorAvailability) {
-    const errorMessage = "The administrator already invited to farm " +
-      invitorData.farmId
-    throw new Error(errorMessage)
-  }
-
-  await createAdministratorInvite(invitorData)
-  await sendInviteAdministratorMail(invitorData.email, farm.name)
-  return "administrator invited"
 }
 
 

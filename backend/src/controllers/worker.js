@@ -5,7 +5,7 @@ module.exports = {
   deleteFarmWorker,
   addWorker,
   createWorkerInvite,
-  checkInviteWorkerAvailability,
+  checkInviteWorkerAvailability: checkInviteAvailability,
   formatWorkerArray,
   formatWorker,
   inviteWorker
@@ -72,6 +72,19 @@ async function addWorker(userId, invitorData) {
   return dataBaseResponse.rows.insertId
 }
 
+
+async function inviteWorker(farm, invitorData) {
+  const inviteAvailability =
+    await checkInviteAvailability(invitorData.email, farm.farmId)
+  if (!inviteAvailability) {
+    throw new Error(`The worker already invited to farm ${farm.farmId}`)
+  }
+
+  await createWorkerInvite(invitorData)
+  await sendInviteWorkerMail(invitorData.email, farm.name)
+  return "worker invited"
+}
+
 async function createWorkerInvite(invitorData) {
   const tableName = "worker_invite"
   const fieldNames = [
@@ -92,28 +105,13 @@ async function createWorkerInvite(invitorData) {
   return dataBaseResponse.rows.insertId
 }
 
-async function checkInviteWorkerAvailability(email, farmId) {
+async function checkInviteAvailability(email, farmId) {
   const sqlCommand = `SELECT *
                       FROM worker_invite
                       WHERE email LIKE '${email}'
                         AND farm_id = ${farmId}`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return !dataBaseResponse.rows.length
-}
-
-async function inviteWorker(farm, invitorData) {
-  const inviteWorkerAvailability =
-    await checkInviteWorkerAvailability(
-      invitorData.email, invitorData.farmId)
-  if (!inviteWorkerAvailability) {
-    const errorMessage = "The worker already invited to farm " +
-      invitorData.farmId
-    throw new Error(errorMessage)
-  }
-
-  await createWorkerInvite(invitorData)
-  await sendInviteWorkerMail(invitorData.email, farm.name)
-  return "worker invited"
 }
 
 
