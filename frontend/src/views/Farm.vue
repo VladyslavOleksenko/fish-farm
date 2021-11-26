@@ -19,12 +19,18 @@
         <Staff class="farm__staff"
                category="administrators"
                :user-array="administratorArray"
-               :farm-id="farmId"/>
+               :invite-array="administratorInviteArray"
+               :farm-id="farmId"
+               @updateUserArray="updateAdministratorArray"
+               @updateInviteArray="updateAdministratorInviteArray"/>
 
         <Staff class="farm__staff"
                category="workers"
                :user-array="workerArray"
-               :farm-id="farmId"/>
+               :invite-array="workerInviteArray"
+               :farm-id="farmId"
+               @updateUserArray="updateWorkerArray"
+               @updateInviteArray="updateWorkerInviteArray"/>
       </div>
 
       <Pools class="farm__pools" :farm-id="farmId"/>
@@ -59,7 +65,9 @@ import {
   getFarm,
   getFarmOwner,
   getFarmAdministrators,
+  getFarmAdministratorInvites,
   getFarmWorkers,
+  getFarmWorkerInvites,
   deleteFarm
 } from "@/assets/js/serverRequest";
 import MyModal from "@/components/UI/MyModal";
@@ -71,8 +79,10 @@ export default {
   data: () => ({
     farmInfo: {},
     owner: {},
-    workerArray: [],
     administratorArray: [],
+    administratorInviteArray: [],
+    workerArray: [],
+    workerInviteArray: [],
     deleteModalVisibilityStatus: false
   }),
   computed: {
@@ -84,13 +94,28 @@ export default {
     async deleteFarm() {
       await deleteFarm(this.farmId)
       await this.$router.push("/")
+    },
+    async updateAdministratorArray() {
+      this.administratorArray = await getFarmAdministrators(this.farmId)
+    },
+    async updateAdministratorInviteArray() {
+      this.administratorInviteArray =
+        await getFarmAdministratorInvites(this.farmId)
+    },
+    async updateWorkerArray() {
+      this.workerArray = await getFarmWorkers(this.farmId)
+    },
+    async updateWorkerInviteArray() {
+      this.workerInviteArray = await getFarmWorkerInvites(this.farmId)
     }
   },
   async mounted() {
     this.farmInfo = await getFarm(this.farmId)
     this.owner = await getFarmOwner(this.farmId)
-    this.workerArray = await getFarmWorkers(this.farmId)
-    this.administratorArray = await getFarmAdministrators(this.farmId)
+    await this.updateAdministratorArray()
+    await this.updateAdministratorInviteArray()
+    await this.updateWorkerArray()
+    await this.updateWorkerInviteArray()
   },
 }
 </script>

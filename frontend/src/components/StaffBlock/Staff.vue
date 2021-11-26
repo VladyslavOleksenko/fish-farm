@@ -8,7 +8,16 @@
                   v-for="(user, i) of userArray"
                   :key="i"
                   :user="user"
-                  :category="category"/>
+                  :category="category"
+                  @delete="sendEmployeeDeleteRequest"/>
+      </div>
+      <div class="staff__invites">
+        <Invite class="staff__invite"
+                v-for="(invite, i) of inviteArray"
+                :key="i"
+                :invite="invite"
+                :category="category"
+                @delete="sendInviteDeleteRequest"/>
       </div>
 
       <div class="staff__add-button-wrapper">
@@ -49,14 +58,23 @@
 import Employee from "@/components/StaffBlock/Employee";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import MyModal from "@/components/UI/MyModal";
-import {inviteAdministrator, inviteWorker} from "@/assets/js/serverRequest";
+import {
+  inviteAdministrator,
+  inviteWorker,
+  deleteAdministrator,
+  deleteAdministratorInvite,
+  deleteWorker,
+  deleteWorkerInvite
+} from "@/assets/js/serverRequest";
+import Invite from "@/components/StaffBlock/Invite";
 
 export default {
   name: "Staff",
-  components: {MyModal, MyRectangleButton, Employee},
+  components: {Invite, MyModal, MyRectangleButton, Employee},
   props: {
     category: {type: String, required: true},
     userArray: {type: Array, default: []},
+    inviteArray: {type: Array, default: []},
     farmId: {type: String}
   },
   data: () => ({
@@ -109,9 +127,29 @@ export default {
         }
       }
 
-
       this.inviteModalData.email = ""
       this.inviteModalVisibilityStatus = false
+
+      this.$emit('updateUserArray')
+      this.$emit('updateInviteArray')
+    },
+    async sendEmployeeDeleteRequest(user) {
+      if (this.category === "administrators") {
+        await deleteAdministrator(user.farmAdministratorId)
+      }
+      if (this.category === "workers") {
+        await deleteWorker(user.farmWorkerId)
+      }
+      this.$emit('updateUserArray')
+    },
+    async sendInviteDeleteRequest(invite) {
+      if (this.category === "administrators") {
+        await deleteAdministratorInvite(invite.administratorInviteId)
+      }
+      if (this.category === "workers") {
+        await deleteWorkerInvite(invite.workerInviteId)
+      }
+      this.$emit('updateInviteArray')
     }
   }
 }
@@ -137,12 +175,13 @@ export default {
   color: #eeeeee;
 }
 
-.staff__user {
-  margin: 0 0 20px 0;
-}
-
 .staff__user:last-child {
   margin: 0;
+}
+
+
+.staff__users {
+  margin: 0 0 40px 0;
 }
 
 
