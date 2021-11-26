@@ -15,8 +15,31 @@
         <MyRectangleButton class="staff__add-button"
                            v-if="category !== 'owner'"
                            icon-name="add"
-                           :text="inviteButtonText"/>
+                           :text="'Add ' + categoryInSingular"
+                           @click="inviteModalVisibilityStatus = true"/>
       </div>
+
+      <MyModal v-if="inviteModalVisibilityStatus"
+               @hide="inviteModalVisibilityStatus = false">
+        <div class="staff__invite-modal invite-modal">
+          <div class="invite-modal__advice">
+            <span>To invite an </span>
+            <span class="invite-modal__bold-span">{{ categoryInSingular }}</span>
+            <br>
+            <span>please enter his or her </span>
+            <span class="invite-modal__bold-span">email</span>
+          </div>
+          <input class="invite-modal__input"
+                 type="email"
+                 placeholder="Email *"
+                 v-model="inviteModalData.email">
+          <input class="invite-modal__submit"
+                 type="submit"
+                 value="invite"
+                 :disabled="!inviteModalDataValidStatus"
+                 @click="sendInviteRequest">
+        </div>
+      </MyModal>
     </div>
   </div>
 </template>
@@ -24,22 +47,40 @@
 <script>
 import Employee from "@/components/StaffBlock/Employee";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
+import MyModal from "@/components/UI/MyModal";
 
 export default {
   name: "Staff",
-  components: {MyRectangleButton, Employee},
+  components: {MyModal, MyRectangleButton, Employee},
   props: {
     category: {type: String, required: true},
     userArray: {type: Array, default: []}
   },
+  data: () => ({
+    inviteModalVisibilityStatus: false,
+    inviteModalData: {
+      email: ""
+    }
+  }),
   computed: {
-    inviteButtonText() {
+    categoryInSingular() {
       if (this.category === "administrators") {
-        return "add administrator"
+        return "administrator"
       }
       if (this.category === "workers") {
-        return "add worker"
+        return "worker"
       }
+    },
+    inviteModalDataValidStatus() {
+      return !!this.inviteModalData.email
+    }
+  },
+  methods: {
+    async sendInviteRequest() {
+      console.log(this.inviteModalData.email)
+
+      this.inviteModalData.email = ""
+      this.inviteModalVisibilityStatus = false
     }
   }
 }
@@ -82,5 +123,82 @@ export default {
 .staff__add-button {
   height: 50px;
   padding: 0 50px;
+}
+
+
+.invite-modal {
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.invite-modal__advice {
+  margin: 0 0 30px 0;
+
+  font-size: 20px;
+  text-align: center;
+
+  color: #eeeeee;
+}
+
+.invite-modal__bold-span {
+  font-size: 1.2em;
+  font-weight: 500;
+
+  color: #ffffff;
+}
+
+
+.invite-modal__input {
+  width: 100%;
+  height: 53px;
+  padding: 0 15px;
+
+  font-size: 22px;
+
+  color: #fff;
+  background-color: var(--light-purple-color);
+  border: none;
+  border-radius: 4px;
+  outline: none;
+}
+
+.invite-modal__input::placeholder {
+  color: var(--light-gray-color);
+}
+
+
+.invite-modal__submit {
+  margin: 50px 0 0 0;
+  height: 50px;
+  padding: 0 50px;
+
+  font-size: 22px;
+  font-weight: 500;
+
+  color: #eee;
+  background-color: var(--blue-color);
+
+  border: none;
+  border-radius: 4px;
+  outline: none;
+
+  transition: background-color .2s ease;
+  cursor: pointer;
+}
+
+.invite-modal__submit:hover {
+  background-color: #6fa360;
+}
+
+.invite-modal__submit:active {
+  background-color: #5e8b52;
+}
+
+.invite-modal__submit[disabled] {
+  color: #7f7f7f;
+  background: var(--light-purple-color);
 }
 </style>
