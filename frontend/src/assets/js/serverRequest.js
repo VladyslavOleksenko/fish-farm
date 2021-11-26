@@ -108,11 +108,31 @@ export async function getFarmWorkers(farmId) {
   return await sendServerRequest(requestParams)
 }
 
+export async function inviteWorker(invitorData) {
+  const requestParams = new RequestParams(
+    "POST",
+    "http://localhost:5000/api/worker/invite",
+    invitorData
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
 
 export async function getFarmAdministrators(farmId) {
   const requestParams = new RequestParams(
     "GET",
     "http://localhost:5000/api/administrator/byFarm?farmId=" + farmId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+export async function inviteAdministrator(invitorData) {
+  const requestParams = new RequestParams(
+    "POST",
+    "http://localhost:5000/api/administrator/invite",
+    invitorData
   )
 
   return await sendServerRequest(requestParams)
