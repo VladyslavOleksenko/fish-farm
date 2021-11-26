@@ -1,5 +1,6 @@
 module.exports = {
   getAdministratorArray,
+  getInviteArray,
   getAdministratorByFarmAndUserId,
   getAdministratorInviteByFarmAndEmail,
 
@@ -9,16 +10,27 @@ module.exports = {
 
   deleteFarmAdministrator,
   deleteAllFarmAdministrators,
+  deleteInvite,
   deleteAllFarmInvites,
 
   formatAdministratorArray,
   formatAdministrator,
+  formatInviteArray,
+  formatInvite
 }
 
 
 async function getAdministratorArray(farmId) {
   const sqlCommand = `SELECT *
                       FROM farm_administrator
+                      WHERE farm_id LIKE '${farmId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows
+}
+
+async function getInviteArray(farmId) {
+  const sqlCommand = `SELECT *
+                      FROM administrator_invite
                       WHERE farm_id LIKE '${farmId}'`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows
@@ -146,6 +158,13 @@ async function deleteAllFarmAdministrators(farmId) {
   await sendDataBaseQuery(sqlCommand)
 }
 
+async function deleteInvite(administratorInviteId) {
+  const sqlCommand = `DELETE
+                      FROM administrator_invite
+                      WHERE administrator_invite_id = ${administratorInviteId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
 async function deleteAllFarmInvites(farmId) {
   const sqlCommand = `DELETE
                       FROM administrator_invite
@@ -177,6 +196,26 @@ async function formatAdministrator(administrator) {
     firstName: dbUserFormatted.firstName,
     lastName: dbUserFormatted.lastName,
     email: dbUserFormatted.email
+  }
+}
+
+function formatInviteArray(inviteArray) {
+  let newInviteArray = []
+  for (let invite of inviteArray) {
+    newInviteArray.push(formatInvite(invite))
+  }
+  return newInviteArray
+}
+
+function formatInvite(invite) {
+  return {
+    administratorInviteId: invite["administrator_invite_id"],
+    farmId: invite["farm_id"],
+    email: invite.email,
+    addAdministratorAccess: !!invite["add_administrator_access"],
+    deleteAdministratorAccess: !!invite["delete_administrator_access"],
+    managePoolsAccess: !!invite["manage_pools_access"],
+    changeAccessesAccess: !!invite["change_accesses_access"]
   }
 }
 

@@ -1,5 +1,6 @@
 module.exports = {
   getWorkerArray,
+  getInviteArray,
   getWorkerByFarmAndUserId,
   getWorkerInviteByFarmAndEmail,
 
@@ -9,10 +10,13 @@ module.exports = {
 
   deleteFarmWorker,
   deleteAllFarmWorkers,
+  deleteInvite,
   deleteAllFarmInvites,
 
   formatWorkerArray,
-  formatWorker
+  formatWorker,
+  formatInviteArray,
+  formatInvite
 }
 
 
@@ -24,6 +28,14 @@ async function getWorkerArray(farmId) {
 
   const sqlCommand = `SELECT *
                       FROM farm_worker
+                      WHERE farm_id LIKE '${farmId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows
+}
+
+async function getInviteArray(farmId) {
+  const sqlCommand = `SELECT *
+                      FROM worker_invite
                       WHERE farm_id LIKE '${farmId}'`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows
@@ -140,6 +152,13 @@ async function deleteAllFarmWorkers(farmId) {
   await sendDataBaseQuery(sqlCommand)
 }
 
+async function deleteInvite(workerInviteId) {
+  const sqlCommand = `DELETE
+                      FROM worker_invite
+                      WHERE worker_invite_id = ${workerInviteId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
 async function deleteAllFarmInvites(farmId) {
   const sqlCommand = `DELETE
                       FROM worker_invite
@@ -168,6 +187,23 @@ async function formatWorker(worker) {
     firstName: dbUserFormatted.firstName,
     lastName: dbUserFormatted.lastName,
     email: dbUserFormatted.email
+  }
+}
+
+function formatInviteArray(inviteArray) {
+  let newInviteArray = []
+  for (let invite of inviteArray) {
+    newInviteArray.push(formatInvite(invite))
+  }
+  return newInviteArray
+}
+
+function formatInvite(invite) {
+  return {
+    workerInviteId: invite["worker_invite_id"],
+    email: invite.email,
+    farmId: invite["farm_id"],
+    roleName: invite["role_name"]
   }
 }
 

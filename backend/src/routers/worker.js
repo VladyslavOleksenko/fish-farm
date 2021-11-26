@@ -3,8 +3,11 @@ const workerController = require("../controllers/worker")
 const logError = require("../errorHandler")
 
 const router = express.Router()
-router.get("/byFarm", getWorkerArrayRequest)
+router.get("/", getWorkerArrayRequest)
+router.delete("/", deleteWorkerRequest)
+router.get("/invite", getInviteArrayRequest)
 router.post("/invite", inviteWorkerRequest)
+router.delete("/invite", deleteInviteRequest)
 
 
 async function getWorkerArrayRequest(request, response) {
@@ -21,6 +24,20 @@ async function getWorkerArrayRequest(request, response) {
   }
 }
 
+async function getInviteArrayRequest(request, response) {
+  try {
+    const farmId = request.query.farmId
+    const inviteArray = await workerController.getInviteArray(farmId)
+    const inviteArrayFormatted =
+      workerController.formatInviteArray(inviteArray)
+    response.status(200).json(inviteArrayFormatted)
+  } catch (exception) {
+    const message = "Can't get workers invite array"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
 async function inviteWorkerRequest(request, response) {
   try {
     const invitorData = request.body
@@ -29,6 +46,30 @@ async function inviteWorkerRequest(request, response) {
   } catch (exception) {
     const message = "Can't invite worker"
     response.status(500).json({message, details: exception.message})
+    logError(message, exception)
+  }
+}
+
+async function deleteWorkerRequest(request, response) {
+  try {
+    const farmWorkerId = request.query.farmWorkerId
+    await workerController.deleteFarmWorker(farmWorkerId)
+    response.status(200).json({message: "done"})
+  } catch (exception) {
+    const message = "Can't delete worker"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function deleteInviteRequest(request, response) {
+  try {
+    const workerInviteId = request.query.workerInviteId
+    await workerController.deleteInvite(workerInviteId)
+    response.status(200).json({message: "done"})
+  } catch (exception) {
+    const message = "Can't delete worker invite"
+    response.status(500).json({message})
     logError(message, exception)
   }
 }

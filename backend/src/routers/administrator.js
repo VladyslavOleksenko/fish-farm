@@ -4,8 +4,11 @@ const logError = require("../errorHandler")
 
 
 const router = express.Router()
-router.get("/byFarm", getAdministratorArrayRequest)
+router.get("/", getAdministratorArrayRequest)
+router.delete("/", deleteAdministratorRequest)
+router.get("/invite", getInviteArrayRequest)
 router.post("/invite", inviteAdministratorRequest)
+router.delete("/invite", deleteInviteRequest)
 
 
 async function getAdministratorArrayRequest(request, response) {
@@ -23,6 +26,20 @@ async function getAdministratorArrayRequest(request, response) {
   }
 }
 
+async function getInviteArrayRequest(request, response) {
+  try {
+    const farmId = request.query.farmId
+    const inviteArray = await administratorController.getInviteArray(farmId)
+    const inviteArrayFormatted =
+      administratorController.formatInviteArray(inviteArray)
+    response.status(200).json(inviteArrayFormatted)
+  } catch (exception) {
+    const message = "Can't get administrators invite array"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
 async function inviteAdministratorRequest(request, response) {
   try {
     const invitorData = request.body
@@ -31,6 +48,30 @@ async function inviteAdministratorRequest(request, response) {
   } catch (exception) {
     const message = "Can't invite administrator"
     response.status(500).json({message, details: exception.message})
+    logError(message, exception)
+  }
+}
+
+async function deleteAdministratorRequest(request, response) {
+  try {
+    const farmAdministratorId = request.query.farmAdministratorId
+    await administratorController.deleteFarmAdministrator(farmAdministratorId)
+    response.status(200).json({message: "done"})
+  } catch (exception) {
+    const message = "Can't delete administrator array"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function deleteInviteRequest(request, response) {
+  try {
+    const administratorInviteId = request.query.administratorInviteId
+    await administratorController.deleteInvite(administratorInviteId)
+    response.status(200).json({message: "done"})
+  } catch (exception) {
+    const message = "Can't delete administrator invite"
+    response.status(500).json({message})
     logError(message, exception)
   }
 }
