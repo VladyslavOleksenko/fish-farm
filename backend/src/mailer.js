@@ -34,4 +34,30 @@ async function mailer(recipientEmail, mailSubject, mailText, mailHtml) {
 }
 
 
-module.exports = mailer
+async function sendInviteAdministratorMail(email, farmName) {
+  const mailSubject = "Fish farm invitation"
+  const mailText =
+    `You were invited as administrator to farm ${farmName}
+     But you haven't got an account on FISH Farm
+     Welcome and join to us here:
+     http://localhost:8080`
+
+  await mailer(email, mailSubject, mailText)
+}
+
+async function sendInviteWorkerMail(email, farmName) {
+  const mailSubject = "Fish farm invitation"
+  const mailText =
+    `You were invited as a worker to farm ${farmName}
+     But you haven't got an account on FISH Farm
+     Welcome and join to us here:
+     http://localhost:8080`
+
+  await mailer(email, mailSubject, mailText)
+}
+
+
+module.exports = {
+  sendInviteAdministratorMail,
+  sendInviteWorkerMail
+}
