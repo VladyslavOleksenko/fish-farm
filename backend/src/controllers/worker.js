@@ -1,14 +1,18 @@
 module.exports = {
   getWorkerArray,
-  getWorkersIdArray,
-  deleteAllFarmWorkers,
-  deleteFarmWorker,
-  addWorker,
+  getWorkerByFarmAndUserId,
+  getWorkerInviteByFarmAndEmail,
+
+  inviteWorker,
+  createWorker,
   createWorkerInvite,
-  checkInviteWorkerAvailability: checkInviteAvailability,
+
+  deleteFarmWorker,
+  deleteAllFarmWorkers,
+  deleteAllFarmInvites,
+
   formatWorkerArray,
-  formatWorker,
-  inviteWorker
+  formatWorker
 }
 
 
@@ -25,34 +29,52 @@ async function getWorkerArray(farmId) {
   return dataBaseResponse.rows
 }
 
-async function getWorkersIdArray(farmId) {
-  const workerArray = await getWorkerArray(farmId)
-  if (!workerArray) {
-    throw new Error(`Can't get worker array ${farmId}`)
-  }
-
-  let workersIdArray = []
-  for (let worker of workerArray) {
-    workersIdArray.push(worker["farm_worker_id"])
-  }
-  return workersIdArray
-}
-
-async function deleteAllFarmWorkers(farmId) {
-  const farmWorkersIdArray = await getWorkersIdArray(farmId)
-  for (let farmWorkerId of farmWorkersIdArray) {
-    await deleteFarmWorker(farmWorkerId)
-  }
-}
-
-async function deleteFarmWorker(farmWorkerId) {
-  const sqlCommand = `DELETE
+async function getWorkerByFarmAndUserId(userId, farmId) {
+  const sqlCommand = `SELECT *
                       FROM farm_worker
-                      WHERE farm_worker_id = ${farmWorkerId}`
-  await sendDataBaseQuery(sqlCommand)
+                      WHERE farm_id LIKE '${farmId}'
+                        AND user_id = '${userId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
 }
 
-async function addWorker(userId, invitorData) {
+async function getWorkerInviteByFarmAndEmail(email, farmId) {
+  const sqlCommand = `SELECT *
+                      FROM worker_invite
+                      WHERE farm_id LIKE '${farmId}'
+                        AND email = '${email}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
+}
+
+
+async function inviteWorker(invitorData) {
+  const farm = farmController.getFarmByFarmId(invitorData.farmId)
+  if (!farm) {
+    throw new Error(`No farm with id ${invitorData.farmId}`)
+  }
+
+  const candidate = await userController.getUserByEmail(invitorData.email)
+  if (candidate) {
+    await createWorker(candidate["user_id"], invitorData)
+    return "Registered worker invited"
+  }
+
+  await createWorkerInvite(invitorData)
+  await sendInviteWorkerMail(invitorData.email, farm.name)
+  return "Unregistered worker invited"
+}
+
+async function createWorker(userId, invitorData) {
+  const farmId = invitorData.farmId
+  const administratorCandidate =
+    await administratorController.getAdministratorByFarmAndUserId(userId, farmId)
+  const workerCandidate =
+    await getWorkerByFarmAndUserId(userId, invitorData.farmId)
+  if (administratorCandidate || workerCandidate) {
+    throw new Error(`User already works on this farm`)
+  }
+
   const tableName = "farm_worker"
   const fieldNames = [
     "farm_worker_id",
@@ -72,20 +94,18 @@ async function addWorker(userId, invitorData) {
   return dataBaseResponse.rows.insertId
 }
 
+async function createWorkerInvite(invitorData) {
+  const email = invitorData.email
+  const farmId = invitorData.farmId
+  const invitedAdministratorCandidate =
+    await administratorController.getAdministratorInviteByFarmAndEmail(email, farmId)
+  const invitedWorkerCandidate =
+    await getWorkerInviteByFarmAndEmail(email, farmId)
 
-async function inviteWorker(farm, invitorData) {
-  const inviteAvailability =
-    await checkInviteAvailability(invitorData.email, farm.farmId)
-  if (!inviteAvailability) {
-    throw new Error(`The worker already invited to farm ${farm.farmId}`)
+  if (invitedAdministratorCandidate || invitedWorkerCandidate) {
+    throw new Error(`User already invited to this farm`)
   }
 
-  await createWorkerInvite(invitorData)
-  await sendInviteWorkerMail(invitorData.email, farm.name)
-  return "worker invited"
-}
-
-async function createWorkerInvite(invitorData) {
   const tableName = "worker_invite"
   const fieldNames = [
     "worker_invite_id",
@@ -105,13 +125,26 @@ async function createWorkerInvite(invitorData) {
   return dataBaseResponse.rows.insertId
 }
 
-async function checkInviteAvailability(email, farmId) {
-  const sqlCommand = `SELECT *
+
+async function deleteFarmWorker(farmWorkerId) {
+  const sqlCommand = `DELETE
+                      FROM farm_worker
+                      WHERE farm_worker_id = ${farmWorkerId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
+async function deleteAllFarmWorkers(farmId) {
+  const sqlCommand = `DELETE
+                      FROM farm_worker
+                      WHERE farm_id = ${farmId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
+async function deleteAllFarmInvites(farmId) {
+  const sqlCommand = `DELETE
                       FROM worker_invite
-                      WHERE email LIKE '${email}'
-                        AND farm_id = ${farmId}`
-  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
-  return !dataBaseResponse.rows.length
+                      WHERE farm_id = ${farmId}`
+  await sendDataBaseQuery(sqlCommand)
 }
 
 
@@ -139,7 +172,8 @@ async function formatWorker(worker) {
 }
 
 
-const {sendDataBaseQuery, createInsertSqlCommand} = require("./../dataBase");
-const {sendInviteWorkerMail} = require("../mailer");
+const {sendDataBaseQuery, createInsertSqlCommand} = require("./../dataBase")
+const {sendInviteWorkerMail} = require("../mailer")
+const farmController = require("./farm")
 const userController = require("./user")
-const farmController = require("./farm");
+const administratorController = require("./administrator")

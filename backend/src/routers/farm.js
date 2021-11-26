@@ -9,7 +9,6 @@ router.delete("/", deleteFarmRequest)
 router.get("/ownFarms", getFarmArrayByOwnerIdRequest)
 router.post("/create", createFarmRequest)
 router.get("/owner", getFarmOwnerRequest)
-router.post("/invite", inviteRequest)
 
 
 async function getFarmRequest(request, response) {
@@ -69,18 +68,6 @@ async function deleteFarmRequest(request, response) {
     response.status(200).json({message: "done"})
   } catch (exception) {
     const message = "Can't delete farm"
-    response.status(500).json({message})
-    logError(message, exception)
-  }
-}
-
-async function inviteRequest(request, response) {
-  try {
-    const invitorData = request.body
-    await farmController.invite(invitorData)
-    response.status(200).json({message: "Hello"})
-  } catch (exception) {
-    const message = "Can't invite"
     response.status(500).json({message})
     logError(message, exception)
   }

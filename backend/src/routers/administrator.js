@@ -5,6 +5,7 @@ const logError = require("../errorHandler")
 
 const router = express.Router()
 router.get("/byFarm", getAdministratorArrayRequest)
+router.post("/invite", inviteAdministratorRequest)
 
 
 async function getAdministratorArrayRequest(request, response) {
@@ -18,8 +19,19 @@ async function getAdministratorArrayRequest(request, response) {
   } catch (exception) {
     const message = "Can't get administrator array"
     response.status(500).json({message})
-    logError(message)
-    logError(exception)
+    logError(message, exception)
+  }
+}
+
+async function inviteAdministratorRequest(request, response) {
+  try {
+    const invitorData = request.body
+    const message = await administratorController.inviteAdministrator(invitorData)
+    response.status(200).json({message})
+  } catch (exception) {
+    const message = "Can't invite administrator"
+    response.status(500).json({message, details: exception.message})
+    logError(message, exception)
   }
 }
 

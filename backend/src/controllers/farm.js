@@ -4,9 +4,6 @@ module.exports = {
   getFarmOwner,
   createFarm,
   deleteFarm,
-  invite,
-  addEmployee,
-  inviteEmployee,
   formatFarmArray,
   formatFarm,
 }
@@ -43,6 +40,7 @@ async function getFarmOwner(farmId) {
   return farmOwner
 }
 
+
 async function createFarm(newFarmData) {
   const user = await userController.getUserByUserId(newFarmData.userId)
   if (!user) {
@@ -75,47 +73,14 @@ async function deleteFarm(farmId) {
   }
 
   await administratorController.deleteAllFarmAdministrators(farmId)
+  await administratorController.deleteAllFarmInvites(farmId)
   await workerController.deleteAllFarmWorkers(farmId)
+  await workerController.deleteAllFarmInvites(farmId)
 
   const sqlCommand = `DELETE
                       FROM farm
                       WHERE farm_id = ${farmId}`
   await sendDataBaseQuery(sqlCommand)
-}
-
-async function invite(invitorData) {
-  const farm = getFarmByFarmId(invitorData.farmId)
-  if (!farm) {
-    throw new Error(`No farm with id ${invitorData.farmId}`)
-  }
-
-  const candidate = await userController.getUserByEmail(invitorData.email)
-  if (candidate) {
-    const userId = candidate["user_id"]
-    return await addEmployee(userId, farm, invitorData)
-  }
-
-  return await inviteEmployee(farm, invitorData)
-}
-
-async function addEmployee(userId, farm, invitorData) {
-  if (invitorData.category === "administrator") {
-    await administratorController.addAdministrator(userId, invitorData)
-    return "Administrator added"
-  }
-  if (invitorData.category === "worker") {
-    await workerController.addWorker(userId, invitorData)
-    return "Administrator added"
-  }
-}
-
-async function inviteEmployee(farm, invitorData) {
-  if (invitorData.category === "administrator") {
-    return await administratorController.inviteAdministrator(farm, invitorData)
-  }
-  if (invitorData.category === "worker") {
-    return await workerController.inviteWorker(farm, invitorData)
-  }
 }
 
 

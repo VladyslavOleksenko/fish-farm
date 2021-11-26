@@ -1,23 +1,22 @@
 module.exports = {
   getAdministratorArray,
-  getAdministratorsIdArray,
-  deleteAllFarmAdministrators,
-  deleteFarmAdministrator,
-  addAdministrator,
-  createAdministratorInvite,
-  checkInviteAvailability,
+  getAdministratorByFarmAndUserId,
+  getAdministratorInviteByFarmAndEmail,
+
   inviteAdministrator,
+  createAdministrator,
+  createAdministratorInvite,
+
+  deleteFarmAdministrator,
+  deleteAllFarmAdministrators,
+  deleteAllFarmInvites,
+
   formatAdministratorArray,
-  formatAdministrator
+  formatAdministrator,
 }
 
 
 async function getAdministratorArray(farmId) {
-  const farm = await farmController.getFarmByFarmId(farmId)
-  if (!farm) {
-    throw new Error(`No farm with id ${farmId}`)
-  }
-
   const sqlCommand = `SELECT *
                       FROM farm_administrator
                       WHERE farm_id LIKE '${farmId}'`
@@ -25,34 +24,52 @@ async function getAdministratorArray(farmId) {
   return dataBaseResponse.rows
 }
 
-async function getAdministratorsIdArray(farmId) {
-  const administratorArray = await getAdministratorArray(farmId)
-  if (!administratorArray) {
-    throw new Error(`Can't get administrator array ${farmId}`)
-  }
-
-  let administratorsIdArray = []
-  for (let administrator of administratorArray) {
-    administratorsIdArray.push(administrator["farm_administrator_id"])
-  }
-  return administratorsIdArray
-}
-
-async function deleteAllFarmAdministrators(farmId) {
-  const farmAdministratorsIdArray = await getAdministratorsIdArray(farmId)
-  for (let farmAdministratorId of farmAdministratorsIdArray) {
-    await deleteFarmAdministrator(farmAdministratorId)
-  }
-}
-
-async function deleteFarmAdministrator(farmAdministratorId) {
-  const sqlCommand = `DELETE
+async function getAdministratorByFarmAndUserId(userId, farmId) {
+  const sqlCommand = `SELECT *
                       FROM farm_administrator
-                      WHERE farm_administrator_id = ${farmAdministratorId}`
-  await sendDataBaseQuery(sqlCommand)
+                      WHERE farm_id LIKE '${farmId}'
+                        AND user_id = '${userId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
 }
 
-async function addAdministrator(userId, invitorData) {
+async function getAdministratorInviteByFarmAndEmail(email, farmId) {
+  const sqlCommand = `SELECT *
+                      FROM administrator_invite
+                      WHERE farm_id LIKE '${farmId}'
+                        AND email = '${email}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
+}
+
+
+async function inviteAdministrator(invitorData) {
+  const farm = farmController.getFarmByFarmId(invitorData.farmId)
+  if (!farm) {
+    throw new Error(`No farm with id ${invitorData.farmId}`)
+  }
+
+  const candidate = await userController.getUserByEmail(invitorData.email)
+  if (candidate) {
+    await createAdministrator(candidate["user_id"], invitorData)
+    return "Registered administrator invited"
+  }
+
+  await createAdministratorInvite(invitorData)
+  await sendInviteAdministratorMail(invitorData.email, farm.name)
+  return "Unregistered administrator invited"
+}
+
+async function createAdministrator(userId, invitorData) {
+  const farmId = invitorData.farmId
+  const administratorCandidate =
+    await getAdministratorByFarmAndUserId(userId, farmId)
+  const workerCandidate =
+    await workerController.getWorkerByFarmAndUserId(userId, farmId)
+  if (administratorCandidate || workerCandidate) {
+    throw new Error(`User already works on this farm`)
+  }
+
   const tableName = "farm_administrator"
   const fieldNames = [
     "farm_administrator_id",
@@ -78,20 +95,17 @@ async function addAdministrator(userId, invitorData) {
   return dataBaseResponse.rows.insertId
 }
 
-
-async function inviteAdministrator(farm, invitorData) {
-  const inviteAvailability =
-    await checkInviteAvailability(invitorData.email, farm.farmId)
-  if (!inviteAvailability) {
-    throw new Error(`The administrator already invited to farm ${farm.farmId}`)
+async function createAdministratorInvite(invitorData) {
+  const email = invitorData.email
+  const farmId = invitorData.farmId
+  const invitedAdministratorCandidate =
+    await getAdministratorInviteByFarmAndEmail(email, farmId)
+  const invitedWorkerCandidate =
+    await getWorkerInviteByFarmAndEmail(email, farmId)
+  if (invitedAdministratorCandidate || invitedWorkerCandidate) {
+    throw new Error(`User already invited to this farm`)
   }
 
-  await createAdministratorInvite(invitorData)
-  await sendInviteAdministratorMail(invitorData.email, farm.name)
-  return "administrator invited"
-}
-
-async function createAdministratorInvite(invitorData) {
   const tableName = "administrator_invite"
   const fieldNames = [
     "administrator_invite_id",
@@ -117,13 +131,26 @@ async function createAdministratorInvite(invitorData) {
   return dataBaseResponse.rows.insertId
 }
 
-async function checkInviteAvailability(email, farmId) {
-  const sqlCommand = `SELECT *
+
+async function deleteFarmAdministrator(farmAdministratorId) {
+  const sqlCommand = `DELETE
+                      FROM farm_administrator
+                      WHERE farm_administrator_id = ${farmAdministratorId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
+async function deleteAllFarmAdministrators(farmId) {
+  const sqlCommand = `DELETE
+                      FROM farm_administrator
+                      WHERE farm_id = ${farmId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
+async function deleteAllFarmInvites(farmId) {
+  const sqlCommand = `DELETE
                       FROM administrator_invite
-                      WHERE email LIKE '${email}'
-                        AND farm_id = ${farmId}`
-  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
-  return !dataBaseResponse.rows.length
+                      WHERE farm_id = ${farmId}`
+  await sendDataBaseQuery(sqlCommand)
 }
 
 
@@ -154,7 +181,9 @@ async function formatAdministrator(administrator) {
 }
 
 
-const {sendDataBaseQuery, createInsertSqlCommand} = require("./../dataBase");
-const {sendInviteAdministratorMail} = require("../mailer");
+const {sendDataBaseQuery, createInsertSqlCommand} = require("./../dataBase")
+const {sendInviteAdministratorMail} = require("../mailer")
 const farmController = require("./farm")
-const userController = require("./user");
+const userController = require("./user")
+const workerController = require("./worker")
+const {getWorkerInviteByFarmAndEmail} = require("./worker");
