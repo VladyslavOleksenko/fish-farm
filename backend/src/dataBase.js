@@ -29,7 +29,14 @@ function createInsertSqlCommand(tableName, fieldNames, fieldValues) {
       if (fieldValuesStr !== "(") {
         fieldValuesStr += ", "
       }
-      fieldValuesStr += (fieldValue ? `'${fieldValue}'` : "NULL")
+      const fieldValueNullStatus = (fieldValue === null || fieldValue === undefined)
+      if (fieldValue === false) {
+        fieldValue = 0
+      }
+      if (fieldValue === true) {
+        fieldValue = 1
+      }
+      fieldValuesStr += (fieldValueNullStatus ? "NULL" : `'${fieldValue}'`)
     }
     fieldValuesStr += ")"
 
