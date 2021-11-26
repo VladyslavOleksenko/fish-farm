@@ -1,8 +1,14 @@
-const jsonwebtoken = require("jsonwebtoken")
-const jsonwebtokenKey = require("./../../appConfig").jsonwebtokenKey
+module.exports = {
+  registerUser,
+  loginUser,
+  getUserByUserId,
+  getUserByEmail,
+  generateToken,
+  formatUser,
+}
 
 
-const registerUser = module.exports.registerUser = async function(newUserData) {
+async function registerUser(newUserData) {
   const candidate = await getUserByEmail(newUserData.email)
   if (candidate) {
     throw new Error(`User with email ${newUserData.body.email} already exists`)
@@ -32,7 +38,7 @@ const registerUser = module.exports.registerUser = async function(newUserData) {
   return await getUserByEmail(newUserData.email)
 }
 
-const loginUser = module.exports.loginUser = async function(userData) {
+async function loginUser(userData) {
   const user = await getUserByEmail(userData.email)
   if (!user) {
     throw new Error(`No user with email ${userData.email}`)
@@ -46,7 +52,7 @@ const loginUser = module.exports.loginUser = async function(userData) {
   return user
 }
 
-const getUserByUserId = module.exports.getUserByUserId = async function(userId) {
+async function getUserByUserId(userId) {
   const sqlCommand = `SELECT *
                       FROM user
                       WHERE user_id LIKE '${userId}'`
@@ -54,7 +60,7 @@ const getUserByUserId = module.exports.getUserByUserId = async function(userId) 
   return dataBaseResponse.rows[0]
 }
 
-const getUserByEmail = module.exports.getUserByEmail = async function(email) {
+async function getUserByEmail(email) {
   const sqlCommand = `SELECT *
                       FROM user
                       WHERE email LIKE '${email}'`
@@ -62,13 +68,13 @@ const getUserByEmail = module.exports.getUserByEmail = async function(email) {
   return dataBaseResponse.rows[0]
 }
 
-const generateToken = module.exports.generateToken = function(payload) {
+function generateToken(payload) {
   const expiresIn = 60 * 60
   return "Bearer " + jsonwebtoken.sign(payload, jsonwebtokenKey, {expiresIn})
 }
 
 
-const formatUser = module.exports.formatUser = function(user) {
+function formatUser(user) {
   return {
     userId: user["user_id"],
     email: user.email,
@@ -80,4 +86,6 @@ const formatUser = module.exports.formatUser = function(user) {
 }
 
 
+const jsonwebtoken = require("jsonwebtoken")
+const jsonwebtokenKey = require("./../../appConfig").jsonwebtokenKey
 const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");

@@ -1,7 +1,19 @@
-getAdministratorArray =
-  module.exports.getAdministratorArray =
-    async function (farmId) {
-  const farm = await getFarmByFarmId(farmId)
+module.exports = {
+  getAdministratorArray,
+  getAdministratorsIdArray,
+  deleteAllFarmAdministrators,
+  deleteFarmAdministrator,
+  addAdministrator,
+  createAdministratorInvite,
+  checkInviteAvailability,
+  inviteAdministrator,
+  formatAdministratorArray,
+  formatAdministrator
+}
+
+
+async function getAdministratorArray(farmId) {
+  const farm = await farmController.getFarmByFarmId(farmId)
   if (!farm) {
     throw new Error(`No farm with id ${farmId}`)
   }
@@ -13,9 +25,7 @@ getAdministratorArray =
   return dataBaseResponse.rows
 }
 
-getAdministratorsIdArray =
-  module.exports.getAdministratorsIdArray =
-    async function (farmId) {
+async function getAdministratorsIdArray(farmId) {
   const administratorArray = await getAdministratorArray(farmId)
   if (!administratorArray) {
     throw new Error(`Can't get administrator array ${farmId}`)
@@ -28,27 +38,21 @@ getAdministratorsIdArray =
   return administratorsIdArray
 }
 
-deleteAllFarmAdministrators =
-  module.exports.deleteAllFarmAdministrators =
-    async function (farmId) {
+async function deleteAllFarmAdministrators(farmId) {
   const farmAdministratorsIdArray = await getAdministratorsIdArray(farmId)
   for (let farmAdministratorId of farmAdministratorsIdArray) {
     await deleteFarmAdministrator(farmAdministratorId)
   }
 }
 
-deleteFarmAdministrator =
-  module.exports.deleteFarmAdministrator =
-    async function (farmAdministratorId) {
+async function deleteFarmAdministrator(farmAdministratorId) {
   const sqlCommand = `DELETE
                       FROM farm_administrator
                       WHERE farm_administrator_id = ${farmAdministratorId}`
   await sendDataBaseQuery(sqlCommand)
 }
 
-addAdministrator =
-  module.exports.addAdministrator =
-    async function (userId, invitorData) {
+async function addAdministrator(userId, invitorData) {
   const tableName = "farm_administrator"
   const fieldNames = [
     "farm_administrator_id",
@@ -74,9 +78,7 @@ addAdministrator =
   return dataBaseResponse.rows.insertId
 }
 
-createAdministratorInvite =
-  module.exports.createAdministratorInvite =
-    async function (invitorData) {
+async function createAdministratorInvite(invitorData) {
   const tableName = "administrator_invite"
   const fieldNames = [
     "administrator_invite_id",
@@ -102,9 +104,7 @@ createAdministratorInvite =
   return dataBaseResponse.rows.insertId
 }
 
-checkInviteAdministratorAvailability =
-  module.exports.checkInviteAdministratorAvailability =
-    async (email, farmId) => {
+async function checkInviteAvailability(email, farmId) {
   const sqlCommand = `SELECT *
                       FROM administrator_invite
                       WHERE email LIKE '${email}'
@@ -113,25 +113,23 @@ checkInviteAdministratorAvailability =
   return !dataBaseResponse.rows.length
 }
 
-inviteAdministrator =
-  module.exports.inviteAdministrator =
-    async function(farm, invitorData) {
-      const inviteAdministratorAvailability =
-        await checkInviteAdministratorAvailability(
-          invitorData.email, invitorData.farmId)
-      if (!inviteAdministratorAvailability) {
-        const errorMessage = "The administrator already invited to farm " +
-          invitorData.farmId
-        throw new Error(errorMessage)
-      }
+async function inviteAdministrator(farm, invitorData) {
+  const inviteAdministratorAvailability =
+    await checkInviteAvailability(
+      invitorData.email, invitorData.farmId)
+  if (!inviteAdministratorAvailability) {
+    const errorMessage = "The administrator already invited to farm " +
+      invitorData.farmId
+    throw new Error(errorMessage)
+  }
 
-      await createAdministratorInvite(invitorData)
-      await sendInviteAdministratorMail(invitorData.email, farm.name)
-      return "administrator invited"
-    }
+  await createAdministratorInvite(invitorData)
+  await sendInviteAdministratorMail(invitorData.email, farm.name)
+  return "administrator invited"
+}
 
 
-const formatAdministratorArray = module.exports.formatAdministratorArray = async function (administratorArray) {
+async function formatAdministratorArray(administratorArray) {
   let newAdministratorArray = []
   for (let administrator of administratorArray) {
     newAdministratorArray.push(await formatAdministrator(administrator))
@@ -139,9 +137,10 @@ const formatAdministratorArray = module.exports.formatAdministratorArray = async
   return newAdministratorArray
 }
 
-const formatAdministrator = module.exports.formatAdministrator = async function (administrator) {
-  const dbUser = await getUserByUserId(administrator["user_id"])
-  const dbUserFormatted = formatUser(dbUser)
+async function formatAdministrator(administrator) {
+  const userId = administrator["user_id"]
+  const dbUser = await userController.getUserByUserId(userId)
+  const dbUserFormatted = userController.formatUser(dbUser)
   return {
     farmAdministratorId: administrator["farm_administrator_id"],
     farmId: administrator["farm_id"],
@@ -158,6 +157,6 @@ const formatAdministrator = module.exports.formatAdministrator = async function 
 
 
 const {sendDataBaseQuery, createInsertSqlCommand} = require("./../dataBase");
-const {getFarmByFarmId} = require("./farm")
-const {getUserByUserId, formatUser} = require("./user");
 const {sendInviteAdministratorMail} = require("../mailer");
+const farmController = require("./farm")
+const userController = require("./user");

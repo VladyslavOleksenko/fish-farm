@@ -1,5 +1,15 @@
-const createPool = module.exports.createPool = async function(newPoolData) {
-  const farm = await getFarmByFarmId(newPoolData.farmId)
+module.exports = {
+  createPool,
+  getPoolArray,
+  getPoolByPoolId,
+  deletePool,
+  formatPoolArray,
+  formatPool,
+}
+
+
+async function createPool(newPoolData) {
+  const farm = await farmController.getFarmByFarmId(newPoolData.farmId)
   if (!farm) {
     throw new Error(`No farm with id ${newPoolData.farmId}`)
   }
@@ -21,8 +31,8 @@ const createPool = module.exports.createPool = async function(newPoolData) {
   return dataBaseResponse.rows.insertId
 }
 
-const getPoolArray = module.exports.getPoolArray = async function(farmId) {
-  const farm = await getFarmByFarmId(farmId)
+async function getPoolArray(farmId) {
+  const farm = await farmController.getFarmByFarmId(farmId)
   if (!farm) {
     throw new Error(`No farm with id ${farmId}`)
   }
@@ -34,7 +44,7 @@ const getPoolArray = module.exports.getPoolArray = async function(farmId) {
   return dataBaseResponse.rows
 }
 
-const getPoolByPoolId = module.exports.getPoolByPoolId = async function(poolId) {
+async function getPoolByPoolId(poolId) {
   const sqlCommand = `SELECT *
                       FROM pool
                       WHERE pool_id LIKE '${poolId}'`
@@ -42,7 +52,7 @@ const getPoolByPoolId = module.exports.getPoolByPoolId = async function(poolId) 
   return dataBaseResponse.rows[0]
 }
 
-const deletePool = module.exports.deletePool = async function(poolId) {
+async function deletePool(poolId) {
   const sqlCommand = `DELETE
                       FROM pool
                       WHERE pool_id = ${poolId}`
@@ -50,7 +60,7 @@ const deletePool = module.exports.deletePool = async function(poolId) {
 }
 
 
-const formatPoolArray = module.exports.formatPoolArray = function(poolArray) {
+function formatPoolArray(poolArray) {
   let poolArrayFormatted = []
   for (let pool of poolArray) {
     poolArrayFormatted.push(formatPool(pool))
@@ -58,7 +68,7 @@ const formatPoolArray = module.exports.formatPoolArray = function(poolArray) {
   return poolArrayFormatted
 }
 
-const formatPool = module.exports.formatPool = function (pool) {
+function formatPool(pool) {
   return {
     poolId: pool["pool_id"],
     name: pool.name,
@@ -67,7 +77,5 @@ const formatPool = module.exports.formatPool = function (pool) {
 }
 
 
-
-
 const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
-const {getFarmByFarmId} = require("./farm");
+const farmController = require("./farm");
