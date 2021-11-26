@@ -10,19 +10,37 @@
                   :user="user"
                   :category="category"/>
       </div>
+
+      <div class="staff__add-button-wrapper">
+        <MyRectangleButton class="staff__add-button"
+                           v-if="category !== 'owner'"
+                           icon-name="add"
+                           :text="inviteButtonText"/>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import Employee from "@/components/StaffBlock/Employee";
+import MyRectangleButton from "@/components/UI/MyRectangleButton";
 
 export default {
   name: "Staff",
-  components: {Employee},
+  components: {MyRectangleButton, Employee},
   props: {
     category: {type: String, required: true},
     userArray: {type: Array, default: []}
+  },
+  computed: {
+    inviteButtonText() {
+      if (this.category === "administrators") {
+        return "add administrator"
+      }
+      if (this.category === "workers") {
+        return "add worker"
+      }
+    }
   }
 }
 </script>
@@ -53,5 +71,16 @@ export default {
 
 .staff__user:last-child {
   margin: 0;
+}
+
+
+.staff__add-button-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.staff__add-button {
+  height: 50px;
+  padding: 0 50px;
 }
 </style>

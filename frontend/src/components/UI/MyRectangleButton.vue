@@ -2,8 +2,10 @@
   <div class="my-rectangle-button">
     <div class="my-rectangle-button__content"
          @click="$emit('clicked')">
-      <MyIcon class="my-rectangle-button__icon" icon-name="add" path-color="#eee"/>
-      <p class="my-rectangle-button__text">Add pool</p>
+      <MyIcon class="my-rectangle-button__icon"
+              :icon-name="iconName"
+              path-color="#eee"/>
+      <p class="my-rectangle-button__text">{{ text }}</p>
     </div>
   </div>
 </template>
@@ -23,8 +25,6 @@ export default {
 
 <style scoped>
 .my-rectangle-button {
-  margin: 50px 0 0 0;
-
   display: flex;
   justify-content: center;
 }
@@ -32,6 +32,7 @@ export default {
 .my-rectangle-button__content {
   width: 100%;
   height: 100%;
+  padding: 0 50px;
 
   display: flex;
   justify-content: center;
@@ -62,6 +63,6 @@ export default {
 }
 
 .my-rectangle-button__text {
-  font-size: 22px;
+  font-size: 20px;
 }
 </style>

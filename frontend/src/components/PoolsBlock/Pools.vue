@@ -107,7 +107,6 @@ export default {
 }
 
 .pools__add-button {
-  width: 200px;
   height: 50px;
 }
 
