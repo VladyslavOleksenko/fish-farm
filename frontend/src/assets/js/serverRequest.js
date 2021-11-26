@@ -99,10 +99,68 @@ export async function deleteFarm(farmId) {
 }
 
 
+export async function getFarmAdministrators(farmId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/administrator?farmId=" + farmId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+export async function getFarmAdministratorInvites(farmId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/administrator/invite?farmId=" + farmId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+export async function inviteAdministrator(invitorData) {
+  const requestParams = new RequestParams(
+    "POST",
+    "http://localhost:5000/api/administrator/invite",
+    invitorData
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+export async function deleteAdministrator(farmAdministratorId) {
+  const requestParams = new RequestParams(
+    "DELETE",
+    "http://localhost:5000/api/administrator?farmAdministratorId=" +
+    farmAdministratorId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+export async function deleteAdministratorInvite(administratorInviteId) {
+  const requestParams = new RequestParams(
+    "DELETE",
+    "http://localhost:5000/api/administrator/invite?" +
+    "administratorInviteId=" + administratorInviteId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+
 export async function getFarmWorkers(farmId) {
   const requestParams = new RequestParams(
     "GET",
-    "http://localhost:5000/api/worker/byFarm?farmId=" + farmId
+    "http://localhost:5000/api/worker?farmId=" + farmId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+export async function getFarmWorkerInvites(farmId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/worker/invite?farmId=" + farmId
   )
 
   return await sendServerRequest(requestParams)
@@ -118,21 +176,21 @@ export async function inviteWorker(invitorData) {
   return await sendServerRequest(requestParams)
 }
 
-
-export async function getFarmAdministrators(farmId) {
+export async function deleteWorker(farmWorkerId) {
   const requestParams = new RequestParams(
-    "GET",
-    "http://localhost:5000/api/administrator/byFarm?farmId=" + farmId
+    "DELETE",
+    "http://localhost:5000/api/worker?farmWorkerId=" +
+    farmWorkerId
   )
 
   return await sendServerRequest(requestParams)
 }
 
-export async function inviteAdministrator(invitorData) {
+export async function deleteWorkerInvite(workerInviteId) {
   const requestParams = new RequestParams(
-    "POST",
-    "http://localhost:5000/api/administrator/invite",
-    invitorData
+    "DELETE",
+    "http://localhost:5000/api/worker/invite?" +
+    "workerInviteId=" + workerInviteId
   )
 
   return await sendServerRequest(requestParams)
