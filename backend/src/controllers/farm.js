@@ -1,4 +1,18 @@
-const getFarmArrayByOwnerId = module.exports.getFarmArrayByOwnerId = async function(ownerId) {
+module.exports = {
+  getFarmArrayByOwnerId,
+  getFarmByFarmId,
+  getFarmOwner,
+  createFarm,
+  deleteFarm,
+  invite,
+  addEmployee,
+  inviteEmployee,
+  formatFarmArray,
+  formatFarm,
+}
+
+
+async function getFarmArrayByOwnerId(ownerId) {
   const sqlCommand = `SELECT *
                       FROM farm
                       WHERE owner_id LIKE '${ownerId}'`
@@ -6,7 +20,7 @@ const getFarmArrayByOwnerId = module.exports.getFarmArrayByOwnerId = async funct
   return dataBaseResponse.rows
 }
 
-const getFarmByFarmId = module.exports.getFarmByFarmId = async function(farmId) {
+async function getFarmByFarmId(farmId) {
   const sqlCommand = `SELECT *
                       FROM farm
                       WHERE farm_id LIKE '${farmId}'`
@@ -14,7 +28,7 @@ const getFarmByFarmId = module.exports.getFarmByFarmId = async function(farmId) 
   return dataBaseResponse.rows[0]
 }
 
-const getFarmOwner = module.exports.getFarmOwner = async function(farmId) {
+async function getFarmOwner(farmId) {
   const farm = await getFarmByFarmId(farmId)
   if (!farm) {
     throw new Error(`No farm with id ${farmId}`)
@@ -28,7 +42,7 @@ const getFarmOwner = module.exports.getFarmOwner = async function(farmId) {
   return farmOwner
 }
 
-const createFarm = module.exports.createFarm = async function(newFarmData) {
+async function createFarm(newFarmData) {
   const user = await getUserByUserId(newFarmData.userId)
   if (!user) {
     throw new Error(`No user with id ${newFarmData.userId}`)
@@ -53,7 +67,7 @@ const createFarm = module.exports.createFarm = async function(newFarmData) {
   return dataBaseResponse.rows.insertId
 }
 
-const deleteFarm = module.exports.deleteFarm = async function(farmId) {
+async function deleteFarm(farmId) {
   const farm = getFarmByFarmId(farmId)
   if (!farm) {
     throw new Error(`No farm with id ${farmId}`)
@@ -68,8 +82,42 @@ const deleteFarm = module.exports.deleteFarm = async function(farmId) {
   await sendDataBaseQuery(sqlCommand)
 }
 
+async function invite(invitorData) {
+  const farm = getFarmByFarmId(invitorData.farmId)
+  if (!farm) {
+    throw new Error(`No farm with id ${invitorData.farmId}`)
+  }
 
-const formatFarmArray = module.exports.formatFarmArray = function(farmArray) {
+  const candidate = await getUserByEmail(invitorData.email)
+  if (candidate) {
+    return await addEmployee(candidate, farm, invitorData)
+  }
+
+  return await inviteEmployee(farm, invitorData)
+}
+
+async function addEmployee(candidate, farm, invitorData) {
+  if (invitorData.category === "administrator") {
+    await addAdministrator(candidate["user_id"], invitorData)
+    return "Administrator added"
+  }
+  if (invitorData.category === "worker") {
+    await addWorker(candidate["user_id"], invitorData)
+    return "Administrator added"
+  }
+}
+
+async function inviteEmployee(farm, invitorData) {
+  if (invitorData.category === "administrator") {
+    return await inviteAdministrator(farm, invitorData)
+  }
+  if (invitorData.category === "worker") {
+    return await inviteWorker(farm, invitorData)
+  }
+}
+
+
+function formatFarmArray(farmArray) {
   let farmArrayFormatted = []
   for (let farm of farmArray) {
     farmArrayFormatted.push(formatFarm(farm))
@@ -77,7 +125,7 @@ const formatFarmArray = module.exports.formatFarmArray = function(farmArray) {
   return farmArrayFormatted
 }
 
-const formatFarm = module.exports.formatFarm = function(farm) {
+function formatFarm(farm) {
   return {
     farmId: farm["farm_id"],
     name: farm.name,
@@ -88,6 +136,15 @@ const formatFarm = module.exports.formatFarm = function(farm) {
 
 
 const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
-const {getUserByUserId} = require("./user")
-const {deleteAllFarmWorkers} = require("./worker");
-const {deleteAllFarmAdministrators} = require("./administrator");
+const {getUserByUserId, getUserByEmail} = require("./user")
+const {
+  deleteAllFarmWorkers,
+  addWorker,
+  inviteWorker
+} = require("./worker");
+const {
+  deleteAllFarmAdministrators,
+  addAdministrator,
+  inviteAdministrator
+} = require("./administrator");
+const {sendInviteAdministratorMail, sendInviteWorkerMail} = require("../mailer");
