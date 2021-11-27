@@ -8,7 +8,8 @@ function createInsertSqlCommand(tableName, fieldNames, fieldValues) {
     throw new Error("fieldNames.length != fieldValues.length")
   }
 
-  return `INSERT INTO ${tableName} ${createFieldNameStr()} VALUES ${createFieldValuesStr()};`
+  return `INSERT
+          INTO ${tableName} ${createFieldNameStr()} VALUES ${createFieldValuesStr()};`
 
   function createFieldNameStr() {
     let fieldNamesStr = "("
@@ -29,7 +30,8 @@ function createInsertSqlCommand(tableName, fieldNames, fieldValues) {
       if (fieldValuesStr !== "(") {
         fieldValuesStr += ", "
       }
-      const fieldValueNullStatus = (fieldValue === null || fieldValue === undefined)
+      const fieldValueNullStatus =
+        (fieldValue === null || fieldValue === undefined)
       if (fieldValue === false) {
         fieldValue = 0
       }
@@ -52,8 +54,7 @@ async function sendDataBaseQuery(sqlCommand) {
     await connection.end()
 
     return {rows, fields}
-  }
-  catch (exception) {
+  } catch (exception) {
     const message = "DataBase error: " + exception
     throwError(message)
   }
