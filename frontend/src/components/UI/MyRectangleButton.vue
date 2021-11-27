@@ -1,13 +1,13 @@
 <template>
-  <div class="my-rectangle-button">
-    <div class="content"
-         :class="{'content__disabled': disabled}"
+  <div>
+    <div class="button"
+         :class="{'button-disabled': disabled}"
          @click="clicked">
-      <MyIcon class="content__icon"
+      <MyIcon class="button__icon"
               :style="{'opacity': disabled ? .5 : 1}"
               :icon-name="iconName"
               path-color="#eee"/>
-      <p class="content__text">{{ text }}</p>
+      <p class="button__text">{{ text }}</p>
     </div>
   </div>
 </template>
@@ -26,7 +26,7 @@ export default {
   methods: {
     clicked() {
       if (this.disabled) {
-        return
+        return this.$emit('disableClicked')
       }
       this.$emit('clicked')
     }
@@ -35,12 +35,7 @@ export default {
 </script>
 
 <style scoped>
-.my-rectangle-button {
-  display: flex;
-  justify-content: center;
-}
-
-.content {
+.button {
   width: 100%;
   height: 100%;
   padding: 0 50px;
@@ -57,7 +52,7 @@ export default {
   border .2s ease;
 }
 
-.content__icon {
+.button__icon {
   margin: 0 15px 0 0;
   width: 20px;
   height: 20px;
@@ -65,7 +60,7 @@ export default {
   transition: opacity .2s ease;
 }
 
-.content__text {
+.button__text {
   font-size: 20px;
 
   color: #eeeeee;
@@ -73,38 +68,38 @@ export default {
   transition: color .2s ease;
 }
 
-.content:hover {
+.button:hover {
   background-color: var(--light-purple-color);
 }
 
-.content:hover .content__text {
+.button:hover .button__text {
   color: #ffffff;
 }
 
-.content:active .content__text {
+.button:active .button__text {
   color: var(--light-gray-color);
 }
 
 
-.content__disabled {
+.button-disabled {
   border: 2px solid var(--light-gray-color);
 
   transition: background-color .5s ease;
 }
 
-.content__disabled .content__text {
+.button-disabled .button__text {
   color: var(--light-gray-color);
 }
 
-.content__disabled:hover {
+.button-disabled:hover {
   background-color: rgba(243, 117, 117, 0.15);
 }
 
-.content__disabled:hover .content__text {
+.button-disabled:hover .button__text {
   color: var(--light-gray-color);
 }
 
-.content__disabled:active {
+.button-disabled:active {
   background-color: rgba(243, 117, 117, 0.5);
 }
 </style>
