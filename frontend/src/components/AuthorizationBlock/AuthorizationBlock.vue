@@ -8,87 +8,69 @@
               right-value="Login"
               v-model="mode"/>
 
-    <form class="wrapper__register-form form"
-          action="http://localhost:5000/api/user"
-          method="post"
-          v-if="mode === 'register'">
-      <div class="form__error"
-           v-if="registerServerError">
-        {{ registerServerError }}
-      </div>
-      <div class="form__advice"
-           v-if="registerDataValidationError">
-        Fill all the fields
-      </div>
-      <div class="form__input-fields-row">
-        <MyInput class="form__input"
-                 type="text"
-                 placeholder="First name"
-                 required
-                 v-model="registerData.firstName"/>
-        <MyInput class="form__input"
-                 type="text"
-                 placeholder="Last name"
-                 v-model="registerData.lastName"/>
-      </div>
-      <div class="form__input-fields-row">
-        <MyInput class="form__input"
-                 type="email"
-                 placeholder="Email"
-                 required
-                 v-model="registerData.email"/>
-      </div>
-      <div class="form__input-fields-row">
-        <MyInput class="form__input"
-                 type="password"
-                 placeholder="Password"
-                 required
-                 v-model="registerData.password"/>
-      </div>
+    <MyForm
+      v-if="mode === 'register'"
+      submit-text="Register"
+      :submit-disabled="!validateRegisterData"
+      :message="registerData.message"
+      v-model:message-visibility-status="registerData.messageVisibilityStatus"
+      @submitted="sendRegisterRequest">
+      <FormRow>
+        <FormInput
+          type="text"
+          placeholder="First name"
+          required
+          v-model="registerData.firstName"
+          @updated="registerDataUpdated"/>
+        <FormInput
+          type="text"
+          placeholder="Last name"
+          required
+          v-model="registerData.lastName"
+          @updated="registerDataUpdated"/>
+      </FormRow>
+      <FormRow>
+        <FormInput
+          type="email"
+          placeholder="Email"
+          required
+          v-model="registerData.email"
+          @updated="registerDataUpdated"/>
+      </FormRow>
+      <FormRow>
+        <FormInput
+          type="password"
+          placeholder="Password"
+          required
+          v-model="registerData.password"
+          @updated="registerDataUpdated"/>
+      </FormRow>
+    </MyForm>
 
-      <div class="form__submit-wrapper">
-        <MyRectangleButton class="form__submit"
-                           icon-name="ok"
-                           text="Register"
-                           :disabled="!!registerDataValidationError"
-                           @clicked="sendRegisterRequest"/>
-      </div>
-    </form>
-
-    <form class="wrapper__login-form form"
-          action=""
-          v-else-if="mode === 'login'">
-      <div class="form__error"
-           v-if="loginServerError">
-        {{ loginServerError }}
-      </div>
-      <div class="form__advice"
-           v-if="loginDataValidationError">
-        Fill all the fields
-      </div>
-      <div class="form__input-fields-row">
-        <MyInput class="form__input"
-                 type="email"
-                 placeholder="Email"
-                 required
-                 v-model="loginData.email"/>
-      </div>
-      <div class="form__input-fields-row">
-        <MyInput class="form__input"
-                 type="password"
-                 placeholder="Password"
-                 required
-                 v-model="loginData.password"/>
-      </div>
-
-      <div class="form__submit-wrapper">
-        <MyRectangleButton class="form__submit"
-                           icon-name="ok"
-                           text="Login"
-                           :disabled="!!loginDataValidationError"
-                           @clicked="sendLoginRequest"/>
-      </div>
-    </form>
+    <MyForm
+      v-else
+      submit-text="Login"
+      :submit-disabled="!validateLoginData"
+      :message="loginData.message"
+      v-model:message-visibility-status="loginData.messageVisibilityStatus"
+      @submitted="sendLoginRequest">
+      <FormRow>
+        <FormInput
+          type="email"
+          placeholder="Email"
+          required
+          v-model="loginData.email"
+          @updated="loginDataUpdated"/>
+      </FormRow>
+      <FormRow>
+        <FormInput
+          type="password"
+          placeholder="Password"
+          required
+          v-model="loginData.password"
+          @updated="loginDataUpdated"/>
+      </FormRow>
+    </MyForm>
   </div>
 </template>
 
@@ -98,11 +80,21 @@ import {mapMutations, mapState} from "vuex"
 import MyInput from "@/components/UI/MyInput";
 import Switcher from "@/components/UI/Switcher";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
+import MyForm from "@/components/Form/MyForm";
+import FormRow from "@/components/Form/FormRow";
+import FormInput from "@/components/Form/FormInput";
 
 
 export default {
   name: "AuthorizationBlock",
-  components: {MyRectangleButton, Switcher, MyInput},
+  components: {
+    FormInput,
+    FormRow,
+    MyForm,
+    MyRectangleButton,
+    Switcher,
+    MyInput
+  },
   data: () => ({
     testModel: "",
     mode: "register",
@@ -110,71 +102,80 @@ export default {
       firstName: "",
       lastName: "",
       email: "",
-      password: ""
+      password: "",
+      message: "",
+      messageVisibilityStatus: false
     },
     loginData: {
       email: "",
-      password: ""
-    },
-    registerServerError: "",
-    loginServerError: ""
+      password: "",
+      message: "",
+      messageVisibilityStatus: false
+    }
   }),
   computed: {
-    registerDataValidationError() {
+    validateRegisterData() {
       if (!this.registerData.firstName) {
-        return "Enter your first name"
+        this.registerData.message = "Please enter your first name first"
+        return false
       }
       if (!this.registerData.lastName) {
-        return "Enter your last name"
+        this.registerData.message = "Please enter your last name first"
+        return false
       }
       if (!this.registerData.email) {
-        return "Enter your email"
+        this.registerData.message = "Please enter your email first"
+        return false
       }
       if (!this.registerData.password) {
-        return "Create your password"
+        this.registerData.message = "Please create your password first"
+        return false
       }
-      return null
+      return true
     },
-    loginDataValidationError() {
+    validateLoginData() {
       if (!this.loginData.email) {
-        return "Enter your email"
+        this.loginData.message = "Please enter your email first"
+        return false
       }
       if (!this.loginData.password) {
-        return "Enter your password"
+        this.loginData.message = "Please enter your password first"
+        return false
       }
-      return null
+      return true
     },
-    ...mapState({
-      userInfo: state => state.user.userInfo
-    })
   },
   methods: {
     ...mapMutations({
       setToken: "authorization/setToken",
       setUser: "user/setUser"
     }),
+    registerDataUpdated() {
+      this.registerData.messageVisibilityStatus = false
+    },
+    loginDataUpdated() {
+      this.loginData.messageVisibilityStatus = false
+    },
     async sendRegisterRequest() {
       try {
+        await this.$router.push("/profile")
         const serverResponse = await register(this.registerData)
         this.setToken(serverResponse.token)
         this.setUser(serverResponse.user)
-        this.registerServerError = ""
-        await this.$router.push("/profile")
       } catch (exception) {
-        console.error(exception)
-        this.registerServerError = exception.message
+        this.registerData.message = exception.message
+        this.registerData.messageVisibilityStatus = true
       }
     },
     async sendLoginRequest() {
       try {
+        await this.$router.push("/profile")
         const serverResponse = await login(this.loginData)
         this.setToken(serverResponse.token)
         this.setUser(serverResponse.user)
-        this.loginServerError = ""
-        await this.$router.push("/profile")
       } catch (exception) {
-        console.error(exception)
-        this.loginServerError = exception.message
+        this.loginData.message = exception.message
+        this.loginData.messageVisibilityStatus = true
       }
     }
   }
@@ -184,58 +185,13 @@ export default {
 <style scoped>
 .wrapper {
   width: 30vw;
-
   background-color: var(--dark-purple-color);
   border-radius: 6px;
 }
 
 
 .wrapper__switcher {
-  margin: 0 0 50px 0;
+  margin: 0 0 20px 0;
   height: 60px;
-}
-
-
-.form__error, .form__advice {
-  margin: 0 0 20px;
-  padding: 0 20px;
-
-  text-align: center;
-  font-size: 22px;
-  font-weight: 500;
-}
-
-.form__error {
-  color: #ff2c2c;
-}
-
-.form__advice {
-  color: #8ddd72;
-}
-
-
-.form__input-fields-row {
-  margin: 0 0 22px 0;
-  padding: 0 20px;
-  width: calc(100% + 15px);
-
-  display: flex;
-}
-
-.form__input {
-  width: 100%;
-  margin: 0 15px 0 0;
-}
-
-
-.form__submit-wrapper {
-  margin: 50px 0 20px;
-
-  display: flex;
-  justify-content: center;
-}
-
-.form__submit {
-  height: 50px;
 }
 </style>
