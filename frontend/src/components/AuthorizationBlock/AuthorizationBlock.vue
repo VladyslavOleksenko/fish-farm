@@ -26,26 +26,29 @@
         Fill all the fields
       </div>
       <div class="form__input-fields-row">
-        <input class="form__input"
-               type="text"
-               placeholder="First name"
-               v-model="registerData.firstName">
-        <input class="form__input"
-               type="text"
-               placeholder="Last name"
-               v-model="registerData.lastName">
+        <MyInput class="form__input"
+                 type="text"
+                 placeholder="First name"
+                 required
+                 v-model="registerData.firstName"/>
+        <MyInput class="form__input"
+                 type="text"
+                 placeholder="Last name"
+                 v-model="registerData.lastName"/>
       </div>
       <div class="form__input-fields-row">
-        <input class="form__input"
-               type="email"
-               placeholder="Email"
-               v-model="registerData.email">
+        <MyInput class="form__input"
+                 type="email"
+                 placeholder="Email"
+                 required
+                 v-model="registerData.email"/>
       </div>
       <div class="form__input-fields-row">
-        <input class="form__input"
-               type="password"
-               placeholder="Password"
-               v-model="registerData.password">
+        <MyInput class="form__input"
+                 type="password"
+                 placeholder="Password"
+                 required
+                 v-model="registerData.password"/>
       </div>
 
       <div class="form__submit-wrapper">
@@ -69,16 +72,18 @@
         Fill all the fields
       </div>
       <div class="form__input-fields-row">
-        <input class="form__input"
-               type="email"
-               placeholder="Email"
-               v-model="loginData.email">
+        <MyInput class="form__input"
+                 type="email"
+                 placeholder="Email"
+                 required
+                 v-model="loginData.email"/>
       </div>
       <div class="form__input-fields-row">
-        <input class="form__input"
-               type="password"
-               placeholder="Password"
-               v-model="loginData.password">
+        <MyInput class="form__input"
+                 type="password"
+                 placeholder="Password"
+                 required
+                 v-model="loginData.password"/>
       </div>
 
       <div class="form__submit-wrapper">
@@ -95,11 +100,14 @@
 <script>
 import {register, login} from "@/assets/js/serverRequest"
 import {mapMutations, mapState} from "vuex"
+import MyInput from "@/components/UI/MyInput";
 
 
 export default {
   name: "AuthorizationBlock",
+  components: {MyInput},
   data: () => ({
+    testModel: "",
     mode: "register",
     registerData: {
       firstName: "",
@@ -267,21 +275,7 @@ export default {
 
 .form__input {
   width: 100%;
-  height: 53px;
   margin: 0 15px 0 0;
-  padding: 0 15px;
-
-  font-size: 22px;
-
-  color: #fff;
-  background-color: var(--light-purple-color);
-  border: none;
-  border-radius: 4px;
-  outline: none;
-}
-
-.form__input::placeholder {
-  color: var(--light-gray-color);
 }
 
 
