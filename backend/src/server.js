@@ -6,6 +6,7 @@ const farmRouter = require("./routers/farm")
 const administratorRouter = require("./routers/administrator")
 const workerRouter = require("./routers/worker")
 const poolRouter = require("./routers/pool")
+const taskRouter = require("./routers/task")
 
 
 const app = express()
@@ -17,6 +18,7 @@ const app = express()
   .use("/api/administrator", administratorRouter)
   .use("/api/worker", workerRouter)
   .use("/api/pool", poolRouter)
+  .use("/api/task", taskRouter)
 
 const PORT = require("../appConfig").server.PORT || 5000
 app.listen(PORT, () => {
