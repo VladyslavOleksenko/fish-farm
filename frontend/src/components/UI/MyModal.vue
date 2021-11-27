@@ -33,7 +33,7 @@ export default {
 
 .my-modal__content {
   padding: 20px;
-  min-width: 30%;
+  min-width: 10%;
   min-height: 10%;
   max-width: 45%;
 
