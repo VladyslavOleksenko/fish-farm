@@ -47,11 +47,11 @@
       </div>
 
       <div class="form__submit-wrapper">
-        <button class="form__submit"
-                :disabled="registerDataValidationError"
-                @click.prevent="sendRegisterRequest">
-          Register
-        </button>
+        <MyRectangleButton class="form__submit"
+                           icon-name="ok"
+                           text="Register"
+                           :disabled="!!registerDataValidationError"
+                           @clicked="sendRegisterRequest"/>
       </div>
     </form>
 
@@ -82,11 +82,11 @@
       </div>
 
       <div class="form__submit-wrapper">
-        <button class="form__submit"
-                :disabled="loginDataValidationError"
-                @click.prevent="sendLoginRequest">
-          Login
-        </button>
+        <MyRectangleButton class="form__submit"
+                           icon-name="ok"
+                           text="Login"
+                           :disabled="!!loginDataValidationError"
+                           @clicked="sendLoginRequest"/>
       </div>
     </form>
   </div>
@@ -97,11 +97,12 @@ import {register, login} from "@/assets/js/serverRequest"
 import {mapMutations, mapState} from "vuex"
 import MyInput from "@/components/UI/MyInput";
 import Switcher from "@/components/UI/Switcher";
+import MyRectangleButton from "@/components/UI/MyRectangleButton";
 
 
 export default {
   name: "AuthorizationBlock",
-  components: {Switcher, MyInput},
+  components: {MyRectangleButton, Switcher, MyInput},
   data: () => ({
     testModel: "",
     mode: "register",
@@ -236,32 +237,5 @@ export default {
 
 .form__submit {
   height: 50px;
-  padding: 0 50px;
-
-  font-size: 22px;
-  font-weight: 500;
-
-  color: #eee;
-  background-color: var(--blue-color);
-
-  border: none;
-  border-radius: 4px;
-  outline: none;
-
-  transition: background-color .2s ease;
-  cursor: pointer;
-}
-
-.form__submit:hover {
-  background-color: #6fa360;
-}
-
-.form__submit:active {
-  background-color: #5e8b52;
-}
-
-.form__submit[disabled] {
-  color: #7f7f7f;
-  background: var(--light-purple-color);
 }
 </style>
