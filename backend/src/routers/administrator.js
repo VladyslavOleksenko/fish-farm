@@ -26,6 +26,18 @@ async function getAdministratorArrayRequest(request, response) {
   }
 }
 
+async function deleteAdministratorRequest(request, response) {
+  try {
+    const farmAdministratorId = request.query.farmAdministratorId
+    await administratorController.deleteFarmAdministrator(farmAdministratorId)
+    response.status(200).json({message: "done"})
+  } catch (exception) {
+    const message = "Can't delete administrator array"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
 async function getInviteArrayRequest(request, response) {
   try {
     const farmId = request.query.farmId
@@ -48,18 +60,6 @@ async function inviteAdministratorRequest(request, response) {
   } catch (exception) {
     const message = "Can't invite administrator"
     response.status(500).json({message, details: exception.message})
-    logError(message, exception)
-  }
-}
-
-async function deleteAdministratorRequest(request, response) {
-  try {
-    const farmAdministratorId = request.query.farmAdministratorId
-    await administratorController.deleteFarmAdministrator(farmAdministratorId)
-    response.status(200).json({message: "done"})
-  } catch (exception) {
-    const message = "Can't delete administrator array"
-    response.status(500).json({message})
     logError(message, exception)
   }
 }

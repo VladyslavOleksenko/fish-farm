@@ -23,6 +23,18 @@ async function getFarmRequest(request, response) {
   }
 }
 
+async function deleteFarmRequest(request, response) {
+  try {
+    const farmId = request.query.farmId
+    await farmController.deleteFarm(farmId)
+    response.status(200).json({message: "done"})
+  } catch (exception) {
+    const message = "Can't delete farm"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
 async function getFarmArrayByOwnerIdRequest(request, response) {
   try {
     const ownerId = request.query.userId
@@ -56,18 +68,6 @@ async function getFarmOwnerRequest(request, response) {
     response.status(200).json(farmOwnerFormatted)
   } catch (exception) {
     const message = "Can't get farm owner"
-    response.status(500).json({message})
-    logError(message, exception)
-  }
-}
-
-async function deleteFarmRequest(request, response) {
-  try {
-    const farmId = request.query.farmId
-    await farmController.deleteFarm(farmId)
-    response.status(200).json({message: "done"})
-  } catch (exception) {
-    const message = "Can't delete farm"
     response.status(500).json({message})
     logError(message, exception)
   }
