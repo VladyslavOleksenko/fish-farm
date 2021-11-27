@@ -10,31 +10,65 @@
     <div class="profile__greeting">Hello, Vladyslav</div>
     <div class="profile__slogan">It is your profile page</div>
 
-    <div class="profile__personal-data-block">
-      <div class="profile__personal-data-slogan">Your personal data</div>
-      <img class="profile__avatar"
-           v-if="avatar"
-           :src="avatar"
-           alt="">
-      <NoAvatar class="profile__no-avatar" v-else/>
-      <div class="profile__personal-data-row">
+    <div class="profile__data-block">
+      <div class="profile__data-header">
+        <img class="profile__avatar"
+             v-if="user.avatar"
+             :src="user.avatar"
+             alt="">
+        <NoAvatar class="profile__no-avatar" v-else/>
+        <p>Your personal data</p>
+      </div>
+
+      <div class="profile__data-row">
         <div class="profile__data-parameter">First name:</div>
         <div class="profile__data-value">{{ user.firstName }}</div>
       </div>
-      <div class="profile__personal-data-row">
+      <div class="profile__data-row">
         <div class="profile__data-parameter">Last name:</div>
         <div class="profile__data-value">{{ user.lastName }}</div>
       </div>
-      <div class="profile__personal-data-row">
+      <div class="profile__data-row">
         <div class="profile__data-parameter">Email:</div>
         <div class="profile__data-value">{{ user.email }}</div>
       </div>
       <div class="profile__change-data-button-wrapper">
-        <button class="profile__change-data-button">
-          <MyIcon class="profile__change-data-icon" icon-name="edit" path-color="#eee"/>
-        </button>
+        <MyRoundButton class="profile__change-data-button" icon-name="edit"/>
       </div>
     </div>
+
+    <MyModal>
+      <MyForm class="profile__change-data-form"
+        title-text="You can change your personal data here"
+        submit-text="Apply"
+        :submit-disabled="!validateFormData"
+        :message="formData.message"
+        v-model:message-visibility-status="formData.messageVisibilityStatus">
+        <FormRow>
+          <FormInput
+            type="file"
+            placeholder="Avatar"
+            v-model="formData.avatar"
+            @updated="formDataUpdated"/>
+        </FormRow>
+        <FormRow>
+          <FormInput
+            type="text"
+            placeholder="First name"
+            required
+            v-model="formData.firstName"
+            @updated="formDataUpdated"/>
+        </FormRow>
+        <FormRow>
+          <FormInput
+            type="text"
+            placeholder="Last name"
+            required
+            v-model="formData.lastName"
+            @updated="formDataUpdated"/>
+        </FormRow>
+      </MyForm>
+    </MyModal>
   </div>
 </template>
 
@@ -42,22 +76,55 @@
 import MyIcon from "@/components/UI/MyIcon";
 import {mapState, mapActions} from "vuex";
 import NoAvatar from "@/components/NoAvatar/NoAvatar";
+import MyRoundButton from "@/components/UI/MyRoundButton";
+import MyModal from "@/components/UI/MyModal";
+import MyForm from "@/components/Form/MyForm";
+import FormRow from "@/components/Form/FormRow";
+import FormInput from "@/components/Form/FormInput";
 
 export default {
   name: "Profile",
-  components: {NoAvatar, MyIcon},
+  components: {
+    FormInput,
+    FormRow, MyForm, MyModal, MyRoundButton, NoAvatar, MyIcon
+  },
+  data: () => ({
+    formData: {
+      avatar: "",
+      firstName: "",
+      lastName: "",
+      message: "",
+      messageVisibilityStatus: false
+    }
+  }),
   computed: {
     ...mapState({
       user: state => state.user.user
     }),
-    avatar() {
-      return null
+    validateFormData() {
+      if (!this.formData.firstName) {
+        this.formData.message = "Field 'first name' can`t be empty"
+        return false
+      }
+      if (!this.formData.lastName) {
+        this.formData.message = "Field 'last name' can`t be empty"
+        return false
+      }
+      return true
     }
   },
   methods: {
     ...mapActions({
       logout: "authorization/logout"
-    })
+    }),
+    formDataUpdated() {
+      this.formData.messageVisibilityStatus = false
+    }
+  },
+  mounted() {
+    this.formData.avatar = this.user.avatar
+    this.formData.firstName = this.user.firstName
+    this.formData.lastName = this.user.lastName
   }
 }
 </script>
@@ -144,10 +211,33 @@ export default {
 }
 
 
+.profile__data-block {
+  padding: 30px 40px;
+  width: 40%;
+
+  background-color: var(--dark-purple-color);
+  box-shadow: 0 5px 10px 4px rgba(44, 46, 67, 0.7);
+  border-radius: 7px;
+}
+
+
+.profile__data-header {
+  margin: 0 0 40px;
+
+  display: flex;
+  align-items: center;
+
+  text-align: center;
+  font-size: 27px;
+  font-weight: 500;
+
+  color: #eeeeee;
+}
+
 .profile__avatar {
   width: 80px;
   height: 80px;
-  margin: 0 0 20px 0;
+  margin: 0 50px 0 0;
 
   background-size: 80% 80%;
   background-color: white;
@@ -158,29 +248,11 @@ export default {
 .profile__no-avatar {
   width: 80px;
   height: 80px;
-  margin: 0 0 20px 0;
+  margin: 0 50px 0 0;
 }
 
 
-.profile__personal-data-block {
-  padding: 30px 40px;
-  width: 40%;
-
-  background-color: var(--dark-purple-color);
-  box-shadow: 0 5px 10px 4px rgba(44, 46, 67, 0.7);
-  border-radius: 7px;
-}
-
-.profile__personal-data-slogan {
-  margin: 0 0 40px;
-
-  text-align: center;
-  font-size: 25px;
-
-  color: #eeeeee;
-}
-
-.profile__personal-data-row {
+.profile__data-row {
   margin: 0 0 20px 0;
 
   display: flex;
@@ -211,21 +283,10 @@ export default {
 .profile__change-data-button {
   width: 70px;
   height: 70px;
-
-  background: none;
-  border-radius: 50px;
-  border: 2px solid #cccccc;
-
-  cursor: pointer;
-  transition: background-color .2s ease;
 }
 
-.profile__change-data-button:hover {
-  background-color: #494d6d;
-}
 
-.profile__change-data-icon {
-  width: 50%;
-  height: 50%;
+.profile__change-data-form {
+  width: 25vw;
 }
 </style>
