@@ -1,16 +1,18 @@
 <template>
   <div class="switcher">
     <div class="switcher__brick"
-         :class="{'switcher__brick-right': switcherPosition === 'right'}"></div>
+         :class="{'switcher__brick-right': position === 1}"></div>
     <button class="switcher__button"
-            :class="{'switcher__button-selected': switcherPosition === 'left'}"
-            @click="switcherPosition = 'left'">
-      {{ leftOption }}
+            :style="{'font-size': fontSize}"
+            :class="{'switcher__button-selected': position === 0}"
+            @click="position = 0">
+      {{ leftValue }}
     </button>
     <button class="switcher__button switcher__button-right"
-            :class="{'switcher__button-selected': switcherPosition === 'right'}"
-            @click="switcherPosition = 'right'">
-      {{ rightOption }}
+            :style="{'font-size': fontSize}"
+            :class="{'switcher__button-selected': position === 1}"
+            @click="position = 1">
+      {{ rightValue }}
     </button>
   </div>
 </template>
@@ -19,15 +21,19 @@
 export default {
   name: "Switcher",
   props: {
-    leftOption: {Type: String, required: true},
-    rightOption: {Type: String, required: true}
+    leftName: {Type: String, required: true},
+    rightName: {Type: String, required: true},
+    leftValue: {Type: String, required: true},
+    rightValue: {Type: String, required: true},
+    fontSize: {Type: String, default: "25px"}
   },
   data: () => ({
-    switcherPosition: "left"
+    position: 0
   }),
   watch: {
-    switcherPosition() {
-      this.$emit("optionSelected", this.switcherPosition)
+    position() {
+      const name = this.position === 0 ? this.leftName : this.rightName
+      this.$emit("update:modelValue", name)
     }
   }
 }
@@ -35,9 +41,8 @@ export default {
 
 <style scoped>
 .switcher {
+  min-height: 20px;
   position: relative;
-  width: 100%;
-  height: 100%;
 
   background-color: var(--dark-purple-color);
   border-radius: 6px;
@@ -69,7 +74,6 @@ export default {
   width: 50%;
   height: 100%;
 
-  font-size: 25px;
   font-weight: 500;
 
   color: var(--light-gray-color);

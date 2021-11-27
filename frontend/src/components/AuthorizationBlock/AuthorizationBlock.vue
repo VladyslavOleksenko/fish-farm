@@ -1,17 +1,12 @@
 <template>
   <div class="wrapper">
-    <div class="wrapper__switcher switcher">
-      <div class="switcher__brick"
-           :class="{'switcher__brick-right': mode === 'login'}"></div>
-      <button class="switcher__button"
-              @click="mode = 'register'">
-        Register
-      </button>
-      <button class="switcher__button switcher__button-right"
-              @click="mode = 'login'">
-        Login
-      </button>
-    </div>
+    <Switcher class="wrapper__switcher"
+              font-size="27px"
+              left-name="register"
+              right-name="login"
+              left-value="Register"
+              right-value="Login"
+              v-model="mode"/>
 
     <form class="wrapper__register-form form"
           action="http://localhost:5000/api/user"
@@ -101,11 +96,12 @@
 import {register, login} from "@/assets/js/serverRequest"
 import {mapMutations, mapState} from "vuex"
 import MyInput from "@/components/UI/MyInput";
+import Switcher from "@/components/UI/Switcher";
 
 
 export default {
   name: "AuthorizationBlock",
-  components: {MyInput},
+  components: {Switcher, MyInput},
   data: () => ({
     testModel: "",
     mode: "register",
@@ -195,55 +191,7 @@ export default {
 
 .wrapper__switcher {
   margin: 0 0 50px 0;
-}
-
-.switcher {
-  position: relative;
   height: 60px;
-
-  display: flex;
-}
-
-.switcher__brick {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-
-  background-color: var(--blue-color);
-  border-radius: 6px 0 0 0;
-
-  transition: left .2s ease,
-  border-radius .2s ease;
-}
-
-.switcher__brick-right {
-  border-radius: 0 6px 0 0;
-  left: 50%;
-}
-
-.switcher__button {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-
-  font-size: 27px;
-  font-weight: 500;
-
-  color: #eee;
-  background: none;
-  border: none;
-  outline: none;
-
-  cursor: pointer;
-  z-index: 1;
-}
-
-.switcher__button-right {
-  left: 50%;
 }
 
 

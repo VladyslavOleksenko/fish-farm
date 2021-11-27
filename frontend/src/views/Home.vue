@@ -5,9 +5,12 @@
       <CreateFarmForm/>
     </MyModal>
     <Switcher class="home__switcher"
-              :left-option="'my own farms'"
-              :right-option="'other farms'"
-              @option-selected="switcherOptionSelected"/>
+              left-name="own"
+              right-name="other"
+              left-value="my own farms"
+              right-value="other farms"
+              v-model="farmsFilter"/>
+
     <FarmListPlug class="home__farm-list-plug"
                   v-if="farmListIsEmptyStatus"
                   :farms-filter="farmsFilter"
@@ -20,7 +23,7 @@
 </template>
 
 <script>
-import Switcher from "@/components/Switcher/Switcher";
+import Switcher from "@/components/UI/Switcher";
 import FarmList from "@/components/FarmList/FarmList";
 import FarmListPlug from "@/components/FarmList/FarmListPlug";
 import {mapState, mapActions} from "vuex";
@@ -51,10 +54,7 @@ export default {
   methods: {
     ...mapActions({
       updateOwnFarms: "farms/updateOwnFarms"
-    }),
-    switcherOptionSelected(selectedOptionPosition) {
-      this.farmsFilter = selectedOptionPosition === "left" ? "own" : "other"
-    }
+    })
   },
   mounted() {
     this.updateOwnFarms(this.user.userId)
