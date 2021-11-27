@@ -96,7 +96,6 @@ export default {
     MyInput
   },
   data: () => ({
-    testModel: "",
     mode: "register",
     registerData: {
       firstName: "",
@@ -158,10 +157,8 @@ export default {
     },
     async sendRegisterRequest() {
       try {
-        await this.$router.push("/profile")
         const serverResponse = await register(this.registerData)
-        this.setToken(serverResponse.token)
-        this.setUser(serverResponse.user)
+        this.authorize(serverResponse)
       } catch (exception) {
         this.registerData.message = exception.message
         this.registerData.messageVisibilityStatus = true
@@ -169,14 +166,17 @@ export default {
     },
     async sendLoginRequest() {
       try {
-        await this.$router.push("/profile")
         const serverResponse = await login(this.loginData)
-        this.setToken(serverResponse.token)
-        this.setUser(serverResponse.user)
+        this.authorize(serverResponse)
       } catch (exception) {
         this.loginData.message = exception.message
         this.loginData.messageVisibilityStatus = true
       }
+    },
+    authorize(serverResponse) {
+      this.$router.push("/profile")
+      this.setToken(serverResponse.token)
+      this.setUser(serverResponse.user)
     }
   }
 }
