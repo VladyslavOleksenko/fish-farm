@@ -1,8 +1,9 @@
 <template>
   <div class="my-form">
+    <p class="my-form__title">{{ titleText }}</p>
     <div class="my-form__message"
          :class="{'my-form__message-hidden': !messageVisibilityStatus}">
-      {{message}}
+      {{ message }}
     </div>
     <slot></slot>
     <MyRectangleButton
@@ -23,6 +24,7 @@ export default {
   name: "MyForm",
   components: {MyRectangleButton},
   props: {
+    titleText: String,
     submitText: {type: String, default: "Submit"},
     submitDisabled: {type: Boolean, default: false},
     message: String,
@@ -37,6 +39,16 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+
+.my-form__title {
+  font-size: 27px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.7em;
+
+  color: #eeeeee;
 }
 
 
