@@ -1,6 +1,8 @@
 module.exports = {
   registerUser,
   loginUser,
+  changeUser,
+
   getUserByUserId,
   getUserByEmail,
   generateToken,
@@ -51,6 +53,27 @@ async function loginUser(userData) {
 
   return user
 }
+
+async function changeUser(userData) {
+  const userId = userData.userId
+  const candidate = await getUserByUserId(userId)
+  if (!candidate) {
+    throw new Error(`No user with id ${userId}`)
+  }
+
+  if (!userData.firstName || !userData.lastName) {
+    throw new Error(`Not valid data`)
+  }
+  userData.avatar = userData.avatar || "NULL"
+
+  const sqlCommand = `UPDATE user
+                      SET first_name = '${userData.firstName}',
+                          last_name  = '${userData.lastName}',
+                          avatar     = '${userData.avatar}'
+                      WHERE user_id = ${userId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
 
 async function getUserByUserId(userId) {
   const sqlCommand = `SELECT *

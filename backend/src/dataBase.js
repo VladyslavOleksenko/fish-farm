@@ -48,16 +48,11 @@ function createInsertSqlCommand(tableName, fieldNames, fieldValues) {
 
 
 async function sendDataBaseQuery(sqlCommand) {
-  try {
-    const connection = await mysql.createConnection(dataBaseConfig);
-    const [rows, fields] = await connection.execute(sqlCommand);
-    await connection.end()
+  const connection = await mysql.createConnection(dataBaseConfig);
+  const [rows, fields] = await connection.execute(sqlCommand);
+  await connection.end()
 
-    return {rows, fields}
-  } catch (exception) {
-    const message = "DataBase error: " + exception
-    throwError(message)
-  }
+  return {rows, fields}
 }
 
 
