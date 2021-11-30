@@ -2,7 +2,7 @@
   <div class="invite">
     <div class="invite__content">
       <div class="invite__avatar"
-           @click.stop="infoVisibilityStatus = true">
+           @click.stop="infoBlockData.visibilityStatus = true">
         <MyIcon class="invite__no-avatar" icon-name="notRegistered"
                 path-color="#aaa"/>
       </div>
@@ -38,9 +38,9 @@
       </div>
     </MyModal>
 
-    <Info v-if="infoVisibilityStatus"
+    <Info v-if="infoBlockData.visibilityStatus"
           :data="infoBlockData"
-          @hide="infoVisibilityStatus = false"/>
+          @hide="infoBlockData.visibilityStatus = false"/>
   </div>
 </template>
 
@@ -68,7 +68,6 @@ export default {
   },
   data: () => ({
     deleteModalVisibilityStatus: false,
-    infoVisibilityStatus: false,
     infoBlockData: {}
   }),
   methods: {
@@ -108,7 +107,8 @@ export default {
       }
     }
     if (this.category === "workers") {
-      const roleName = this.roleName ? this.roleName : "no role given"
+      const roleName =
+        this.invite.roleName ? this.invite.roleName : "no role given"
 
       return this.infoBlockData = {
         title: "Worker invitation",
