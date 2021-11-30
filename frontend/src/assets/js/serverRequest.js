@@ -228,6 +228,16 @@ export async function createPool(farmId, name) {
   return await sendServerRequest(requestParams)
 }
 
+export async function changePool(poolData) {
+  const requestParams = new RequestParams(
+    "PUT",
+    "http://localhost:5000/api/pool",
+    poolData
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
 export async function deletePool(poolId) {
   const requestParams = new RequestParams(
     "DELETE",
