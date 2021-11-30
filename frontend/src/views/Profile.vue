@@ -33,24 +33,21 @@
         <div class="profile__data-value">{{ user.email }}</div>
       </div>
       <div class="profile__change-data-button-wrapper">
-        <MyRoundButton class="profile__change-data-button" icon-name="edit"/>
+        <MyRoundButton class="profile__change-data-button"
+                       icon-name="edit"
+                       @click="changeModalVisibilityStatus = true"/>
       </div>
     </div>
 
-    <MyModal>
+    <MyModal v-if="changeModalVisibilityStatus"
+             @hide="changeModalVisibilityStatus = false">
       <MyForm class="profile__change-data-form"
-        title-text="You can change your personal data here"
-        submit-text="Apply"
-        :submit-disabled="!validateFormData"
-        :message="formData.message"
-        v-model:message-visibility-status="formData.messageVisibilityStatus">
-        <FormRow>
-          <FormInput
-            type="file"
-            placeholder="Avatar"
-            v-model="formData.avatar"
-            @updated="formDataUpdated"/>
-        </FormRow>
+              title-text="You can change your personal data here"
+              submit-text="Apply"
+              :submit-disabled="!validateFormData"
+              :message="formData.message"
+              v-model:message-visibility-status="formData.messageVisibilityStatus"
+              @submitted="sendChangeUserDataRequest">
         <FormRow>
           <FormInput
             type="text"
@@ -74,19 +71,25 @@
 
 <script>
 import MyIcon from "@/components/UI/MyIcon";
-import {mapState, mapActions} from "vuex";
+import {mapState, mapActions, mapMutations} from "vuex";
 import NoAvatar from "@/components/NoAvatar/NoAvatar";
 import MyRoundButton from "@/components/UI/MyRoundButton";
 import MyModal from "@/components/UI/MyModal";
 import MyForm from "@/components/Form/MyForm";
 import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";
+import {changeUserData, changeUserAvatar} from "@/assets/js/serverRequest";
 
 export default {
   name: "Profile",
   components: {
     FormInput,
-    FormRow, MyForm, MyModal, MyRoundButton, NoAvatar, MyIcon
+    FormRow,
+    MyForm,
+    MyModal,
+    MyRoundButton,
+    NoAvatar,
+    MyIcon
   },
   data: () => ({
     formData: {
@@ -95,7 +98,8 @@ export default {
       lastName: "",
       message: "",
       messageVisibilityStatus: false
-    }
+    },
+    changeModalVisibilityStatus: false
   }),
   computed: {
     ...mapState({
@@ -114,11 +118,28 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setUser: "user/setUser"
+    }),
     ...mapActions({
       logout: "authorization/logout"
     }),
     formDataUpdated() {
       this.formData.messageVisibilityStatus = false
+    },
+    async sendChangeUserDataRequest() {
+      try {
+        const userData = {
+          userId: this.user.userId,
+          firstName: this.formData.firstName,
+          lastName: this.formData.lastName,
+        }
+        const serverResponse = await changeUserData(userData)
+        this.setUser(serverResponse)
+      } catch (exception) {
+        this.formData.message = exception.message
+        this.formData.messageVisibilityStatus = true
+      }
     }
   },
   mounted() {
@@ -256,6 +277,7 @@ export default {
   margin: 0 0 20px 0;
 
   display: flex;
+  flex-wrap: wrap;
 
   font-size: 22px;
 }
@@ -270,6 +292,8 @@ export default {
   font-weight: 500;
 
   color: #cccccc;
+
+  overflow: auto;
 }
 
 
