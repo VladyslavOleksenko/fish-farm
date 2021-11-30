@@ -6,7 +6,9 @@ async function sendServerRequest(requestParams) {
     xhr.open(requestParams.method, requestParams.url)
 
     xhr.responseType = requestParams.responseType
-    xhr.setRequestHeader("Content-Type", requestParams.contentType)
+    if (requestParams.contentType) {
+      xhr.setRequestHeader("Content-Type", requestParams.contentType)
+    }
 
     xhr.onload = () => {
       if (xhr.status >= 400) {
@@ -46,6 +48,16 @@ export async function login(body) {
     "POST",
     "http://localhost:5000/api/user/login",
     body
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+export async function changeUserData(userData) {
+  const requestParams = new RequestParams(
+    "PUT",
+    "http://localhost:5000/api/user/data",
+    userData
   )
 
   return await sendServerRequest(requestParams)
