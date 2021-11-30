@@ -40,10 +40,15 @@ import MyModal from "@/components/UI/MyModal";
 import Pool from "@/components/PoolsBlock/Pool";
 import {createPool, getPoolArray} from "@/assets/js/serverRequest";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
+import MyForm from "@/components/Form/MyForm";
+import FormRow from "@/components/Form/FormRow";
+import FormInput from "@/components/Form/FormInput";
 
 export default {
   name: "Pools",
-  components: {MyRectangleButton, MyModal, MyIcon, Pool},
+  components: {
+    FormInput,
+    FormRow, MyForm, MyRectangleButton, MyModal, MyIcon, Pool},
   props: {
     farmId: {type: String, required: true}
   },
