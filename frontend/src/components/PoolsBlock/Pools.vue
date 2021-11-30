@@ -36,7 +36,7 @@
 
 <script>
 import MyIcon from "@/components/UI/MyIcon";
-import MyModal from "@/components/UI/MyModal";
+import MyModal from "@/components/Modal/MyModal";
 import Pool from "@/components/PoolsBlock/Pool";
 import {createPool, getPoolArray} from "@/assets/js/serverRequest";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";

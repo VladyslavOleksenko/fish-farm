@@ -105,7 +105,7 @@
 <script>
 import Employee from "@/components/StaffBlock/Employee";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
-import MyModal from "@/components/UI/MyModal";
+import MyModal from "@/components/Modal/MyModal";
 import {
   inviteAdministrator,
   inviteWorker,

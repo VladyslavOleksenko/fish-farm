@@ -70,7 +70,7 @@ import {
   getFarmWorkerInvites,
   deleteFarm
 } from "@/assets/js/serverRequest";
-import MyModal from "@/components/UI/MyModal";
+import MyModal from "@/components/Modal/MyModal";
 import Pools from "@/components/PoolsBlock/Pools";
 
 export default {

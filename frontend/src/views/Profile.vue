@@ -74,7 +74,7 @@ import MyIcon from "@/components/UI/MyIcon";
 import {mapState, mapActions, mapMutations} from "vuex";
 import NoAvatar from "@/components/NoAvatar/NoAvatar";
 import MyRoundButton from "@/components/UI/MyRoundButton";
-import MyModal from "@/components/UI/MyModal";
+import MyModal from "@/components/Modal/MyModal";
 import MyForm from "@/components/Form/MyForm";
 import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";

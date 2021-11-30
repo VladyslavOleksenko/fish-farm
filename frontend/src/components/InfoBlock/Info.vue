@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import MyModal from "@/components/UI/MyModal";
+import MyModal from "@/components/Modal/MyModal";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 
 export default {

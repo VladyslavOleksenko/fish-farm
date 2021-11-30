@@ -27,7 +27,7 @@ import Switcher from "@/components/UI/Switcher";
 import FarmList from "@/components/FarmList/FarmList";
 import FarmListPlug from "@/components/FarmList/FarmListPlug";
 import {mapState, mapActions} from "vuex";
-import MyModal from "@/components/UI/MyModal";
+import MyModal from "@/components/Modal/MyModal";
 import CreateFarmForm from "@/components/CreateFarm/CreateFarmForm";
 
 export default {

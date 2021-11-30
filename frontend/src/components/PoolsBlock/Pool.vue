@@ -54,7 +54,7 @@
 <script>
 import MyRoundButton from "@/components/UI/MyRoundButton";
 import {deletePool, changePool} from "@/assets/js/serverRequest";
-import MyModal from "@/components/UI/MyModal";
+import MyModal from "@/components/Modal/MyModal";
 import MyForm from "@/components/Form/MyForm";
 import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";
@@ -64,7 +64,11 @@ export default {
   name: "Pool",
   components: {
     MyRectangleButton,
-    FormInput, FormRow, MyForm, MyModal, MyRoundButton
+    FormInput,
+    FormRow,
+    MyForm,
+    MyModal,
+    MyRoundButton
   },
   props: {
     poolInfo: {type: Object, required: true}

@@ -48,7 +48,7 @@
 import MyIcon from "@/components/UI/MyIcon";
 import NoAvatar from "@/components/NoAvatar/NoAvatar";
 import MyRoundButton from "@/components/UI/MyRoundButton";
-import MyModal from "@/components/UI/MyModal";
+import MyModal from "@/components/Modal/MyModal";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import Info from "@/components/InfoBlock/Info";
 
