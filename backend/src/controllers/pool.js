@@ -2,7 +2,10 @@ module.exports = {
   createPool,
   getPoolArray,
   getPoolByPoolId,
+
   deletePool,
+  deleteAllFarmPools,
+
   formatPoolArray,
   formatPool,
 }
@@ -56,6 +59,13 @@ async function deletePool(poolId) {
   const sqlCommand = `DELETE
                       FROM pool
                       WHERE pool_id = ${poolId}`
+  await sendDataBaseQuery(sqlCommand)
+}
+
+async function deleteAllFarmPools(farmId) {
+  const sqlCommand = `DELETE
+                      FROM pool
+                      WHERE farm_id = ${farmId}`
   await sendDataBaseQuery(sqlCommand)
 }
 

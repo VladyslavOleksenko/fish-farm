@@ -76,6 +76,7 @@ async function deleteFarm(farmId) {
   await administratorController.deleteAllFarmInvites(farmId)
   await workerController.deleteAllFarmWorkers(farmId)
   await workerController.deleteAllFarmInvites(farmId)
+  await poolController.deleteAllFarmPools(farmId)
 
   const sqlCommand = `DELETE
                       FROM farm
@@ -106,3 +107,4 @@ const {createInsertSqlCommand, sendDataBaseQuery} = require("./../dataBase");
 const userController = require("./user")
 const administratorController = require("./administrator");
 const workerController = require("./worker");
+const poolController = require("./pool")
