@@ -1,61 +1,50 @@
 <template>
   <div class="farm">
-    <button class="farm__delete-farm-button delete-farm-button"
-            @click="deleteModalVisibilityStatus = true">
-      Delete farm
-    </button>
-
-    <div class="farm__header">
-      <div class="farm__name">{{ farmInfo.name }}</div>
-      <div class="farm__description">{{ farmInfo.description }}</div>
-    </div>
-
-    <div class="farm__info-block">
-      <div class="farm__staff-block">
-        <Staff class="farm__staff"
-               category="owner"
-               :user-array="[owner]"/>
-
-        <Staff class="farm__staff"
-               category="administrators"
-               :user-array="administratorArray"
-               :invite-array="administratorInviteArray"
-               :farm-id="farmId"
-               @updateUserArray="updateAdministratorArray"
-               @updateInviteArray="updateAdministratorInviteArray"/>
-
-        <Staff class="farm__staff"
-               category="workers"
-               :user-array="workerArray"
-               :invite-array="workerInviteArray"
-               :farm-id="farmId"
-               @updateUserArray="updateWorkerArray"
-               @updateInviteArray="updateWorkerInviteArray"/>
+    <div class="farm__content">
+      <div class="farm__header">
+        <div class="farm__name">{{ farmInfo.name }}</div>
+        <div class="farm__description">{{ farmInfo.description }}</div>
       </div>
 
-      <Pools class="farm__pools" :farm-id="farmId"/>
+      <div class="farm__info-block">
+        <div class="farm__staff-block">
+          <Staff class="farm__staff"
+                 category="owner"
+                 :user-array="[owner]"/>
+
+          <Staff class="farm__staff"
+                 category="administrators"
+                 :user-array="administratorArray"
+                 :invite-array="administratorInviteArray"
+                 :farm-id="farmId"
+                 @updateUserArray="updateAdministratorArray"
+                 @updateInviteArray="updateAdministratorInviteArray"/>
+
+          <Staff class="farm__staff"
+                 category="workers"
+                 :user-array="workerArray"
+                 :invite-array="workerInviteArray"
+                 :farm-id="farmId"
+                 @updateUserArray="updateWorkerArray"
+                 @updateInviteArray="updateWorkerInviteArray"/>
+        </div>
+
+        <Pools class="farm__pools" :farm-id="farmId"/>
+      </div>
+
+      <MyRectangleButton
+        class="farm__delete-button"
+        text="Delete farm"
+        icon-name="delete"
+        @click="deleteModalData.visibilityStatus = true"/>
+
+      <img class="farm__image" src="../../public/fishBowl.svg" alt="">
     </div>
 
-    <img class="farm__image" src="../../public/fishBowl.svg" alt="">
-
-    <MyModal v-if="deleteModalVisibilityStatus"
-             @hide="deleteModalVisibilityStatus = false">
-      <div class="farm__delete-modal delete-modal">
-        <div class="delete-modal__title">
-          You are going to delete the farm and all connected data
-        </div>
-        <div class="delete-modal__warning">
-          This action couldn't be undone
-        </div>
-        <div class="delete-modal__warning">
-          Are you sure?
-        </div>
-        <button class="delete-modal__button delete-farm-button"
-                @click="deleteFarm">
-          Delete farm
-        </button>
-      </div>
-    </MyModal>
+    <DeleteModal v-if="deleteModalData.visibilityStatus"
+                 :content="deleteModalData.content"
+                 @hide="deleteModalData.visibilityStatus = false"
+                 @delete="deleteFarm"/>
   </div>
 </template>
 
@@ -72,10 +61,12 @@ import {
 } from "@/assets/js/serverRequest";
 import MyModal from "@/components/Modal/MyModal";
 import Pools from "@/components/PoolsBlock/Pools";
+import MyRectangleButton from "@/components/UI/MyRectangleButton";
+import DeleteModal from "@/components/Modal/DeleteModal";
 
 export default {
   name: "Farm.vue",
-  components: {Pools, MyModal, Staff},
+  components: {DeleteModal, MyRectangleButton, Pools, MyModal, Staff},
   data: () => ({
     farmInfo: {},
     owner: {},
@@ -83,7 +74,12 @@ export default {
     administratorInviteArray: [],
     workerArray: [],
     workerInviteArray: [],
-    deleteModalVisibilityStatus: false
+    deleteModalData: {
+      visibilityStatus: false,
+      content: {
+        message: "You are about to delete the farm and all associated data"
+      }
+    }
   }),
   computed: {
     farmId() {
@@ -121,7 +117,7 @@ export default {
 </script>
 
 <style scoped>
-.farm {
+.farm__content {
   position: relative;
   min-height: 100vh;
   padding: 30px 50px 50px;
@@ -136,34 +132,6 @@ export default {
   transform: scale(-1, 1);
 
   opacity: .8;
-}
-
-
-.farm__delete-farm-button {
-  position: absolute;
-  top: 30px;
-  right: 50px;
-}
-
-.delete-farm-button {
-  height: 50px;
-  padding: 0 50px;
-
-  font-size: 20px;
-
-  color: #ffb1b1;
-  background-color: #717490;
-  border-radius: 4px;
-  border: none;
-  outline: none;
-
-  cursor: pointer;
-  transition: background-color .2s ease,
-  color .2s ease;
-}
-
-.delete-farm-button:hover {
-  background-color: var(--light-purple-color);
 }
 
 
@@ -207,32 +175,11 @@ export default {
 }
 
 
-.delete-modal {
-  padding: 20px 30px;
+.farm__delete-button {
+  width: 250px;
+  height: 50px;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.delete-modal__title {
-  margin: 0 0 30px 0;
-
-  font-size: 25px;
-  text-align: center;
-
-  color: #eeeeee;
-}
-
-.delete-modal__warning {
-  margin: 0 0 15px 0;
-
-  font-size: 20px;
-
-  color: #ff6161;
-}
-
-.delete-modal__button {
-  margin: 60px 0 0 0;
+  background-color: var(--dark-purple-color);
+  border-radius: 10px;
 }
 </style>
