@@ -2,6 +2,7 @@ module.exports = {
   createPool,
   getPoolArray,
   getPoolByPoolId,
+  changePoolData,
 
   deletePool,
   deleteAllFarmPools,
@@ -54,6 +55,26 @@ async function getPoolByPoolId(poolId) {
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows[0]
 }
+
+async function changePoolData(poolData) {
+  const poolId = poolData.poolId
+  const candidate = await getPoolByPoolId(poolId)
+  if (!candidate) {
+    throw new Error(`No pool with id ${poolId}`)
+  }
+
+  if (!poolData.name) {
+    throw new Error(`Not valid data`)
+  }
+
+  const sqlCommand = `UPDATE pool
+                      SET name = '${poolData.name}'
+                      WHERE pool_id = ${poolId}`
+  await sendDataBaseQuery(sqlCommand)
+
+  return getPoolByPoolId(poolId)
+}
+
 
 async function deletePool(poolId) {
   const sqlCommand = `DELETE
