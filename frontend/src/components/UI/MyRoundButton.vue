@@ -1,6 +1,8 @@
 <template>
   <div class="my-round-button">
-    <MyIcon class="my-round-button__icon" :icon-name="iconName" path-color="#eee"/>
+    <MyIcon class="my-round-button__icon"
+            :icon-name="iconName"
+            path-color="#eee"/>
   </div>
 </template>
 

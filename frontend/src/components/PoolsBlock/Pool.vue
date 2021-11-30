@@ -4,7 +4,7 @@
     <div class="pool__buttons">
       <MyRoundButton class="pool__button"
                      icon-name="delete"
-                     @click="sendDeletePoolRequest"/>
+                     @click="deleteModalVisibilityStatus = true"/>
       <MyRoundButton class="pool__button"
                      icon-name="edit"
                      @click="changeModalData.visibilityStatus = true"/>
@@ -29,6 +29,25 @@
         </FormRow>
       </MyForm>
     </MyModal>
+
+    <MyModal v-if="deleteModalVisibilityStatus"
+             @hide="deleteModalVisibilityStatus = false">
+      <div class="farm__delete-modal delete-modal">
+        <div class="delete-modal__title">
+          You are going to delete the pool and all connected data
+        </div>
+        <div class="delete-modal__warning">
+          This action couldn't be undone
+        </div>
+        <div class="delete-modal__warning">
+          Are you sure?
+        </div>
+        <MyRectangleButton class="delete-modal__button"
+                           text="Delete pool"
+                           icon-name="delete"
+                           @click="sendDeletePoolRequest"/>
+      </div>
+    </MyModal>
   </div>
 </template>
 
@@ -39,10 +58,14 @@ import MyModal from "@/components/UI/MyModal";
 import MyForm from "@/components/Form/MyForm";
 import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";
+import MyRectangleButton from "@/components/UI/MyRectangleButton";
 
 export default {
   name: "Pool",
-  components: {FormInput, FormRow, MyForm, MyModal, MyRoundButton},
+  components: {
+    MyRectangleButton,
+    FormInput, FormRow, MyForm, MyModal, MyRoundButton
+  },
   props: {
     poolInfo: {type: Object, required: true}
   },
@@ -52,13 +75,10 @@ export default {
       message: "",
       messageVisibilityStatus: false,
       visibilityStatus: false
-    }
+    },
+    deleteModalVisibilityStatus: false
   }),
   methods: {
-    async sendDeletePoolRequest() {
-      await deletePool(this.poolInfo.poolId)
-      this.$emit("updated")
-    },
     validateChangePoolData() {
       if (!this.changeModalData.name) {
         this.changeModalData.message = "Pool name can't be empty"
@@ -78,6 +98,10 @@ export default {
       this.$emit("updated")
       this.changeModalData.visibilityStatus = false
       this.changeModalData.name = ""
+    },
+    async sendDeletePoolRequest() {
+      await deletePool(this.poolInfo.poolId)
+      this.$emit("updated")
     }
   }
 }
@@ -124,5 +148,36 @@ export default {
 
 .pool__button:last-child {
   margin: 0;
+}
+
+
+.delete-modal {
+  padding: 20px 30px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.delete-modal__title {
+  margin: 0 0 30px 0;
+
+  font-size: 25px;
+  text-align: center;
+
+  color: #eeeeee;
+}
+
+.delete-modal__warning {
+  margin: 0 0 15px 0;
+
+  font-size: 20px;
+
+  color: #ff6161;
+}
+
+.delete-modal__button {
+  margin: 60px 0 0 0;
+  height: 60px;
 }
 </style>
