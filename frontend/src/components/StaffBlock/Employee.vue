@@ -123,7 +123,25 @@ export default {
         ]
       }
     }
+    if (this.category === "owner") {
+      this.infoBlockData = {
+        title: "Farm owner",
+        parameterArray: [
+          'First name',
+          'Last name',
+          'Email'
+        ],
+        valueArray: [
+          this.user.firstName,
+          this.user.lastName,
+          this.user.email
+        ]
+      }
+    }
 
+    if (this.category !== "administrators" && this.category !== "workers") {
+      return
+    }
     this.deleteModalData = {
       visibilityStatus: false,
       content: {
