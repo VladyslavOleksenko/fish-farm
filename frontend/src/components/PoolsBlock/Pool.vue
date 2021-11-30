@@ -1,13 +1,15 @@
 <template>
   <div class="pool">
-    <div class="pool__name">{{ poolInfo.name }}</div>
-    <div class="pool__buttons">
-      <MyRoundButton class="pool__button"
-                     icon-name="delete"
-                     @click="deleteModalVisibilityStatus = true"/>
-      <MyRoundButton class="pool__button"
-                     icon-name="edit"
-                     @click="changeModalData.visibilityStatus = true"/>
+    <div class="pool__content">
+      <div class="pool__name">{{ poolInfo.name }}</div>
+      <div class="pool__buttons">
+        <MyRoundButton class="pool__button"
+                       icon-name="delete"
+                       @click="deleteModalData.visibilityStatus = true"/>
+        <MyRoundButton class="pool__button"
+                       icon-name="edit"
+                       @click="changeModalData.visibilityStatus = true"/>
+      </div>
     </div>
 
     <MyModal v-if="changeModalData.visibilityStatus"
@@ -30,24 +32,10 @@
       </MyForm>
     </MyModal>
 
-    <MyModal v-if="deleteModalVisibilityStatus"
-             @hide="deleteModalVisibilityStatus = false">
-      <div class="farm__delete-modal delete-modal">
-        <div class="delete-modal__title">
-          You are going to delete the pool and all connected data
-        </div>
-        <div class="delete-modal__warning">
-          This action couldn't be undone
-        </div>
-        <div class="delete-modal__warning">
-          Are you sure?
-        </div>
-        <MyRectangleButton class="delete-modal__button"
-                           text="Delete pool"
-                           icon-name="delete"
-                           @click="sendDeletePoolRequest"/>
-      </div>
-    </MyModal>
+    <DeleteModal v-if="deleteModalData.visibilityStatus"
+                 :content="deleteModalData.content"
+                 @hide="deleteModalData.visibilityStatus = false"
+                 @delete="sendDeletePoolRequest"/>
   </div>
 </template>
 
@@ -59,10 +47,12 @@ import MyForm from "@/components/Form/MyForm";
 import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
+import DeleteModal from "@/components/Modal/DeleteModal";
 
 export default {
   name: "Pool",
   components: {
+    DeleteModal,
     MyRectangleButton,
     FormInput,
     FormRow,
@@ -79,6 +69,12 @@ export default {
       message: "",
       messageVisibilityStatus: false,
       visibilityStatus: false
+    },
+    deleteModalData: {
+      visibilityStatus: false,
+      content: {
+        message: "You are about to delete the pool and all associated data"
+      }
     },
     deleteModalVisibilityStatus: false
   }),
@@ -112,7 +108,7 @@ export default {
 </script>
 
 <style scoped>
-.pool {
+.pool__content {
   padding: 10px 20px;
 
   display: flex;
@@ -127,7 +123,7 @@ export default {
   color .2s ease;
 }
 
-.pool:hover {
+.pool__content:hover {
   color: #ffffff;
   background-color: var(--light-purple-color);
 }
@@ -152,36 +148,5 @@ export default {
 
 .pool__button:last-child {
   margin: 0;
-}
-
-
-.delete-modal {
-  padding: 20px 30px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.delete-modal__title {
-  margin: 0 0 30px 0;
-
-  font-size: 25px;
-  text-align: center;
-
-  color: #eeeeee;
-}
-
-.delete-modal__warning {
-  margin: 0 0 15px 0;
-
-  font-size: 20px;
-
-  color: #ff6161;
-}
-
-.delete-modal__button {
-  margin: 60px 0 0 0;
-  height: 60px;
 }
 </style>

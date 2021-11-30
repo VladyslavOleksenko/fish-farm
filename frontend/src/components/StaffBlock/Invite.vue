@@ -12,31 +12,16 @@
       <div class="invite__buttons">
         <MyRoundButton class="invite__button"
                        icon-name="delete"
-                       @click="deleteModalVisibilityStatus = true"/>
+                       @click="deleteModalData.visibilityStatus = true"/>
         <MyRoundButton class="invite__button"
                        icon-name="edit"/>
       </div>
     </div>
 
-    <MyModal v-if="deleteModalVisibilityStatus"
-             @hide="deleteModalVisibilityStatus = false">
-      <div class="farm__delete-modal delete-modal">
-        <div class="delete-modal__title">
-          You are going to delete the invitation for
-          "{{ invite.email }}"
-        </div>
-        <div class="delete-modal__warning">
-          This action couldn't be undone
-        </div>
-        <div class="delete-modal__warning">
-          Are you sure?
-        </div>
-        <MyRectangleButton class="delete-modal__button"
-                           text="Delete invitation"
-                           icon-name="delete"
-                           @click="sendDeleteEvent"/>
-      </div>
-    </MyModal>
+    <DeleteModal v-if="deleteModalData.visibilityStatus"
+                 :content="deleteModalData.content"
+                 @hide="deleteModalData.visibilityStatus = false"
+                 @delete="sendDeleteEvent"/>
 
     <Info v-if="infoBlockData.visibilityStatus"
           :data="infoBlockData"
@@ -51,10 +36,12 @@ import MyRoundButton from "@/components/UI/MyRoundButton";
 import MyModal from "@/components/Modal/MyModal";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import Info from "@/components/InfoBlock/Info";
+import DeleteModal from "@/components/Modal/DeleteModal";
 
 export default {
   name: "Invite",
   components: {
+    DeleteModal,
     Info,
     MyRectangleButton,
     MyModal,
@@ -67,9 +54,22 @@ export default {
     invite: {type: Object, required: true}
   },
   data: () => ({
-    deleteModalVisibilityStatus: false,
-    infoBlockData: {}
+    infoBlockData: {},
+    deleteModalData: {}
   }),
+  computed: {
+    deleteModalDataMessage() {
+      let role = ""
+      if (this.category === "administrators") {
+        role = "administrator"
+      } else if (this.category === "workers") {
+        role = "worker"
+      }
+
+      return `You are about to delete the ${role} invitation ` +
+        `for "${this.invite.email}"`
+    }
+  },
   methods: {
     cutString(string, length = 25) {
       if (string.length <= length) {
@@ -88,7 +88,7 @@ export default {
   },
   mounted() {
     if (this.category === "administrators") {
-      return this.infoBlockData = {
+      this.infoBlockData = {
         title: "Administrator invitation",
         parameterArray: [
           'Email',
@@ -110,7 +110,7 @@ export default {
       const roleName =
         this.invite.roleName ? this.invite.roleName : "no role given"
 
-      return this.infoBlockData = {
+      this.infoBlockData = {
         title: "Worker invitation",
         parameterArray: [
           'Email',
@@ -120,6 +120,13 @@ export default {
           this.invite.email,
           roleName
         ]
+      }
+    }
+
+    this.deleteModalData = {
+      visibilityStatus: false,
+      content: {
+        message: this.deleteModalDataMessage
       }
     }
   }
@@ -177,36 +184,5 @@ export default {
 
 .invite__button:first-child {
   margin: 0 20px 0 0;
-}
-
-
-.delete-modal {
-  padding: 20px 30px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.delete-modal__title {
-  margin: 0 0 30px 0;
-
-  font-size: 25px;
-  text-align: center;
-
-  color: #eeeeee;
-}
-
-.delete-modal__warning {
-  margin: 0 0 15px 0;
-
-  font-size: 20px;
-
-  color: #ff6161;
-}
-
-.delete-modal__button {
-  margin: 60px 0 0 0;
-  height: 60px;
 }
 </style>
