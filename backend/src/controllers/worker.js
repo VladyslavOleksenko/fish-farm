@@ -61,13 +61,17 @@ async function getWorkerInviteByFarmAndEmail(email, farmId) {
 
 
 async function inviteWorker(invitorData) {
-  const farm = farmController.getFarmByFarmId(invitorData.farmId)
+  const farm = await farmController.getFarmByFarmId(invitorData.farmId)
   if (!farm) {
     throw new Error(`No farm with id ${invitorData.farmId}`)
   }
 
   const candidate = await userController.getUserByEmail(invitorData.email)
   if (candidate) {
+    if (candidate["user_id"] === farm["owner_id"]) {
+      throw new Error(`User is an owner of this farm`)
+    }
+
     await createWorker(candidate["user_id"], invitorData)
     return "Registered worker invited"
   }
