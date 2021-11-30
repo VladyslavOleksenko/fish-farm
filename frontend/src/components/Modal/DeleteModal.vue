@@ -5,11 +5,18 @@
         <p class="delete-modal__message">{{ content.message }}</p>
         <p class="delete-modal__warning">This action cannot be undone!</p>
         <p class="delete-modal__warning">Are you sure?</p>
-        <MyRectangleButton
-          class="delete-modal__button"
-          :text="content.buttonText"
-          icon-name="delete"
-          @click="$emit('delete')"/>
+        <div class="delete-modal__buttons">
+          <MyRectangleButton
+            class="delete-modal__button"
+            :text="content.cancelButtonText || 'cancel'"
+            icon-name="ok"
+            @click="$emit('hide')"/>
+          <MyRectangleButton
+            class="delete-modal__button"
+            :text="content.deleteButtonText || 'delete'"
+            icon-name="delete"
+            @click="$emit('delete')"/>
+        </div>
       </div>
     </MyModal>
   </div>
@@ -18,16 +25,18 @@
 <script>
 import MyModal from "@/components/Modal/MyModal";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
+import MyRoundButton from "@/components/UI/MyRoundButton";
 
 export default {
   name: "DeleteModal",
-  components: {MyRectangleButton, MyModal},
+  components: {MyRoundButton, MyRectangleButton, MyModal},
   props: {
     content: {
       type: Object,
       default: {
         message: "",
-        buttonText: "Delete"
+        deleteButtonText: "Delete",
+        cancelButtonText: "Cancel"
       },
       required: true
     }
@@ -63,8 +72,16 @@ export default {
 }
 
 
-.delete-modal__button {
+.delete-modal__buttons {
   margin: 60px 0 0 0;
+  width: 75%;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+.delete-modal__button {
+  width: 47%;
   height: 60px;
 }
 </style>
