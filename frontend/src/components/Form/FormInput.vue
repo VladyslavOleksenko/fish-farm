@@ -12,7 +12,7 @@ export default {
   name: "FormInput",
   components: {MyInput},
   props: {
-    modelValue: [String, Number],
+    modelValue: [String, Number, File],
     type: String,
     placeholder: String,
     required: Boolean,
