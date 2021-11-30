@@ -25,30 +25,78 @@
                            v-if="category !== 'owner'"
                            icon-name="add"
                            :text="'Add ' + categoryInSingular"
-                           @click="inviteModalVisibilityStatus = true"/>
+                           @click="showInviteModal"/>
       </div>
 
-      <MyModal v-if="inviteModalVisibilityStatus"
-               @hide="inviteModalVisibilityStatus = false">
-        <div class="staff__invite-modal invite-modal">
-          <div class="invite-modal__advice">
-            <span>To invite an </span>
-            <span class="invite-modal__bold-span">{{ categoryInSingular }}</span>
-            <br>
-            <span>please enter his or her </span>
-            <span class="invite-modal__bold-span">email</span>
-          </div>
-          <div class="invite-modal__error">{{ inviteModalData.error }}</div>
-          <input class="invite-modal__input"
-                 type="email"
-                 placeholder="Email *"
-                 v-model="inviteModalData.email">
-          <input class="invite-modal__submit"
-                 type="submit"
-                 value="invite"
-                 :disabled="!inviteModalDataValidStatus"
-                 @click="sendInviteRequest">
-        </div>
+      <MyModal v-if="inviteAdministratorModalData.visibilityStatus"
+               @hide="inviteAdministratorModalData.visibilityStatus = false">
+        <MyForm class="staff__invite-form"
+                title-text="Fill all the fields to invite a new administrator"
+                submit-text="Invite"
+                :submit-disabled="!validateInviteAdministratorModalData"
+                :message="inviteAdministratorModalData.message"
+                v-model:message-visibility-status="inviteAdministratorModalData.messageVisibilityStatus"
+                @submitted="sendInviteAdministratorRequest">
+          <FormRow>
+            <FormInput
+              type="text"
+              placeholder="Email"
+              required
+              v-model="inviteAdministratorModalData.email"
+              @updated="inviteAdministratorModalDataChanged"/>
+          </FormRow>
+          <FormRow>
+            <FormInput
+              type="checkbox"
+              placeholder="Manage pools access"
+              v-model="inviteAdministratorModalData.managePoolsAccess"/>
+          </FormRow>
+          <FormRow>
+            <FormInput
+              type="checkbox"
+              placeholder="Add administrator access"
+              v-model="inviteAdministratorModalData.addAdministratorAccess"/>
+          </FormRow>
+          <FormRow>
+            <FormInput
+              type="checkbox"
+              placeholder="Delete administrator access"
+              v-model="inviteAdministratorModalData.deleteAdministratorAccess"/>
+          </FormRow>
+          <FormRow>
+            <FormInput
+              type="checkbox"
+              placeholder="Change accesses access"
+              v-model="inviteAdministratorModalData.changeAccessesAccess"/>
+          </FormRow>
+        </MyForm>
+      </MyModal>
+
+      <MyModal v-if="inviteWorkerModalData.visibilityStatus"
+               @hide="inviteWorkerModalData.visibilityStatus = false">
+        <MyForm class="staff__invite-form"
+                title-text="Fill all the fields to invite a new worker"
+                submit-text="Invite"
+                :submit-disabled="!validateInviteWorkerModalData"
+                :message="inviteWorkerModalData.message"
+                v-model:message-visibility-status="inviteWorkerModalData.messageVisibilityStatus"
+                @submitted="sendInviteWorkerRequest">
+          <FormRow>
+            <FormInput
+              type="text"
+              placeholder="Email"
+              required
+              v-model="inviteWorkerModalData.email"
+              @updated="inviteWorkerModalDataChanged"/>
+          </FormRow>
+          <FormRow>
+            <FormInput
+              type="text"
+              placeholder="Role name"
+              v-model="inviteWorkerModalData.roleName"
+              @updated="inviteWorkerModalDataChanged"/>
+          </FormRow>
+        </MyForm>
       </MyModal>
     </div>
   </div>
@@ -67,10 +115,16 @@ import {
   deleteWorkerInvite
 } from "@/assets/js/serverRequest";
 import Invite from "@/components/StaffBlock/Invite";
+import MyForm from "@/components/Form/MyForm";
+import FormRow from "@/components/Form/FormRow";
+import FormInput from "@/components/Form/FormInput";
 
 export default {
   name: "Staff",
-  components: {Invite, MyModal, MyRectangleButton, Employee},
+  components: {
+    FormInput,
+    FormRow, MyForm, Invite, MyModal, MyRectangleButton, Employee
+  },
   props: {
     category: {type: String, required: true},
     userArray: {type: Array, default: []},
@@ -79,9 +133,22 @@ export default {
   },
   data: () => ({
     inviteModalVisibilityStatus: false,
-    inviteModalData: {
+    inviteAdministratorModalData: {
       email: "",
-      error: ""
+      addAdministratorAccess: false,
+      deleteAdministratorAccess: false,
+      managePoolsAccess: true,
+      changeAccessesAccess: false,
+      message: "",
+      messageVisibilityStatus: false,
+      visibilityStatus: false
+    },
+    inviteWorkerModalData: {
+      email: "",
+      roleName: "",
+      message: "",
+      messageVisibilityStatus: false,
+      visibilityStatus: false
     }
   }),
   computed: {
@@ -95,40 +162,84 @@ export default {
     },
     inviteModalDataValidStatus() {
       return !!this.inviteModalData.email
+    },
+    validateInviteAdministratorModalData() {
+      if (!this.inviteAdministratorModalData.email) {
+        this.inviteAdministratorModalData.message =
+          "Please enter email first"
+        return false
+      }
+
+      return true
+    },
+    validateInviteWorkerModalData() {
+      if (!this.inviteWorkerModalData.email) {
+        this.inviteWorkerModalData.message =
+          "Please enter email first"
+        return false
+      }
+
+      return true
     }
   },
   methods: {
-    async sendInviteRequest() {
+    showInviteModal() {
       if (this.category === "administrators") {
-        const invitorData = {
-          email: this.inviteModalData.email,
-          farmId: this.farmId,
-          addAdministratorAccess: true,
-          deleteAdministratorAccess: false,
-          managePoolsAccess: true,
-          changeAccessesAccess: false
-        }
-        try {
-          await inviteAdministrator(invitorData)
-        } catch (exception) {
-          return this.inviteModalData.error = exception.details
-        }
+        return this.inviteAdministratorModalData.visibilityStatus = true
       }
       if (this.category === "workers") {
-        const invitorData = {
-          email: this.inviteModalData.email,
-          farmId: this.farmId,
-          roleName: "some role"
-        }
-        try {
-          await inviteWorker(invitorData)
-        } catch (exception) {
-          return this.inviteModalData.error = exception.details
-        }
+        return this.inviteWorkerModalData.visibilityStatus = true
+      }
+    },
+    inviteAdministratorModalDataChanged() {
+      this.inviteAdministratorModalData.messageVisibilityStatus = false
+    },
+    inviteWorkerModalDataChanged() {
+      this.inviteWorkerModalData.messageVisibilityStatus = false
+    },
+    async sendInviteAdministratorRequest() {
+      const invitorData = {
+        email: this.inviteAdministratorModalData.email,
+        farmId: this.farmId,
+        managePoolsAccess:
+        this.inviteAdministratorModalData.managePoolsAccess,
+        addAdministratorAccess:
+        this.inviteAdministratorModalData.addAdministratorAccess,
+        deleteAdministratorAccess:
+        this.inviteAdministratorModalData.deleteAdministratorAccess,
+        changeAccessesAccess:
+        this.inviteAdministratorModalData.changeAccessesAccess
+      }
+      try {
+        await inviteAdministrator(invitorData)
+      } catch (exception) {
+        this.inviteAdministratorModalData.message = exception.details
+        return this.inviteAdministratorModalData.messageVisibilityStatus = true
       }
 
-      this.inviteModalData.email = ""
-      this.inviteModalVisibilityStatus = false
+      this.inviteAdministratorModalData.email = ""
+      this.inviteAdministratorModalData.visibilityStatus = false
+      this.inviteAdministratorModalData.messageVisibilityStatus = false
+
+      this.$emit('updateUserArray')
+      this.$emit('updateInviteArray')
+    },
+    async sendInviteWorkerRequest() {
+      const invitorData = {
+        email: this.inviteWorkerModalData.email,
+        farmId: this.farmId,
+        roleName: this.inviteWorkerModalData.roleName
+      }
+      try {
+        await inviteWorker(invitorData)
+      } catch (exception) {
+        this.inviteWorkerModalData.message = exception.details
+        return this.inviteWorkerModalData.messageVisibilityStatus = true
+      }
+
+      this.inviteWorkerModalData.email = ""
+      this.inviteWorkerModalData.roleName = ""
+      this.inviteWorkerModalData.visibilityStatus = false
 
       this.$emit('updateUserArray')
       this.$emit('updateInviteArray')
@@ -198,90 +309,7 @@ export default {
 }
 
 
-.invite-modal {
-  padding: 0 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-
-.invite-modal__advice {
-  margin: 0 0 15px 0;
-
-  font-size: 20px;
-  text-align: center;
-
-  color: #eeeeee;
-}
-
-.invite-modal__bold-span {
-  font-size: 1.2em;
-  font-weight: 500;
-
-  color: #ffffff;
-}
-
-
-.invite-modal__error {
-  margin: 0 0 40px 0;
-
-  text-align: center;
-  font-size: 20px;
-  font-weight: 500;
-
-  color: #ff6060;
-}
-
-
-.invite-modal__input {
-  width: 100%;
-  height: 53px;
-  padding: 0 15px;
-
-  font-size: 22px;
-
-  color: #fff;
-  background-color: var(--light-purple-color);
-  border: none;
-  border-radius: 4px;
-  outline: none;
-}
-
-.invite-modal__input::placeholder {
-  color: var(--light-gray-color);
-}
-
-
-.invite-modal__submit {
-  margin: 50px 0 0 0;
-  height: 50px;
-  padding: 0 50px;
-
-  font-size: 22px;
-  font-weight: 500;
-
-  color: #eee;
-  background-color: var(--blue-color);
-
-  border: none;
-  border-radius: 4px;
-  outline: none;
-
-  transition: background-color .2s ease;
-  cursor: pointer;
-}
-
-.invite-modal__submit:hover {
-  background-color: #6fa360;
-}
-
-.invite-modal__submit:active {
-  background-color: #5e8b52;
-}
-
-.invite-modal__submit[disabled] {
-  color: #7f7f7f;
-  background: var(--light-purple-color);
+.staff__invite-form {
+  max-width: 25vw;
 }
 </style>
