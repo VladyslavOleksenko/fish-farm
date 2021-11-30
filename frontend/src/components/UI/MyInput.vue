@@ -1,10 +1,17 @@
 <template>
   <div class="my-input">
     <input
-           :placeholder="required ? placeholder + ' *' : placeholder"
-           :type="type"
-           :value="modelValue"
-           @input="updateInput">
+      v-if="type === 'file'"
+      type="file"
+      :file="modelValue"
+      @change="updateModelValue"
+    >
+    <input
+      v-else
+      :placeholder="required ? placeholder + ' *' : placeholder"
+      :type="type"
+      :value="modelValue"
+      @input="updateModelValue">
   </div>
 </template>
 
@@ -12,14 +19,18 @@
 export default {
   name: "MyInput",
   props: {
-    modelValue: [String, Number],
+    modelValue: [String, Number, File],
     placeholder: {type: String, default: "Input here"},
     type: {type: String, default: "text"},
     required: {type: Boolean, default: false}
   },
   methods: {
-    updateInput(event) {
-      this.$emit("update:modelValue", event.target.value)
+    updateModelValue(event) {
+      if (this.type !== "file") {
+        return this.$emit("update:modelValue", event.target.value)
+      }
+
+      return this.$emit("update:modelValue", event.target.files[0])
     }
   }
 }
