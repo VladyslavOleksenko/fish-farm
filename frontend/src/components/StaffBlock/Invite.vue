@@ -1,15 +1,21 @@
 <template>
   <div class="invite">
-    <div class="invite__avatar">
-      <MyIcon class="invite__no-avatar" icon-name="notRegistered" path-color="#aaa"/>
-    </div>
-    <div class="invite__email">{{ invite.email }}</div>
-    <div class="invite__buttons">
-      <MyRoundButton class="invite__button"
-                     icon-name="delete"
-                     @click="deleteModalVisibilityStatus = true"/>
-      <MyRoundButton class="invite__button"
-                     icon-name="edit"/>
+    <div class="invite__content">
+      <div class="invite__avatar"
+           @click.stop="infoVisibilityStatus = true">
+        <MyIcon class="invite__no-avatar" icon-name="notRegistered"
+                path-color="#aaa"/>
+      </div>
+      <div class="invite__email">
+        {{ cutString(invite.email, 24) }}
+      </div>
+      <div class="invite__buttons">
+        <MyRoundButton class="invite__button"
+                       icon-name="delete"
+                       @click="deleteModalVisibilityStatus = true"/>
+        <MyRoundButton class="invite__button"
+                       icon-name="edit"/>
+      </div>
     </div>
 
     <MyModal v-if="deleteModalVisibilityStatus"
@@ -17,7 +23,7 @@
       <div class="farm__delete-modal delete-modal">
         <div class="delete-modal__title">
           You are going to delete the invitation for
-          "{{invite.email}}"
+          "{{ invite.email }}"
         </div>
         <div class="delete-modal__warning">
           This action couldn't be undone
@@ -31,6 +37,10 @@
                            @click="sendDeleteEvent"/>
       </div>
     </MyModal>
+
+    <Info v-if="infoVisibilityStatus"
+          :data="infoBlockData"
+          @hide="infoVisibilityStatus = false"/>
   </div>
 </template>
 
@@ -40,28 +50,84 @@ import NoAvatar from "@/components/NoAvatar/NoAvatar";
 import MyRoundButton from "@/components/UI/MyRoundButton";
 import MyModal from "@/components/UI/MyModal";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
+import Info from "@/components/InfoBlock/Info";
 
 export default {
   name: "Invite",
-  components: {MyRectangleButton, MyModal, MyRoundButton, NoAvatar, MyIcon},
+  components: {
+    Info,
+    MyRectangleButton,
+    MyModal,
+    MyRoundButton,
+    NoAvatar,
+    MyIcon
+  },
   props: {
     category: {type: String, required: true},
     invite: {type: Object, required: true}
   },
   data: () => ({
-    deleteModalVisibilityStatus: false
+    deleteModalVisibilityStatus: false,
+    infoVisibilityStatus: false,
+    infoBlockData: {}
   }),
   methods: {
+    cutString(string, length = 25) {
+      if (string.length <= length) {
+        return string
+      }
+
+      return string.substr(0, length - 3) + "..."
+    },
     sendDeleteEvent() {
       this.$emit('delete', this.invite)
       this.deleteModalVisibilityStatus = false
+    },
+    getWordByBoolean(boolean) {
+      return boolean ? "YES" : "NO"
+    },
+  },
+  mounted() {
+    if (this.category === "administrators") {
+      return this.infoBlockData = {
+        title: "Administrator invitation",
+        parameterArray: [
+          'Email',
+          'Manage pools access',
+          'Add administrator access',
+          'Delete administrator access',
+          'Change accesses access'
+        ],
+        valueArray: [
+          this.invite.email,
+          this.getWordByBoolean(this.invite.managePoolsAccess),
+          this.getWordByBoolean(this.invite.addAdministratorAccess),
+          this.getWordByBoolean(this.invite.deleteAdministratorAccess),
+          this.getWordByBoolean(this.invite.changeAccessesAccess)
+        ]
+      }
+    }
+    if (this.category === "workers") {
+      const roleName = this.roleName ? this.roleName : "no role given"
+
+      return this.infoBlockData = {
+        title: "Worker invitation",
+        parameterArray: [
+          'Email',
+          'Role name'
+        ],
+        valueArray: [
+          this.invite.email,
+          roleName
+        ]
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.invite {
+.invite__content {
   padding: 10px 20px;
 
   display: flex;
@@ -75,7 +141,7 @@ export default {
   color .2s ease;
 }
 
-.invite:hover {
+.invite__content:hover {
   color: #ffffff;
   background-color: var(--light-purple-color);
 }

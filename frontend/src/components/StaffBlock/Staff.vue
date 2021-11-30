@@ -137,7 +137,7 @@ export default {
       email: "",
       addAdministratorAccess: false,
       deleteAdministratorAccess: false,
-      managePoolsAccess: true,
+      managePoolsAccess: false,
       changeAccessesAccess: false,
       message: "",
       messageVisibilityStatus: false,
