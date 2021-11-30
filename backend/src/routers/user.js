@@ -5,7 +5,7 @@ const logError = require("../errorHandler")
 const router = express.Router()
 router.post("/register", registerUserRequest)
 router.post("/login", loginUserRequest)
-router.put("/", changeUserRequest)
+router.put("/data", changeUserDataRequest)
 
 
 async function registerUserRequest(request, response) {
@@ -42,11 +42,12 @@ async function loginUserRequest(request, response) {
   }
 }
 
-async function changeUserRequest(request, response) {
+async function changeUserDataRequest(request, response) {
   try {
     const userData = request.body
-    await userController.changeUser(userData)
-    response.status(200).json({message: "done"})
+    const user = await userController.changeUserData(userData)
+    const userFormatted = userController.formatUser(user)
+    response.status(200).json(userFormatted)
   } catch (exception) {
     const message = "Can't login"
     response.status(400).json({message})
