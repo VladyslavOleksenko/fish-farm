@@ -9,7 +9,8 @@
                   :key="i"
                   :user="user"
                   :category="category"
-                  @delete="sendEmployeeDeleteRequest"/>
+                  @delete="sendEmployeeDeleteRequest"
+                  @update="$emit('updateUserArray')"/>
       </div>
       <div class="staff__invites">
         <Invite class="staff__invite"
@@ -17,7 +18,8 @@
                 :key="i"
                 :invite="invite"
                 :category="category"
-                @delete="sendInviteDeleteRequest"/>
+                @delete="sendInviteDeleteRequest"
+                @update="$emit('updateInviteArray')"/>
       </div>
 
       <div class="staff__add-button-wrapper">
