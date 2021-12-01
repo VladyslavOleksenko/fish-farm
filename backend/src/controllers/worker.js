@@ -2,11 +2,13 @@ module.exports = {
   getWorkerArray,
   getInviteArray,
   getWorkerByFarmAndUserId,
-  getWorkerInviteByFarmAndEmail,
+  getInvite,
+  getInviteByFarmAndEmail,
 
   inviteWorker,
   createWorker,
   createWorkerInvite,
+  changeInvite,
 
   deleteFarmWorker,
   deleteAllFarmWorkers,
@@ -50,7 +52,16 @@ async function getWorkerByFarmAndUserId(userId, farmId) {
   return dataBaseResponse.rows[0]
 }
 
-async function getWorkerInviteByFarmAndEmail(email, farmId) {
+async function getInvite(workerInviteId) {
+  const sqlCommand = `SELECT *
+                      FROM worker_invite
+                      WHERE worker_invite_id LIKE
+                            '${workerInviteId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
+}
+
+async function getInviteByFarmAndEmail(email, farmId) {
   const sqlCommand = `SELECT *
                       FROM worker_invite
                       WHERE farm_id LIKE '${farmId}'
@@ -114,9 +125,9 @@ async function createWorkerInvite(invitorData) {
   const email = invitorData.email
   const farmId = invitorData.farmId
   const invitedAdministratorCandidate =
-    await administratorController.getAdministratorInviteByFarmAndEmail(email, farmId)
+    await administratorController.getInviteByFarmAndEmail(email, farmId)
   const invitedWorkerCandidate =
-    await getWorkerInviteByFarmAndEmail(email, farmId)
+    await getInviteByFarmAndEmail(email, farmId)
 
   if (invitedAdministratorCandidate || invitedWorkerCandidate) {
     throw new Error(`User already invited to this farm`)
@@ -139,6 +150,22 @@ async function createWorkerInvite(invitorData) {
   const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows.insertId
+}
+
+async function changeInvite(inviteData) {
+  const inviteId = inviteData.workerInviteId
+  const candidate = getInvite(inviteId)
+  if (!candidate) {
+    throw new Error(`No worker invite with id ${inviteId}`)
+  }
+
+  const sqlCommand =
+    `UPDATE worker_invite
+     SET role_name = '${inviteData.roleName}'
+     WHERE worker_invite_id = ${inviteId}`
+  await sendDataBaseQuery(sqlCommand)
+
+  return getInvite(inviteId)
 }
 
 

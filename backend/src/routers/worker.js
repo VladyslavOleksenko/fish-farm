@@ -7,6 +7,7 @@ router.get("/", getWorkerArrayRequest)
 router.delete("/", deleteWorkerRequest)
 router.get("/invite", getInviteArrayRequest)
 router.post("/invite", inviteWorkerRequest)
+router.put("/invite", changeInviteRequest)
 router.delete("/invite", deleteInviteRequest)
 
 
@@ -19,6 +20,18 @@ async function getWorkerArrayRequest(request, response) {
     response.status(200).json(workerArrayFormatted)
   } catch (exception) {
     const message = "Can't get worker array"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function deleteWorkerRequest(request, response) {
+  try {
+    const farmWorkerId = request.query.farmWorkerId
+    await workerController.deleteFarmWorker(farmWorkerId)
+    response.status(200).json({message: "done"})
+  } catch (exception) {
+    const message = "Can't delete worker"
     response.status(500).json({message})
     logError(message, exception)
   }
@@ -50,13 +63,14 @@ async function inviteWorkerRequest(request, response) {
   }
 }
 
-async function deleteWorkerRequest(request, response) {
+async function changeInviteRequest(request, response) {
   try {
-    const farmWorkerId = request.query.farmWorkerId
-    await workerController.deleteFarmWorker(farmWorkerId)
-    response.status(200).json({message: "done"})
+    const inviteData = request.body
+    const invite = await workerController.changeInvite(inviteData)
+    const inviteFormatted = workerController.formatInvite(invite)
+    response.status(200).json(inviteFormatted)
   } catch (exception) {
-    const message = "Can't delete worker"
+    const message = "Can't change worker invite"
     response.status(500).json({message})
     logError(message, exception)
   }

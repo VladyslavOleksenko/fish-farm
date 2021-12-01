@@ -2,11 +2,13 @@ module.exports = {
   getAdministratorArray,
   getInviteArray,
   getAdministratorByFarmAndUserId,
-  getAdministratorInviteByFarmAndEmail,
+  getInvite,
+  getInviteByFarmAndEmail,
 
   inviteAdministrator,
   createAdministrator,
   createAdministratorInvite,
+  changeInvite,
 
   deleteFarmAdministrator,
   deleteAllFarmAdministrators,
@@ -45,7 +47,16 @@ async function getAdministratorByFarmAndUserId(userId, farmId) {
   return dataBaseResponse.rows[0]
 }
 
-async function getAdministratorInviteByFarmAndEmail(email, farmId) {
+async function getInvite(administratorInviteId) {
+  const sqlCommand = `SELECT *
+                      FROM administrator_invite
+                      WHERE administrator_invite_id LIKE
+                            '${administratorInviteId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
+}
+
+async function getInviteByFarmAndEmail(email, farmId) {
   const sqlCommand = `SELECT *
                       FROM administrator_invite
                       WHERE farm_id LIKE '${farmId}'
@@ -115,9 +126,9 @@ async function createAdministratorInvite(invitorData) {
   const email = invitorData.email
   const farmId = invitorData.farmId
   const invitedAdministratorCandidate =
-    await getAdministratorInviteByFarmAndEmail(email, farmId)
+    await getInviteByFarmAndEmail(email, farmId)
   const invitedWorkerCandidate =
-    await getWorkerInviteByFarmAndEmail(email, farmId)
+    await getInviteByFarmAndEmail(email, farmId)
   if (invitedAdministratorCandidate || invitedWorkerCandidate) {
     throw new Error(`User already invited to this farm`)
   }
@@ -145,6 +156,39 @@ async function createAdministratorInvite(invitorData) {
   const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows.insertId
+}
+
+async function changeInvite(inviteData) {
+  const inviteId = inviteData.administratorInviteId
+  const candidate = getInvite(inviteId)
+  if (!candidate) {
+    throw new Error(`No administrator invite with id ${inviteId}`)
+  }
+
+  const managePoolsAccess =
+    getIntByBoolean(inviteData.managePoolsAccess)
+  const addAdministratorAccess =
+    getIntByBoolean(inviteData.addAdministratorAccess)
+  const deleteAdministratorAccess =
+    getIntByBoolean(inviteData.deleteAdministratorAccess)
+  const changeAccessesAccess =
+    getIntByBoolean(inviteData.changeAccessesAccess)
+
+  const sqlCommand =
+    `UPDATE administrator_invite
+     SET manage_pools_access         = '${managePoolsAccess}',
+         add_administrator_access    = '${addAdministratorAccess}',
+         delete_administrator_access = '${deleteAdministratorAccess}',
+         change_accesses_access      = '${changeAccessesAccess}'
+     WHERE administrator_invite_id = ${inviteId}`
+  await sendDataBaseQuery(sqlCommand)
+
+  return getInvite(inviteId)
+
+
+  function getIntByBoolean(boolean) {
+    return boolean ? 1 : 0
+  }
 }
 
 
@@ -229,4 +273,3 @@ const {sendInviteAdministratorMail} = require("../mailer")
 const farmController = require("./farm")
 const userController = require("./user")
 const workerController = require("./worker")
-const {getWorkerInviteByFarmAndEmail} = require("./worker");
