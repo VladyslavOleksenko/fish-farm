@@ -9,7 +9,7 @@
           <MyRectangleButton
             class="delete-modal__button"
             :text="content.cancelButtonText || 'cancel'"
-            icon-name="ok"
+            icon-name="back"
             @click="$emit('hide')"/>
           <MyRectangleButton
             class="delete-modal__button"
