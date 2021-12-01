@@ -188,6 +188,16 @@ export async function inviteWorker(invitorData) {
   return await sendServerRequest(requestParams)
 }
 
+export async function changeWorkerInvite(invitorData) {
+  const requestParams = new RequestParams(
+    "PUT",
+    "http://localhost:5000/api/worker/invite",
+    invitorData
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
 export async function deleteWorker(farmWorkerId) {
   const requestParams = new RequestParams(
     "DELETE",
