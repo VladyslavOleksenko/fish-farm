@@ -28,6 +28,21 @@ async function getAdministratorArrayRequest(request, response) {
   }
 }
 
+async function changeAdministratorRequest(request, response) {
+  try {
+    const administratorData = request.body
+    const administrator =
+      await administratorController.changeAdministrator(administratorData)
+    const administratorFormatted =
+      administratorController.formatAdministrator(administrator)
+    response.status(200).json(administratorFormatted)
+  } catch (exception) {
+    const message = "Can't change administrator"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
 async function deleteAdministratorRequest(request, response) {
   try {
     const farmAdministratorId = request.query.farmAdministratorId
@@ -40,17 +55,6 @@ async function deleteAdministratorRequest(request, response) {
   }
 }
 
-async function changeAdministratorRequest(request, response) {
-  try {
-    const administratorInviteId = request.query.administratorInviteId
-    await administratorController.deleteInvite(administratorInviteId)
-    response.status(200).json({message: "done"})
-  } catch (exception) {
-    const message = "Can't delete administrator invite"
-    response.status(500).json({message})
-    logError(message, exception)
-  }
-}
 
 async function getInviteArrayRequest(request, response) {
   try {

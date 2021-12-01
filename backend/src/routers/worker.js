@@ -4,6 +4,7 @@ const logError = require("../errorHandler")
 
 const router = express.Router()
 router.get("/", getWorkerArrayRequest)
+router.put("/", changeWorkerRequest)
 router.delete("/", deleteWorkerRequest)
 router.get("/invite", getInviteArrayRequest)
 router.post("/invite", inviteWorkerRequest)
@@ -25,6 +26,21 @@ async function getWorkerArrayRequest(request, response) {
   }
 }
 
+async function changeWorkerRequest(request, response) {
+  try {
+    const workerData = request.body
+    const worker =
+      await workerController.changeWorker(workerData)
+    const workerFormatted =
+      workerController.formatWorker(worker)
+    response.status(200).json(workerFormatted)
+  } catch (exception) {
+    const message = "Can't change administrator"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
 async function deleteWorkerRequest(request, response) {
   try {
     const farmWorkerId = request.query.farmWorkerId
@@ -36,6 +52,7 @@ async function deleteWorkerRequest(request, response) {
     logError(message, exception)
   }
 }
+
 
 async function getInviteArrayRequest(request, response) {
   try {

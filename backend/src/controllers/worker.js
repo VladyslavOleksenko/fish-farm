@@ -1,6 +1,7 @@
 module.exports = {
   getWorkerArray,
   getInviteArray,
+  getWorker,
   getWorkerByFarmAndUserId,
   getInvite,
   getInviteByFarmAndEmail,
@@ -8,6 +9,7 @@ module.exports = {
   inviteWorker,
   createWorker,
   createWorkerInvite,
+  changeWorker,
   changeInvite,
 
   deleteFarmWorker,
@@ -41,6 +43,15 @@ async function getInviteArray(farmId) {
                       WHERE farm_id LIKE '${farmId}'`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows
+}
+
+async function getWorker(farmWorkerId) {
+  const sqlCommand = `SELECT *
+                      FROM farm_worker
+                      WHERE farm_worker_id LIKE
+                            '${farmWorkerId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
 }
 
 async function getWorkerByFarmAndUserId(userId, farmId) {
@@ -150,6 +161,22 @@ async function createWorkerInvite(invitorData) {
   const sqlCommand = createInsertSqlCommand(tableName, fieldNames, fieldValues)
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows.insertId
+}
+
+async function changeWorker(workerData) {
+  const workerId = workerData.farmWorkerId
+  const candidate = getWorker(workerId)
+  if (!candidate) {
+    throw new Error(`No farm worker with id ${workerId}`)
+  }
+
+  const sqlCommand =
+    `UPDATE farm_worker
+     SET role_name         = '${workerData.roleName}'
+     WHERE farm_worker_id = ${workerId}`
+  await sendDataBaseQuery(sqlCommand)
+
+  return getWorker(workerId)
 }
 
 async function changeInvite(inviteData) {

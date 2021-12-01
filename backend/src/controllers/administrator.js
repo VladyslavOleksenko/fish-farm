@@ -1,6 +1,7 @@
 module.exports = {
   getAdministratorArray,
   getInviteArray,
+  getAdministrator,
   getAdministratorByFarmAndUserId,
   getInvite,
   getInviteByFarmAndEmail,
@@ -8,6 +9,7 @@ module.exports = {
   inviteAdministrator,
   createAdministrator,
   createAdministratorInvite,
+  changeAdministrator,
   changeInvite,
 
   deleteFarmAdministrator,
@@ -36,6 +38,15 @@ async function getInviteArray(farmId) {
                       WHERE farm_id LIKE '${farmId}'`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows
+}
+
+async function getAdministrator(farmAdministratorId) {
+  const sqlCommand = `SELECT *
+                      FROM farm_administrator
+                      WHERE farm_administrator_id LIKE
+                            '${farmAdministratorId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
 }
 
 async function getAdministratorByFarmAndUserId(userId, farmId) {
@@ -158,6 +169,34 @@ async function createAdministratorInvite(invitorData) {
   return dataBaseResponse.rows.insertId
 }
 
+async function changeAdministrator(administratorData) {
+  const administratorId = administratorData.farmAdministratorId
+  const candidate = getAdministrator(administratorId)
+  if (!candidate) {
+    throw new Error(`No farm administrator with id ${administratorId}`)
+  }
+
+  const managePoolsAccess =
+    getIntByBoolean(administratorData.managePoolsAccess)
+  const addAdministratorAccess =
+    getIntByBoolean(administratorData.addAdministratorAccess)
+  const deleteAdministratorAccess =
+    getIntByBoolean(administratorData.deleteAdministratorAccess)
+  const changeAccessesAccess =
+    getIntByBoolean(administratorData.changeAccessesAccess)
+
+  const sqlCommand =
+    `UPDATE farm_administrator
+     SET manage_pools_access         = '${managePoolsAccess}',
+         add_administrator_access    = '${addAdministratorAccess}',
+         delete_administrator_access = '${deleteAdministratorAccess}',
+         change_accesses_access      = '${changeAccessesAccess}'
+     WHERE farm_administrator_id = ${administratorId}`
+  await sendDataBaseQuery(sqlCommand)
+
+  return getAdministrator(administratorId)
+}
+
 async function changeInvite(inviteData) {
   const inviteId = inviteData.administratorInviteId
   const candidate = getInvite(inviteId)
@@ -184,11 +223,6 @@ async function changeInvite(inviteData) {
   await sendDataBaseQuery(sqlCommand)
 
   return getInvite(inviteId)
-
-
-  function getIntByBoolean(boolean) {
-    return boolean ? 1 : 0
-  }
 }
 
 
@@ -265,6 +299,11 @@ function formatInvite(invite) {
     managePoolsAccess: !!invite["manage_pools_access"],
     changeAccessesAccess: !!invite["change_accesses_access"]
   }
+}
+
+
+function getIntByBoolean(boolean) {
+  return boolean ? 1 : 0
 }
 
 
