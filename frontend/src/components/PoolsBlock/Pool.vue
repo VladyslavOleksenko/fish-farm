@@ -103,6 +103,9 @@ export default {
       await deletePool(this.poolInfo.poolId)
       this.$emit("updated")
     }
+  },
+  mounted() {
+    this.changeModalData.name = this.poolInfo.name
   }
 }
 </script>
