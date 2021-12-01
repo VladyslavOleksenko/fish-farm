@@ -2,7 +2,7 @@
   <div class="employee">
     <div class="employee__content">
       <div class="employee__avatar"
-           @click.stop="infoBlockData.visibilityStatus = true">
+           @click.stop="infoBlockVisibilityStatus = true">
         <NoAvatar class="employee__no-avatar"/>
       </div>
       <div class="employee__fullName">
@@ -14,18 +14,74 @@
                        icon-name="delete"
                        @click="deleteModalData.visibilityStatus = true"/>
         <MyRoundButton class="employee__button"
-                       icon-name="edit"/>
+                       icon-name="edit"
+                       @click="changeModalData.visibilityStatus = true"/>
       </div>
     </div>
+
+    <Info v-if="infoBlockVisibilityStatus"
+          :data="infoBlockContent"
+          @hide="infoBlockVisibilityStatus = false"/>
+
+    <MyModal v-if="changeModalData.visibilityStatus"
+             @hide="changeModalData.visibilityStatus = false">
+      <MyForm v-if="category === 'administrators'"
+              :title-text="changeModalData.content.title"
+              submit-text="Change"
+              :submit-disabled="!validateChangeModalData"
+              :message="changeModalData.message"
+              v-model:message-visibility-status="changeModalData.messageVisibilityStatus"
+              @submitted="sendChangeEmployeeRequest">
+        <FormRow>
+          <FormInput
+            type="checkbox"
+            placeholder="Manage pools access"
+            v-model="changeModalData.content.managePoolsAccess"
+            @updated="changeModalDataUpdated"/>
+        </FormRow>
+        <FormRow>
+          <FormInput
+            type="checkbox"
+            placeholder="Add administrator access"
+            v-model="changeModalData.content.addAdministratorAccess"
+            @updated="changeModalDataUpdated"/>
+        </FormRow>
+        <FormRow>
+          <FormInput
+            type="checkbox"
+            placeholder="Delete administrator access"
+            v-model="changeModalData.content.deleteAdministratorAccess"
+            @updated="changeModalDataUpdated"/>
+        </FormRow>
+        <FormRow>
+          <FormInput
+            type="checkbox"
+            placeholder="Change accesses access"
+            v-model="changeModalData.content.changeAccessesAccess"
+            @updated="changeModalDataUpdated"/>
+        </FormRow>
+      </MyForm>
+      <MyForm v-else-if="category === 'workers'"
+              :title-text="changeModalData.content.title"
+              submit-text="Change"
+              :submit-disabled="!validateChangeModalData"
+              :message="changeModalData.message"
+              v-model:message-visibility-status="changeModalData.messageVisibilityStatus"
+              @submitted="sendChangeEmployeeRequest">
+        <FormRow>
+          <FormInput
+            type="text"
+            placeholder="Role name"
+            v-model="changeModalData.content.roleName"
+            @updated="changeModalDataUpdated"/>
+        </FormRow>
+      </MyForm>
+    </MyModal>
 
     <DeleteModal v-if="deleteModalData.visibilityStatus"
                  :content="deleteModalData.content"
                  @hide="deleteModalData.visibilityStatus = false"
                  @delete="sendDeleteEvent"/>
-
-    <Info v-if="infoBlockData.visibilityStatus"
-          :data="infoBlockData"
-          @hide="infoBlockData.visibilityStatus = false"/>
   </div>
 </template>
 
@@ -37,10 +93,20 @@ import MyModal from "@/components/Modal/MyModal";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import Info from "@/components/InfoBlock/Info";
 import DeleteModal from "@/components/Modal/DeleteModal";
+import MyForm from "@/components/Form/MyForm";
+import FormRow from "@/components/Form/FormRow";
+import FormInput from "@/components/Form/FormInput";
+import {
+  changeAdministrator,
+  changeWorker
+} from "@/assets/js/serverRequest";
 
 export default {
   name: "Employee",
   components: {
+    FormInput,
+    FormRow,
+    MyForm,
     DeleteModal,
     Info,
     MyRectangleButton,
@@ -54,7 +120,12 @@ export default {
     user: {type: Object, required: true}
   },
   data: () => ({
-    infoBlockData: {},
+    infoBlockVisibilityStatus: false,
+    changeModalData: {
+      visibilityStatus: false,
+      messageVisibilityStatus: false,
+      content: {}
+    },
     deleteModalData: {}
   }),
   computed: {
@@ -68,6 +139,66 @@ export default {
 
       return `You are about to delete the ${role} ` +
         `${this.user.firstName} ${this.user.lastName}"`
+    },
+    infoBlockContent() {
+      if (this.category === "owner") {
+        return {
+          title: "Farm owner",
+          parameterArray: [
+            'Email',
+            'First name',
+            'Last name'
+          ],
+          valueArray: [
+            this.user.email,
+            this.user.firstName,
+            this.user.lastName
+          ]
+        }
+      }
+      if (this.category === "administrators") {
+        return {
+          title: "Farm administrator",
+          parameterArray: [
+            'Email',
+            'First name',
+            'Last name',
+            'Manage pools access',
+            'Add administrator access',
+            'Delete administrator access',
+            'Change accesses access'
+          ],
+          valueArray: [
+            this.user.email,
+            this.user.firstName,
+            this.user.lastName,
+            this.getWordByBoolean(this.user.managePoolsAccess),
+            this.getWordByBoolean(this.user.addAdministratorAccess),
+            this.getWordByBoolean(this.user.deleteAdministratorAccess),
+            this.getWordByBoolean(this.user.changeAccessesAccess)
+          ]
+        }
+      }
+      if (this.category === "workers") {
+        const roleName =
+          this.user.roleName ? this.user.roleName : "no role given"
+
+        return {
+          title: "Worker invitation",
+          parameterArray: [
+            'Email',
+            'First name',
+            'Last name',
+            'Role name'
+          ],
+          valueArray: [
+            this.user.email,
+            this.user.firstName,
+            this.user.lastName,
+            roleName
+          ]
+        }
+      }
     }
   },
   methods: {
@@ -77,77 +208,79 @@ export default {
     },
     getWordByBoolean(boolean) {
       return boolean ? "YES" : "NO"
+    },
+    validateChangeModalData() {
+      return true
+    },
+    changeModalDataUpdated() {
+      this.changeModalData.messageVisibilityStatus = false
+    },
+    async sendChangeEmployeeRequest() {
+      try {
+        if (this.category === "administrators") {
+          const administratorData = {
+            farmAdministratorId:
+            this.user.farmAdministratorId,
+            managePoolsAccess:
+            this.changeModalData.content.managePoolsAccess,
+            addAdministratorAccess:
+            this.changeModalData.content.addAdministratorAccess,
+            deleteAdministratorAccess:
+            this.changeModalData.content.deleteAdministratorAccess,
+            changeAccessesAccess:
+            this.changeModalData.content.changeAccessesAccess
+          }
+
+          await changeAdministrator(administratorData)
+        }
+        if (this.category === "workers") {
+          const workerData = {
+            farmWorkerId: this.user.farmWorkerId,
+            roleName: this.changeModalData.content.roleName
+          }
+
+          await changeWorker(workerData)
+        }
+      } catch (exception) {
+        console.log(exception)
+        return
+      }
+
+      this.changeModalData.visibilityStatus = false
+      await this.$emit("update")
+    },
+
+    updateChangeModalData() {
+      if (this.category === "administrators") {
+        this.changeModalData.content = {
+          title: `Farm administrator ${this.user.firstName} ${this.user.lastName}`,
+          message: "",
+          managePoolsAccess: this.user.managePoolsAccess,
+          addAdministratorAccess: this.user.addAdministratorAccess,
+          deleteAdministratorAccess: this.user.deleteAdministratorAccess,
+          changeAccessesAccess: this.user.changeAccessesAccess
+        }
+      }
+      if (this.category === "workers") {
+        this.changeModalData.content = {
+          title: `Farm worker ${this.user.firstName} ${this.user.lastName}`,
+          message: "",
+          roleName: this.user.roleName
+        }
+      }
+    },
+    updateDeleteModalData() {
+      this.deleteModalData = {
+        visibilityStatus: false,
+        content: {
+          message: this.deleteModalDataMessage
+        }
+      }
     }
   },
   mounted() {
-    if (this.category === "administrators") {
-      this.infoBlockData = {
-        title: "Farm administrator",
-        parameterArray: [
-          'First name',
-          'Last name',
-          'Email',
-          'Manage pools access',
-          'Add administrator access',
-          'Delete administrator access',
-          'Change accesses access'
-        ],
-        valueArray: [
-          this.user.firstName,
-          this.user.lastName,
-          this.user.email,
-          this.getWordByBoolean(this.user.managePoolsAccess),
-          this.getWordByBoolean(this.user.addAdministratorAccess),
-          this.getWordByBoolean(this.user.deleteAdministratorAccess),
-          this.getWordByBoolean(this.user.changeAccessesAccess)
-        ]
-      }
-    }
-    if (this.category === "workers") {
-      const roleName =
-        this.invite.roleName ? this.invite.roleName : "no role given"
-
-      this.infoBlockData = {
-        title: "Farm worker",
-        parameterArray: [
-          'First name',
-          'Last name',
-          'Email',
-          'Role name'
-        ],
-        valueArray: [
-          this.user.firstName,
-          this.user.lastName,
-          this.user.email,
-          roleName
-        ]
-      }
-    }
-    if (this.category === "owner") {
-      this.infoBlockData = {
-        title: "Farm owner",
-        parameterArray: [
-          'First name',
-          'Last name',
-          'Email'
-        ],
-        valueArray: [
-          this.user.firstName,
-          this.user.lastName,
-          this.user.email
-        ]
-      }
-    }
-
-    if (this.category !== "administrators" && this.category !== "workers") {
-      return
-    }
-    this.deleteModalData = {
-      visibilityStatus: false,
-      content: {
-        message: this.deleteModalDataMessage
-      }
-    }
+    this.updateChangeModalData()
+    this.updateDeleteModalData()
   }
 }
 </script>
