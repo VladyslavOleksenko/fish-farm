@@ -139,6 +139,26 @@ export async function inviteAdministrator(invitorData) {
   return await sendServerRequest(requestParams)
 }
 
+export async function changeAdministrator(administratorData) {
+  const requestParams = new RequestParams(
+    "PUT",
+    "http://localhost:5000/api/administrator",
+    administratorData
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+export async function changeAdministratorInvite(invitorData) {
+  const requestParams = new RequestParams(
+    "PUT",
+    "http://localhost:5000/api/administrator/invite",
+    invitorData
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
 export async function deleteAdministrator(farmAdministratorId) {
   const requestParams = new RequestParams(
     "DELETE",
@@ -183,6 +203,16 @@ export async function inviteWorker(invitorData) {
     "POST",
     "http://localhost:5000/api/worker/invite",
     invitorData
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
+export async function changeWorker(workerData) {
+  const requestParams = new RequestParams(
+    "PUT",
+    "http://localhost:5000/api/worker",
+    workerData
   )
 
   return await sendServerRequest(requestParams)
