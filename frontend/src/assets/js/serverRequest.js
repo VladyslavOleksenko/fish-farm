@@ -286,3 +286,14 @@ export async function deletePool(poolId) {
 
   return await sendServerRequest(requestParams)
 }
+
+
+export async function createTask(newTaskData) {
+  const requestParams = new RequestParams(
+    "POST",
+    "http://localhost:5000/api/task",
+    newTaskData
+  )
+
+  return await sendServerRequest(requestParams)
+}
