@@ -1,22 +1,27 @@
 <template>
   <div class="employee">
     <div class="employee__content">
-      <div class="employee__avatar"
-           @click.stop="infoBlockVisibilityStatus = true">
-        <NoAvatar class="employee__no-avatar"/>
+      <div class="employee__info">
+        <div class="employee__avatar"
+             @click.stop="infoBlockVisibilityStatus = true">
+          <NoAvatar class="employee__no-avatar"/>
+        </div>
+        <div class="employee__fullName">
+          {{ user.firstName }} {{ user.lastName }}
+        </div>
+        <div class="employee__buttons"
+             v-if="category !== 'owner'">
+          <MyRoundButton class="employee__button"
+                         icon-name="delete"
+                         @click="deleteModalData.visibilityStatus = true"/>
+          <MyRoundButton class="employee__button"
+                         icon-name="edit"
+                         @click="changeModalData.visibilityStatus = true"/>
+        </div>
       </div>
-      <div class="employee__fullName">
-        {{ user.firstName }} {{ user.lastName }}
-      </div>
-      <div class="employee__buttons"
-           v-if="category !== 'owner'">
-        <MyRoundButton class="employee__button"
-                       icon-name="delete"
-                       @click="deleteModalData.visibilityStatus = true"/>
-        <MyRoundButton class="employee__button"
-                       icon-name="edit"
-                       @click="changeModalData.visibilityStatus = true"/>
-      </div>
+      <Tasks class="employee__tasks"
+             v-if="category === 'workers'"
+             :farmWorkerId="user.farmWorkerId"/>
     </div>
 
     <Info v-if="infoBlockVisibilityStatus"
@@ -100,10 +105,12 @@ import {
   changeAdministrator,
   changeWorker
 } from "@/assets/js/serverRequest";
+import Tasks from "@/components/TaskBlock/Tasks";
 
 export default {
   name: "Employee",
   components: {
+    Tasks,
     FormInput,
     FormRow,
     MyForm,
@@ -289,9 +296,6 @@ export default {
 .employee__content {
   padding: 10px 20px;
 
-  display: flex;
-  align-items: center;
-
   color: #cccccc;
   border-radius: 4px;
 
@@ -303,6 +307,12 @@ export default {
 .employee__content:hover {
   color: #ffffff;
   background-color: var(--light-purple-color);
+}
+
+
+.employee__info {
+  display: flex;
+  align-items: center;
 }
 
 
@@ -336,5 +346,10 @@ export default {
 
 .employee__button:first-child {
   margin: 0 20px 0 0;
+}
+
+
+.employee__tasks {
+  margin: 20px 0 0 100px;
 }
 </style>
