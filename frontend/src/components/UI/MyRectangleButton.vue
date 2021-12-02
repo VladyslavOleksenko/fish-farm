@@ -69,7 +69,7 @@ export default {
 }
 
 .button:hover {
-  background-color: var(--light-purple-color);
+  background-color: rgba(255, 255, 255, 0.16);
 }
 
 .button:hover .button__text {
