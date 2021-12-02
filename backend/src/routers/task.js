@@ -1,6 +1,5 @@
 const express = require("express")
-const farmController = require("../controllers/farm")
-const userController = require("../controllers/user")
+const taskController = require("../controllers/task")
 const logError = require("../errorHandler")
 
 const router = express.Router()
@@ -55,6 +54,8 @@ async function getTaskByWorkerRequest(request, response) {
 async function createTaskRequest(request, response) {
   try {
     const newTaskData = request.body
+    const result = await taskController.createTask(newTaskData)
+    response.status(200).json(result)
   } catch (exception) {
     const message = "Can't get task by taskId"
     response.status(500).json({message})
