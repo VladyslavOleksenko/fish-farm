@@ -20,15 +20,19 @@
     <MyModal v-if="addModalVisibilityStatus"
              @hide="addModalVisibilityStatus = false">
       <div class="add-modal">
-        <div class="add-modal__title">Add new pool to your farm</div>
-        <input class="add-modal__input"
-               type="text"
-               placeholder="Name *"
-               v-model="addModalData.poolName">
-        <input class="add-modal__submit"
-               type="submit"
-               :disabled="!addModalDataValidStatus"
-               @click="sendCreatePoolRequest">
+        <MyForm
+          title-text="Add new pool to your farm"
+          submit-text="submit"
+          :submit-disabled="!addModalDataValidStatus"
+          @submitted="sendCreatePoolRequest">
+          <FormRow>
+            <FormInput
+              type="text"
+              placeholder="Name"
+              :required="true"
+              v-model="addModalData.poolName"/>
+          </FormRow>
+        </MyForm>
       </div>
     </MyModal>
   </div>
@@ -50,7 +54,7 @@ export default {
     FormInput,
     FormRow, MyForm, MyRectangleButton, MyModal, MyIcon, Pool},
   props: {
-    farmId: {type: String, required: true}
+    farmId: {type: Number, required: true}
   },
   data: () => ({
     poolArray: [],
@@ -83,7 +87,11 @@ export default {
 
 <style scoped>
 .pools {
+  max-height: 100%;
   padding: 20px;
+
+  display: flex;
+  flex-direction: column;
 
   background-color: var(--dark-purple-color);
   box-shadow: 0 5px 10px 4px rgba(44, 46, 67, 0.7);
@@ -99,8 +107,11 @@ export default {
 }
 
 
+.pools__pool-list {
+  overflow: auto;
+}
+
 .pools__pool {
-  margin: 0 0 10px 0;
 }
 
 

@@ -2,7 +2,8 @@
   <div class="pool">
     <div class="pool__content">
       <div class="pool__name">{{ poolInfo.name }}</div>
-      <div class="pool__buttons">
+      <div class="pool__buttons"
+           v-if="$route.name !== 'Dashboard'">
         <MyRoundButton class="pool__button"
                        icon-name="delete"
                        @click="deleteModalData.visibilityStatus = true"/>

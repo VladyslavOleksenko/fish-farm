@@ -15,47 +15,47 @@
           <FormInput
             type="text"
             placeholder="Task"
-            v-model="content.title"
+            v-model="selfContent.title"
             @updated="contentUpdated"/>
         </FormRow>
         <FormRow>
           <FormInput
             type="text"
             placeholder="Description"
-            v-model="content.description"
+            v-model="selfContent.description"
             @updated="contentUpdated"/>
         </FormRow>
         <FormRow>
           <FormInput
             type="date"
-            v-model="content.deadlineDate"
+            v-model="selfContent.deadlineDate"
             @updated="contentUpdated"/>
         </FormRow>
         <FormRow>
           <FormInput
             type="time"
-            v-model="content.deadlineTime"
+            v-model="selfContent.deadlineTime"
             @updated="contentUpdated"/>
         </FormRow>
         <FormRow>
           <FormInput
             type="checkbox"
             placeholder="Recurring"
-            v-model="content.isRecurring"
+            v-model="selfContent.isRecurring"
             @updated="contentUpdated"/>
         </FormRow>
         <FormRow>
           <FormInput
             type="text"
             placeholder="Recurring period"
-            v-model="content.recurringPeriod"
+            v-model="selfContent.recurringPeriod"
             @updated="contentUpdated"/>
         </FormRow>
         <FormRow>
           <FormInput
             type="checkbox"
             placeholder="Result required"
-            v-model="content.resultRequiredStatus"
+            v-model="selfContent.resultRequiredStatus"
             @updated="contentUpdated"/>
         </FormRow>
       </MyForm>
@@ -68,22 +68,32 @@ import MyModal from "@/components/Modal/MyModal";
 import MyForm from "@/components/Form/MyForm";
 import FormInput from "@/components/Form/FormInput";
 import FormRow from "@/components/Form/FormRow";
-import {createTask} from "@/assets/js/serverRequest"
+import {createTask, getTaskArrayByFarmWorker} from "@/assets/js/serverRequest"
 
 export default {
   name: "AddTaskModal",
   components: {FormRow, FormInput, MyForm, MyModal},
   props: {
     visibilityStatus: Boolean,
-    content: Object
+    farmWorkerId: {type: Number, required: true}
   },
   data: () => ({
     message: "",
-    messageVisibilityStatus: false
+    messageVisibilityStatus: false,
+    selfContent: {
+      farmWorkerId: null,
+      title: "",
+      description: "",
+      deadlineDate: "",
+      deadlineTime: "",
+      isRecurring: false,
+      recurringPeriod: "",
+      resultRequiredStatus: false
+    }
   }),
   methods: {
     validateContent() {
-      if (!this.content.title) {
+      if (!this.selfContent.title) {
         this.message = "Task title can't be empty"
         return false
       }
@@ -95,23 +105,36 @@ export default {
     },
     async sendAddTaskRequest() {
       const newTaskData = {
-        farmWorkerId: this.content.farmWorkerId,
-        title: this.content.title,
-        description: this.content.description,
-        deadlineDate: this.content.deadlineDate,
-        deadlineTime: this.content.deadlineTime,
-        isRecurring: this.content.isRecurring,
-        recurringPeriod: this.content.recurringPeriod,
-        resultRequiredStatus: this.content.resultRequiredStatus
+        farmWorkerId: this.selfContent.farmWorkerId,
+        title: this.selfContent.title,
+        description: this.selfContent.description,
+        deadlineDate: this.selfContent.deadlineDate,
+        deadlineTime: this.selfContent.deadlineTime,
+        isRecurring: this.selfContent.isRecurring,
+        recurringPeriod: this.selfContent.recurringPeriod,
+        resultRequiredStatus: this.selfContent.resultRequiredStatus
       }
 
-      const serverResponse = await createTask(newTaskData)
-      console.log(serverResponse)
-    }
+      try {
+        await createTask(newTaskData)
+      } catch (exception) {
+        console.log(exception)
+      }
+
+      this.$emit("update:visibilityStatus", false)
+      this.$emit("added")
+
+      this.selfContent.title = ""
+      this.selfContent.description = ""
+      this.selfContent.deadlineDate = ""
+      this.selfContent.deadlineTime = ""
+      this.selfContent.isRecurring = false
+      this.selfContent.recurringPeriod = ""
+      this.selfContent.resultRequiredStatus = false
+    },
+  },
+  async mounted() {
+    this.selfContent.farmWorkerId = this.farmWorkerId
   }
 }
 </script>
-
-<style scoped>
-
-</style>

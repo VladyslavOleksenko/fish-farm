@@ -10,7 +10,7 @@
           {{ user.firstName }} {{ user.lastName }}
         </div>
         <div class="employee__buttons"
-             v-if="category !== 'owner'">
+             v-if="category !== 'owner' && $route.name !== 'Dashboard'">
           <MyRoundButton class="employee__button"
                          icon-name="delete"
                          @click="deleteModalData.visibilityStatus = true"/>
@@ -20,7 +20,7 @@
         </div>
       </div>
       <Tasks class="employee__tasks"
-             v-if="category === 'workers'"
+             v-if="category === 'workers' && $route.name === 'Dashboard'"
              :farmWorkerId="user.farmWorkerId"/>
     </div>
 
@@ -350,6 +350,6 @@ export default {
 
 
 .employee__tasks {
-  margin: 20px 0 0 100px;
+  margin: 20px 0 0 50px;
 }
 </style>

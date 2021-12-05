@@ -22,7 +22,8 @@
                 @update="$emit('updateInviteArray')"/>
       </div>
 
-      <div class="staff__add-button-wrapper">
+      <div class="staff__add-button-wrapper"
+           v-if="$route.name !== 'Dashboard'">
         <MyRectangleButton class="staff__add-button"
                            v-if="category !== 'owner'"
                            icon-name="add"
@@ -131,7 +132,7 @@ export default {
     category: {type: String, required: true},
     userArray: {type: Array, default: []},
     inviteArray: {type: Array, default: []},
-    farmId: {type: String}
+    farmId: {type: Number}
   },
   data: () => ({
     inviteModalVisibilityStatus: false,
@@ -161,9 +162,6 @@ export default {
       if (this.category === "workers") {
         return "worker"
       }
-    },
-    inviteModalDataValidStatus() {
-      return !!this.inviteModalData.email
     },
     validateInviteAdministratorModalData() {
       if (!this.inviteAdministratorModalData.email) {
@@ -270,8 +268,12 @@ export default {
 
 <style scoped>
 .staff__content {
+  max-height: 100%;
   width: 100%;
   padding: 20px;
+
+  display: flex;
+  flex-direction: column;
 
   background-color: var(--dark-purple-color);
   box-shadow: 0 5px 10px 4px rgba(44, 46, 67, 0.7);
@@ -295,6 +297,10 @@ export default {
 
 .staff__users {
   margin: 0 0 40px 0;
+  overflow: auto;
+}
+
+.staff__user {
 }
 
 

@@ -7,29 +7,49 @@
       </div>
 
       <div class="farm__info-block">
-        <div class="farm__staff-block">
-          <Staff class="farm__staff"
-                 category="owner"
-                 :user-array="[owner]"/>
+        <div class="farm__info-left">
+          <div class="farm__staff-block">
+            <Staff class="farm__staff"
+                   category="owner"
+                   :user-array="[owner]"/>
 
-          <Staff class="farm__staff"
-                 category="administrators"
-                 :user-array="administratorArray"
-                 :invite-array="administratorInviteArray"
-                 :farm-id="farmId"
-                 @updateUserArray="updateAdministratorArray"
-                 @updateInviteArray="updateAdministratorInviteArray"/>
+            <Staff class="farm__staff"
+                   category="administrators"
+                   :user-array="administratorArray"
+                   :invite-array="administratorInviteArray"
+                   :farm-id="farmId"
+                   @updateUserArray="updateAdministratorArray"
+                   @updateInviteArray="updateAdministratorInviteArray"/>
 
-          <Staff class="farm__staff"
-                 category="workers"
-                 :user-array="workerArray"
-                 :invite-array="workerInviteArray"
-                 :farm-id="farmId"
-                 @updateUserArray="updateWorkerArray"
-                 @updateInviteArray="updateWorkerInviteArray"/>
+            <Staff class="farm__staff"
+                   category="workers"
+                   :user-array="workerArray"
+                   :invite-array="workerInviteArray"
+                   :farm-id="farmId"
+                   @updateUserArray="updateWorkerArray"
+                   @updateInviteArray="updateWorkerInviteArray"/>
+          </div>
         </div>
 
-        <Pools class="farm__pools" :farm-id="farmId"/>
+        <div class="farm__info-right">
+          <Pools class="farm__pools" :farm-id="farmId"/>
+
+          <div class="farm__dashboard dashboard">
+            <img class="dashboard__image"
+                 src="../../public/dashboard.svg"
+                 alt="">
+            <MyRectangleButton
+              class="dashboard__button"
+              icon-name="statistics"
+              text="Welcome to dashboard"
+              @click="$router.push({
+                name: 'Dashboard',
+                params: {
+                  farmId: farmId
+                }
+              })"/>
+          </div>
+        </div>
       </div>
 
       <MyRectangleButton
@@ -83,7 +103,7 @@ export default {
   }),
   computed: {
     farmId() {
-      return this.$route.params.farmId
+      return parseInt(this.$route.params.farmId.toString())
     }
   },
   methods: {
@@ -161,7 +181,7 @@ export default {
 }
 
 
-.farm__staff-block {
+.farm__info-left {
   width: 40%;
 }
 
@@ -169,17 +189,40 @@ export default {
   margin: 0 0 45px 0;
 }
 
-
-.farm__pools {
-  width: 40%;
-}
-
-
 .farm__delete-button {
   width: 250px;
   height: 50px;
 
   background-color: var(--dark-purple-color);
   border-radius: 10px;
+}
+
+
+.farm__info-right {
+  width: 40%;
+}
+
+.farm__pools {
+  margin: 0 0 45px 0;
+}
+
+
+.dashboard {
+  padding: 20px;
+
+  background-color: var(--dark-purple-color);
+  box-shadow: 0 5px 10px 4px rgba(44, 46, 67, 0.7);
+  border-radius: 6px;
+}
+
+.dashboard__image {
+  width: 70%;
+  margin: 0 15% 20px;
+
+  opacity: .7;
+}
+
+.dashboard__button {
+  height: 60px;
 }
 </style>
