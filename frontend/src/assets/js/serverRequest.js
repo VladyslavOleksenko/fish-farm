@@ -288,6 +288,16 @@ export async function deletePool(poolId) {
 }
 
 
+export async function getTaskArrayByFarmWorker(farmWorkerId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/task/byFarmWorker?farmWorkerId=" +
+    farmWorkerId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
 export async function createTask(newTaskData) {
   const requestParams = new RequestParams(
     "POST",
