@@ -74,4 +74,18 @@ export default {
   transition: var(--sidebar-transition);
   background-color: var(--light-gray-color);
 }
+
+*::-webkit-scrollbar {
+  width: 15px;
+  height: 15px;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: #999;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #7460d3;
+}
 </style>
