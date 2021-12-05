@@ -4,6 +4,7 @@ const logError = require("../errorHandler")
 
 const router = express.Router()
 router.get("/", getTaskRequest)
+router.get("/byFarmWorker", getTaskArrayByFarmWorkerRequest)
 router.get("/farm", getTaskByFarmRequest)
 router.get("/pool", getTaskByPoolRequest)
 router.get("/worker", getTaskByWorkerRequest)
@@ -16,6 +17,19 @@ async function getTaskRequest(request, response) {
     const taskId = request.query.taskId
   } catch (exception) {
     const message = "Can't get task by taskId"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function getTaskArrayByFarmWorkerRequest(request, response) {
+  try {
+    const farmWorkerId = request.query.farmWorkerId
+    const taskArray = await taskController.getTaskArrayByWorker(farmWorkerId)
+    const taskArrayFormatted = taskController.formatTaskArray(taskArray)
+    response.status(200).json(taskArrayFormatted)
+  } catch (exception) {
+    const message = "Can't get task by farm worker id"
     response.status(500).json({message})
     logError(message, exception)
   }
