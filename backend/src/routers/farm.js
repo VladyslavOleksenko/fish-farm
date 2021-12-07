@@ -6,7 +6,8 @@ const logError = require("../errorHandler")
 const router = express.Router()
 router.get("/", getFarmRequest)
 router.delete("/", deleteFarmRequest)
-router.get("/ownFarms", getFarmArrayByOwnerIdRequest)
+router.get("/own", getFarmArrayByOwnerIdRequest)
+router.get("/other", getFarmArrayByEmployeeIdRequest)
 router.post("/create", createFarmRequest)
 router.get("/owner", getFarmOwnerRequest)
 
@@ -43,6 +44,21 @@ async function getFarmArrayByOwnerIdRequest(request, response) {
     response.json(farmArrayFormatted)
   } catch (exception) {
     const message = "Can't get farm array by owner id"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function getFarmArrayByEmployeeIdRequest(request, response) {
+  try {
+    const employeeId = request.query.userId
+    const farmArray =
+      await farmController.getFarmArrayByEmployeeId(employeeId)
+    const farmArrayFormatted =
+      farmController.formatFarmArray(farmArray)
+    response.json(farmArrayFormatted)
+  } catch (exception) {
+    const message = "Can't get farm array by employee id"
     response.status(500).json({message})
     logError(message, exception)
   }

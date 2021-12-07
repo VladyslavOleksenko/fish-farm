@@ -1,9 +1,13 @@
 module.exports = {
   getFarmArrayByOwnerId,
+  getFarmArrayByEmployeeId,
   getFarmByFarmId,
   getFarmOwner,
+
   createFarm,
+
   deleteFarm,
+
   formatFarmArray,
   formatFarm,
 }
@@ -13,6 +17,21 @@ async function getFarmArrayByOwnerId(ownerId) {
   const sqlCommand = `SELECT *
                       FROM farm
                       WHERE owner_id LIKE '${ownerId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows
+}
+
+async function getFarmArrayByEmployeeId(ownerId) {
+  const sqlCommand =
+    `SELECT farm.farm_id,
+            farm.name,
+            farm.description,
+            farm.owner_id
+     FROM farm,
+          farm_worker
+     WHERE farm_worker.user_id = ${ownerId}
+       AND farm_worker.farm_id = farm.farm_id`
+
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows
 }
