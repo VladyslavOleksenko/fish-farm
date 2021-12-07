@@ -124,6 +124,4 @@ export default {
 
   color: #aaf;
 }
-
-
 </style>

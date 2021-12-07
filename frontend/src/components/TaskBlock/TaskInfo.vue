@@ -65,7 +65,7 @@
 
     <DeleteModal v-if="deleteModalData.visibilityStatus"
                  :content="deleteModalData.content"
-                 @hide="deleteModalData.visibilityStatus = false"
+                 @hide="this.deleteModalData.visibilityStatus = false"
                  @delete="sendDeleteTaskRequest"/>
   </div>
 </template>

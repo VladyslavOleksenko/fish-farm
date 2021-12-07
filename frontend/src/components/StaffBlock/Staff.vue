@@ -303,9 +303,6 @@ export default {
   overflow: auto;
 }
 
-.staff__user {
-}
-
 
 .staff__add-button-wrapper {
   margin: 50px 0 0 0;
