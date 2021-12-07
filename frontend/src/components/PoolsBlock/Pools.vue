@@ -7,14 +7,17 @@
             v-for="(poolInfo, i) of poolArray"
             :key="i"
             :pool-info="poolInfo"
+            :user-permissions="userPermissions"
             @updated="updatePools"/>
     </div>
 
     <div class="pools__add-button-wrapper">
-      <MyRectangleButton class="pools__add-button"
-                         icon-name="add"
-                         text="Add pool"
-                         @clicked="addModalVisibilityStatus = true"/>
+      <MyRectangleButton
+        v-if="userPermissions.managePools"
+        class="pools__add-button"
+        icon-name="add"
+        text="Add pool"
+        @clicked="addModalVisibilityStatus = true"/>
     </div>
 
     <MyModal v-if="addModalVisibilityStatus"
@@ -52,9 +55,11 @@ export default {
   name: "Pools",
   components: {
     FormInput,
-    FormRow, MyForm, MyRectangleButton, MyModal, MyIcon, Pool},
+    FormRow, MyForm, MyRectangleButton, MyModal, MyIcon, Pool
+  },
   props: {
-    farmId: {type: Number, required: true}
+    farmId: {type: Number, required: true},
+    userPermissions: {type: Object, required: true}
   },
   data: () => ({
     poolArray: [],

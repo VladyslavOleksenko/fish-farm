@@ -10,12 +10,16 @@
         {{ cutString(invite.email, 24) }}
       </div>
       <div class="invite__buttons">
-        <MyRoundButton class="invite__button"
-                       icon-name="delete"
-                       @click="deleteModalData.visibilityStatus = true"/>
-        <MyRoundButton class="invite__button"
-                       icon-name="edit"
-                       @click="changeModalData.visibilityStatus = true"/>
+        <MyRoundButton
+          v-if="userPermissions.deleteEmployees"
+          class="invite__button"
+          icon-name="delete"
+          @click="deleteModalData.visibilityStatus = true"/>
+        <MyRoundButton
+          v-if="changeButtonVisibilityStatus"
+          class="invite__button"
+          icon-name="edit"
+          @click="changeModalData.visibilityStatus = true"/>
       </div>
     </div>
 
@@ -96,7 +100,10 @@ import DeleteModal from "@/components/Modal/DeleteModal";
 import MyForm from "@/components/Form/MyForm";
 import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";
-import {changeAdministratorInvite, changeWorkerInvite} from "@/assets/js/serverRequest";
+import {
+  changeAdministratorInvite,
+  changeWorkerInvite
+} from "@/assets/js/serverRequest";
 
 export default {
   name: "Invite",
@@ -114,7 +121,8 @@ export default {
   },
   props: {
     category: {type: String, required: true},
-    invite: {type: Object, required: true}
+    invite: {type: Object, required: true},
+    userPermissions: {type: Object, required: true}
   },
   data: () => ({
     infoBlockVisibilityStatus: false,
@@ -123,7 +131,8 @@ export default {
       messageVisibilityStatus: false,
       content: {}
     },
-    deleteModalData: {}
+    deleteModalData: {},
+    changeButtonVisibilityStatus: false
   }),
   computed: {
     deleteModalDataMessage() {
@@ -261,6 +270,13 @@ export default {
   mounted() {
     this.updateChangeModalData()
     this.updateDeleteModalData()
+
+    this.changeButtonVisibilityStatus = (
+      this.category === "administrators" &&
+      this.userPermissions.changeAdministrator ||
+      this.category === "workers" &&
+      this.userPermissions.changeWorker
+    )
   }
 }
 </script>

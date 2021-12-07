@@ -11,6 +11,7 @@
           <div class="farm__staff-block">
             <Staff class="farm__staff"
                    category="owner"
+                   :user-permissions="userPermissions"
                    :user-array="[owner]"/>
 
             <Staff class="farm__staff"
@@ -18,6 +19,7 @@
                    :user-array="administratorArray"
                    :invite-array="administratorInviteArray"
                    :farm-id="farmId"
+                   :user-permissions="userPermissions"
                    @updateUserArray="updateAdministratorArray"
                    @updateInviteArray="updateAdministratorInviteArray"/>
 
@@ -26,15 +28,19 @@
                    :user-array="workerArray"
                    :invite-array="workerInviteArray"
                    :farm-id="farmId"
+                   :user-permissions="userPermissions"
                    @updateUserArray="updateWorkerArray"
                    @updateInviteArray="updateWorkerInviteArray"/>
           </div>
         </div>
 
         <div class="farm__info-right">
-          <Pools class="farm__pools" :farm-id="farmId"/>
+          <Pools class="farm__pools"
+                 :farm-id="farmId"
+                 :user-permissions="userPermissions"/>
 
-          <div class="farm__dashboard dashboard">
+          <div class="farm__dashboard dashboard"
+               v-if="userPermissions.dashboard">
             <img class="dashboard__image"
                  src="../../public/dashboard.svg"
                  alt="">
@@ -53,6 +59,7 @@
       </div>
 
       <MyRectangleButton
+        v-if="userPermissions.deleteFarm"
         class="farm__delete-button"
         text="Delete farm"
         icon-name="delete"
@@ -77,12 +84,13 @@ import {
   getFarmAdministratorInvites,
   getFarmWorkers,
   getFarmWorkerInvites,
-  deleteFarm
+  deleteFarm, getUserPermissions
 } from "@/assets/js/serverRequest";
 import MyModal from "@/components/Modal/MyModal";
 import Pools from "@/components/PoolsBlock/Pools";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import DeleteModal from "@/components/Modal/DeleteModal";
+import {mapState} from "vuex";
 
 export default {
   name: "Farm.vue",
@@ -99,9 +107,20 @@ export default {
       content: {
         message: "You are about to delete the farm and all associated data"
       }
+    },
+    userPermissions: {
+      deleteFarm: false,
+      managePools: false,
+      addEmployees: false,
+      deleteEmployees: false,
+      changeAdministrator: false,
+      dashboard: false
     }
   }),
   computed: {
+    ...mapState({
+      userId: state => state.user.user.userId
+    }),
     farmId() {
       return parseInt(this.$route.params.farmId.toString())
     }
@@ -115,6 +134,9 @@ export default {
       this.administratorArray = await getFarmAdministrators(this.farmId)
     },
     async updateAdministratorInviteArray() {
+      if (!this.userPermissions.seeInvites) {
+        return this.administratorInviteArray = []
+      }
       this.administratorInviteArray =
         await getFarmAdministratorInvites(this.farmId)
     },
@@ -122,6 +144,9 @@ export default {
       this.workerArray = await getFarmWorkers(this.farmId)
     },
     async updateWorkerInviteArray() {
+      if (!this.userPermissions.seeInvites) {
+        return this.workerInviteArray = []
+      }
       this.workerInviteArray = await getFarmWorkerInvites(this.farmId)
     }
   },
@@ -132,6 +157,8 @@ export default {
     await this.updateAdministratorInviteArray()
     await this.updateWorkerArray()
     await this.updateWorkerInviteArray()
+
+    this.userPermissions = await getUserPermissions(this.farmId, this.userId)
   },
 }
 </script>

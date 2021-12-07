@@ -11,12 +11,16 @@
         </div>
         <div class="employee__buttons"
              v-if="category !== 'owner' && $route.name !== 'Dashboard'">
-          <MyRoundButton class="employee__button"
-                         icon-name="delete"
-                         @click="deleteModalData.visibilityStatus = true"/>
-          <MyRoundButton class="employee__button"
-                         icon-name="edit"
-                         @click="changeModalData.visibilityStatus = true"/>
+          <MyRoundButton
+            v-if="userPermissions.deleteEmployees"
+            class="employee__button"
+            icon-name="delete"
+            @click="deleteModalData.visibilityStatus = true"/>
+          <MyRoundButton
+            v-if="changeButtonVisibilityStatus"
+            class="employee__button"
+            icon-name="edit"
+            @click="changeModalData.visibilityStatus = true"/>
         </div>
       </div>
       <Tasks class="employee__tasks"
@@ -127,7 +131,8 @@ export default {
   },
   props: {
     category: {type: String, required: true},
-    user: {type: Object, required: true}
+    user: {type: Object, required: true},
+    userPermissions: {type: Object, required: true}
   },
   data: () => ({
     infoBlockVisibilityStatus: false,
@@ -136,9 +141,17 @@ export default {
       messageVisibilityStatus: false,
       content: {}
     },
-    deleteModalData: {}
+    deleteModalData: {},
   }),
   computed: {
+    changeButtonVisibilityStatus() {
+      return (
+        this.category === "administrators" &&
+        this.userPermissions.changeAdministrator ||
+        this.category === "workers" &&
+        this.userPermissions.changeWorker
+      )
+    },
     deleteModalDataMessage() {
       let role = ""
       if (this.category === "administrators") {

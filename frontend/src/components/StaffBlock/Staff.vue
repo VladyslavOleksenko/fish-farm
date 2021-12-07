@@ -9,6 +9,7 @@
                   :key="i"
                   :user="user"
                   :category="category"
+                  :user-permissions="userPermissions"
                   @delete="sendEmployeeDeleteRequest"
                   @update="$emit('updateUserArray')"/>
       </div>
@@ -18,12 +19,13 @@
                 :key="i"
                 :invite="invite"
                 :category="category"
+                :user-permissions="userPermissions"
                 @delete="sendInviteDeleteRequest"
                 @update="$emit('updateInviteArray')"/>
       </div>
 
       <div class="staff__add-button-wrapper"
-           v-if="$route.name !== 'Dashboard'">
+           v-if="userPermissions.addEmployees && $route.name !== 'Dashboard'">
         <MyRectangleButton class="staff__add-button"
                            v-if="category !== 'owner'"
                            icon-name="add"
@@ -132,7 +134,8 @@ export default {
     category: {type: String, required: true},
     userArray: {type: Array, default: []},
     inviteArray: {type: Array, default: []},
-    farmId: {type: Number}
+    farmId: {type: Number},
+    userPermissions: {type: Object, required: true}
   },
   data: () => ({
     inviteModalVisibilityStatus: false,

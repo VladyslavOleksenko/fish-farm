@@ -3,7 +3,7 @@
     <div class="pool__content">
       <div class="pool__name">{{ poolInfo.name }}</div>
       <div class="pool__buttons"
-           v-if="$route.name !== 'Dashboard'">
+           v-if="userPermissions.managePools && $route.name !== 'Dashboard'">
         <MyRoundButton class="pool__button"
                        icon-name="delete"
                        @click="deleteModalData.visibilityStatus = true"/>
@@ -62,7 +62,8 @@ export default {
     MyRoundButton
   },
   props: {
-    poolInfo: {type: Object, required: true}
+    poolInfo: {type: Object, required: true},
+    userPermissions: {type: Object, required: true}
   },
   data: () => ({
     changeModalData: {
