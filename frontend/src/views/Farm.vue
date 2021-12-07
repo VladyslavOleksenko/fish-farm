@@ -111,9 +111,11 @@ export default {
     userPermissions: {
       deleteFarm: false,
       managePools: false,
+      seeInvites: false,
       addEmployees: false,
       deleteEmployees: false,
       changeAdministrator: false,
+      changeWorker: false,
       dashboard: false
     }
   }),
@@ -151,14 +153,14 @@ export default {
     }
   },
   async mounted() {
+    this.userPermissions = await getUserPermissions(this.farmId, this.userId)
+
     this.farmInfo = await getFarm(this.farmId)
     this.owner = await getFarmOwner(this.farmId)
     await this.updateAdministratorArray()
     await this.updateAdministratorInviteArray()
     await this.updateWorkerArray()
     await this.updateWorkerInviteArray()
-
-    this.userPermissions = await getUserPermissions(this.farmId, this.userId)
   },
 }
 </script>
