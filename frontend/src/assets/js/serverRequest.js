@@ -63,6 +63,16 @@ export async function changeUserData(userData) {
   return await sendServerRequest(requestParams)
 }
 
+export async function getUserPermissions(farmId, userId) {
+  const queryParams = `?farmId=${farmId}&userId=${userId}`
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/farm/userPermissions" + queryParams
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
 
 export async function getFarm(farmId) {
   const requestParams = new RequestParams(
