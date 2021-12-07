@@ -1,43 +1,46 @@
 <template>
   <div class="profile">
-    <img class="profile__image" src="../../public/profile.svg" alt="">
-    <div class="profile__exit-button exit-button"
-         @click="logout">
-      <MyIcon class="exit-button__icon" icon-name="logout" path-color="#ccc"/>
-      <p class="exit-button__text">Exit</p>
+    <div class="profile__content">
+      <img class="profile__image" src="../../public/profile.svg" alt="">
+      <div class="profile__exit-button exit-button"
+           @click="logout">
+        <MyIcon class="exit-button__icon" icon-name="logout" path-color="#ccc"/>
+        <p class="exit-button__text">Exit</p>
+      </div>
+
+      <div class="profile__greeting">Hello, Vladyslav</div>
+      <div class="profile__slogan">It is your profile page</div>
+
+      <div class="profile__data-block">
+        <div class="profile__data-header">
+          <img class="profile__avatar"
+               v-if="user.avatar"
+               :src="user.avatar"
+               alt="">
+          <NoAvatar class="profile__no-avatar" v-else/>
+          <p>Your personal data</p>
+        </div>
+
+        <div class="profile__data-row">
+          <div class="profile__data-parameter">First name:</div>
+          <div class="profile__data-value">{{ user.firstName }}</div>
+        </div>
+        <div class="profile__data-row">
+          <div class="profile__data-parameter">Last name:</div>
+          <div class="profile__data-value">{{ user.lastName }}</div>
+        </div>
+        <div class="profile__data-row">
+          <div class="profile__data-parameter">Email:</div>
+          <div class="profile__data-value">{{ user.email }}</div>
+        </div>
+        <div class="profile__change-data-button-wrapper">
+          <MyRoundButton class="profile__change-data-button"
+                         icon-name="edit"
+                         @click="changeModalVisibilityStatus = true"/>
+        </div>
+      </div>
     </div>
 
-    <div class="profile__greeting">Hello, Vladyslav</div>
-    <div class="profile__slogan">It is your profile page</div>
-
-    <div class="profile__data-block">
-      <div class="profile__data-header">
-        <img class="profile__avatar"
-             v-if="user.avatar"
-             :src="user.avatar"
-             alt="">
-        <NoAvatar class="profile__no-avatar" v-else/>
-        <p>Your personal data</p>
-      </div>
-
-      <div class="profile__data-row">
-        <div class="profile__data-parameter">First name:</div>
-        <div class="profile__data-value">{{ user.firstName }}</div>
-      </div>
-      <div class="profile__data-row">
-        <div class="profile__data-parameter">Last name:</div>
-        <div class="profile__data-value">{{ user.lastName }}</div>
-      </div>
-      <div class="profile__data-row">
-        <div class="profile__data-parameter">Email:</div>
-        <div class="profile__data-value">{{ user.email }}</div>
-      </div>
-      <div class="profile__change-data-button-wrapper">
-        <MyRoundButton class="profile__change-data-button"
-                       icon-name="edit"
-                       @click="changeModalVisibilityStatus = true"/>
-      </div>
-    </div>
 
     <MyModal v-if="changeModalVisibilityStatus"
              @hide="changeModalVisibilityStatus = false">
@@ -138,8 +141,10 @@ export default {
         this.setUser(serverResponse)
       } catch (exception) {
         this.formData.message = exception.message
-        this.formData.messageVisibilityStatus = true
+        return this.formData.messageVisibilityStatus = true
       }
+
+      this.changeModalVisibilityStatus = false
     }
   },
   mounted() {
@@ -151,7 +156,7 @@ export default {
 </script>
 
 <style scoped>
-.profile {
+.profile__content {
   padding: 40px 0 50px 60px;
 }
 
