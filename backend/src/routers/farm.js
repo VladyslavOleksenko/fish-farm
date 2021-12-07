@@ -100,7 +100,7 @@ async function getUserPermissionsRequest(request, response) {
       await farmController.getUserPermissions(farmId, userId)
     response.status(200).json(userPermissions)
   } catch (exception) {
-    const message = "Can't get farm owner"
+    const message = "Can't get user permissions"
     response.status(500).json({message})
     logError(message, exception)
   }
