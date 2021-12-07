@@ -15,4 +15,13 @@ export class MyDateClass {
     const shortMonthForm = this.months.shortForm[date.getMonth()]
     return date.getDate() + " " + shortMonthForm
   }
+
+  static getDayAndMonthAndYear(date) {
+    if (typeof date === "string") {
+      date = new Date(date)
+    }
+
+    const year = date.getYear() + 1900
+    return this.getDayAndMonth(date) + " " + year
+  }
 }
