@@ -4,6 +4,7 @@ const logError = require("../errorHandler")
 
 const router = express.Router()
 router.get("/", getTaskRequest)
+router.delete("/", deleteTaskRequest)
 router.get("/byFarmWorker", getTaskArrayByFarmWorkerRequest)
 router.get("/farm", getTaskByFarmRequest)
 router.get("/pool", getTaskByPoolRequest)
@@ -17,6 +18,18 @@ async function getTaskRequest(request, response) {
     const taskId = request.query.taskId
   } catch (exception) {
     const message = "Can't get task by taskId"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function deleteTaskRequest(request, response) {
+  try {
+    const taskId = request.query.taskId
+    await taskController.deleteTask(taskId)
+    response.json({message: "task deleted"})
+  } catch (exception) {
+    const message = "Can't delete task by task id"
     response.status(500).json({message})
     logError(message, exception)
   }
