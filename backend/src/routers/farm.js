@@ -10,6 +10,8 @@ router.get("/own", getFarmArrayByOwnerIdRequest)
 router.get("/other", getFarmArrayByEmployeeIdRequest)
 router.post("/create", createFarmRequest)
 router.get("/owner", getFarmOwnerRequest)
+router.get("/userPermissions", getUserPermissionsRequest)
+
 
 
 async function getFarmRequest(request, response) {
@@ -82,6 +84,21 @@ async function getFarmOwnerRequest(request, response) {
     const farmOwner = await farmController.getFarmOwner(farmId)
     const farmOwnerFormatted = userController.formatUser(farmOwner)
     response.status(200).json(farmOwnerFormatted)
+  } catch (exception) {
+    const message = "Can't get farm owner"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function getUserPermissionsRequest(request, response) {
+  try {
+    const farmId = request.query.farmId
+    const userId = request.query.userId
+
+    const userPermissions =
+      await farmController.getUserPermissions(farmId, userId)
+    response.status(200).json(userPermissions)
   } catch (exception) {
     const message = "Can't get farm owner"
     response.status(500).json({message})

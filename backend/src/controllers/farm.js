@@ -3,6 +3,7 @@ module.exports = {
   getFarmArrayByEmployeeId,
   getFarmByFarmId,
   getFarmOwner,
+  getUserPermissions,
 
   createFarm,
 
@@ -57,6 +58,88 @@ async function getFarmOwner(farmId) {
   }
 
   return farmOwner
+}
+
+async function getUserPermissions(farmId, userId) {
+  const farm = await getFarmByFarmId(farmId)
+  if (!farm) {
+    throw new Error(`No farm with id ${farmId}`)
+  }
+
+  const user = await userController.getUserByUserId(userId)
+  if (!user) {
+    throw new Error(`No user with id ${userId}`)
+  }
+
+  if (farm["owner_id"] === user["user_id"]) {
+    return getOwnerPermissions()
+  }
+
+  const administratorAccesses = await getAdministratorAccesses()
+  if (administratorAccesses) {
+    return getAdministratorPermissions(administratorAccesses)
+  }
+
+  return getWorkerPermissions()
+
+
+  function getOwnerPermissions() {
+    return {
+      deleteFarm: true,
+      managePools: true,
+      seeInvites: true,
+      addEmployees: true,
+      deleteEmployees: true,
+      changeAdministrator: true,
+      changeWorker: true,
+      dashboard: true
+    }
+  }
+
+  async function getAdministratorAccesses() {
+    let sqlCommand =
+      `SELECT farm_administrator.manage_pools_access,
+            farm_administrator.add_administrator_access,
+            farm_administrator.delete_administrator_access,
+            farm_administrator.change_accesses_access
+     FROM farm,
+          farm_administrator
+     WHERE farm.farm_id = ${farmId}
+       AND farm_administrator.user_id = ${userId}
+       AND farm_administrator.farm_id = farm.farm_id`
+    let dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+
+    if (dataBaseResponse.rows) {
+      return dataBaseResponse.rows[0]
+    }
+    return null
+  }
+
+  function getAdministratorPermissions(administratorAccesses) {
+    return {
+      deleteFarm: false,
+      managePools: administratorAccesses.managePoolsAccess,
+      seeInvites: true,
+      addEmployees: administratorAccesses.addAdministratorAccess,
+      deleteEmployees: administratorAccesses.deleteAdministratorAccess,
+      changeAdministrator: administratorAccesses.changeAccessesAccess,
+      changeWorker: true,
+      dashboard: true
+    }
+  }
+
+  function getWorkerPermissions() {
+    return {
+      deleteFarm: false,
+      managePools: false,
+      seeInvites: false,
+      addEmployees: false,
+      deleteEmployees: false,
+      changeAdministrator: false,
+      changeWorker: false,
+      dashboard: false
+    }
+  }
 }
 
 
