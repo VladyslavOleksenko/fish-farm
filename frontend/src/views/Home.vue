@@ -17,7 +17,7 @@
                   @open-create-farm-modal="createFarmModalVisibilityStatus = true"/>
     <FarmList class="home__farm-list"
               v-else
-              :farm-info-array="currentFarmList"
+              :farm-info-array="this.currentFarmList"
               @open-create-farm-modal="createFarmModalVisibilityStatus = true"/>
   </div>
 </template>
@@ -26,38 +26,55 @@
 import Switcher from "@/components/UI/Switcher";
 import FarmList from "@/components/FarmList/FarmList";
 import FarmListPlug from "@/components/FarmList/FarmListPlug";
-import {mapState, mapActions} from "vuex";
+import {mapState} from "vuex";
 import MyModal from "@/components/Modal/MyModal";
 import CreateFarmForm from "@/components/CreateFarm/CreateFarmForm";
+import {getOtherFarms, getOwnFarms} from "@/assets/js/serverRequest";
 
 export default {
   name: "Home",
   components: {CreateFarmForm, MyModal, FarmListPlug, FarmList, Switcher},
   data: () => ({
     farmsFilter: "own",
-    createFarmModalVisibilityStatus: false
+    createFarmModalVisibilityStatus: false,
+    ownFarmArray: [],
+    otherFarmArray: []
   }),
   computed: {
     ...mapState({
-      ownFarms: state => state.farms.ownFarms,
       user: state => state.user.user
     }),
     farmListIsEmptyStatus() {
       return (
-        this.farmsFilter === 'own' && !this.ownFarms.length ||
-        this.farmsFilter === 'other')
+        this.farmsFilter === 'own' && !this.ownFarmArray.length ||
+        this.farmsFilter === 'other' && !this.otherFarmArray.length)
     },
     currentFarmList() {
-      return this.ownFarms
+      if (this.farmsFilter === "own") {
+        return [].concat(this.ownFarmArray)
+      }
+      return [].concat(this.otherFarmArray)
     }
   },
   methods: {
-    ...mapActions({
-      updateOwnFarms: "farms/updateOwnFarms"
-    })
+    async updateOwnFarmArray() {
+      try {
+        this.ownFarmArray = await getOwnFarms(this.user.userId)
+      } catch (exception) {
+        return console.log(exception)
+      }
+    },
+    async updateOtherFarmArray() {
+      try {
+        this.otherFarmArray = await getOtherFarms(this.user.userId)
+      } catch (exception) {
+        return console.log(exception)
+      }
+    }
   },
-  mounted() {
-    this.updateOwnFarms(this.user.userId)
+  async mounted() {
+    await this.updateOwnFarmArray()
+    await this.updateOtherFarmArray()
   }
 }
 </script>
