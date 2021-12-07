@@ -307,3 +307,12 @@ export async function createTask(newTaskData) {
 
   return await sendServerRequest(requestParams)
 }
+
+export async function deleteTask(taskId) {
+  const requestParams = new RequestParams(
+    "DELETE",
+    "http://localhost:5000/api/task?taskId=" + taskId
+  )
+
+  return await sendServerRequest(requestParams)
+}
