@@ -3,7 +3,7 @@
     <input
       v-if="type === 'file'"
       type="file"
-      :file="modelValue"
+      :value="modelValue"
       @change="updateModelValue"
     >
     <div class="my-input__checkbox checkbox"
@@ -13,6 +13,7 @@
       </div>
       <input class="checkbox__input"
              type="checkbox"
+             :checked="modelValue"
              @change="updateModelValue">
     </div>
     <input
