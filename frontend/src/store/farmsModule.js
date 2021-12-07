@@ -1,5 +1,3 @@
-import {getOwnFarms} from "@/assets/js/serverRequest";
-
 export default {
   namespaced: true,
   state: () => ({
