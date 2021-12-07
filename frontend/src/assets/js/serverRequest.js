@@ -317,6 +317,15 @@ export async function getTaskArrayByFarmWorker(farmWorkerId) {
   return await sendServerRequest(requestParams)
 }
 
+export async function getTaskArrayByUserId(userId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/task/byUserId?userId=" + userId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
 export async function createTask(newTaskData) {
   const requestParams = new RequestParams(
     "POST",
