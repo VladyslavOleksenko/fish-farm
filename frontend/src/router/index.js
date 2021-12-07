@@ -9,7 +9,7 @@ const routes = [
   {
     path: "/tasks",
     name: "Tasks",
-    component: () => import("@/views/Tasks")
+    component: () => import("@/views/TaskView")
   },
   {
     path: "/notifications",
