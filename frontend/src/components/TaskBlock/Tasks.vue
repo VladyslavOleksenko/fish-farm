@@ -5,7 +5,8 @@
         <Task class="tasks__task"
               v-for="(task, i) in taskArray"
               :key="i"
-              :task="task"/>
+              :task="task"
+              @click="$emit('select', task)"/>
       </div>
       <MyRectangleButton
         class="tasks__add-button"
@@ -25,7 +26,9 @@
 import Task from "@/components/TaskBlock/Task";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import AddTaskModal from "@/components/Modal/AddTaskModal";
-import {getTaskArrayByFarmWorker} from "@/assets/js/serverRequest"
+import {getTaskArrayByFarmWorker} from "@/assets/js/serverRequest";
+import {mapState} from "vuex";
+
 
 export default {
   name: "Tasks",
@@ -39,9 +42,20 @@ export default {
       visibilityStatus: false
     }
   }),
+  computed: {
+    ...mapState({
+      needToUpdateTasks: state => state.farms.needToUpdateTasks
+    })
+  },
   methods: {
     async updateTaskArray() {
-      this.taskArray = await getTaskArrayByFarmWorker(this.farmWorkerId)
+      this.taskArray =
+        await getTaskArrayByFarmWorker(this.farmWorkerId)
+    }
+  },
+  watch: {
+    async needToUpdateTasks() {
+      await this.updateTaskArray()
     }
   },
   async mounted() {

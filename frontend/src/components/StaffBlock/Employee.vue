@@ -21,7 +21,8 @@
       </div>
       <Tasks class="employee__tasks"
              v-if="category === 'workers' && $route.name === 'Dashboard'"
-             :farmWorkerId="user.farmWorkerId"/>
+             :farmWorkerId="user.farmWorkerId"
+             @select="selectTask"/>
     </div>
 
     <Info v-if="infoBlockVisibilityStatus"
@@ -106,6 +107,8 @@ import {
   changeWorker
 } from "@/assets/js/serverRequest";
 import Tasks from "@/components/TaskBlock/Tasks";
+import {mapMutations} from "vuex";
+
 
 export default {
   name: "Employee",
@@ -209,6 +212,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setSelectedTask: "farms/setSelectedTask"
+    }),
     sendDeleteEvent() {
       this.$emit('delete', this.user)
       this.deleteModalVisibilityStatus = false
@@ -283,6 +289,13 @@ export default {
           message: this.deleteModalDataMessage
         }
       }
+    },
+
+    selectTask(taskInfo) {
+      this.setSelectedTask({
+        task: taskInfo,
+        worker: this.user
+      })
     }
   },
   mounted() {

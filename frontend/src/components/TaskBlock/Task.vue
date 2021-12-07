@@ -1,6 +1,7 @@
 <template>
   <div class="task">
-    <div class="task__content">
+    <div class="task__content"
+         :class="{'task__content-selected': selectedStatus}">
       <div class="task__icon-wrapper">
         <MyIcon class="task__icon"
                 icon-name="time"
@@ -25,7 +26,8 @@
 
 <script>
 import MyIcon from "@/components/UI/MyIcon";
-import {MyDateClass} from "@/assets/js/microLogic"
+import {MyDateClass} from "@/assets/js/microLogic";
+import {mapState} from "vuex";
 
 export default {
   name: "Task",
@@ -34,6 +36,9 @@ export default {
     task: {type: Object, required: true}
   },
   computed: {
+    ...mapState({
+      selectedTask: state => state.farms.selectedTask
+    }),
     deadlineDayAndMonth() {
       if (this.task.deadlineDate.toUpperCase() === "NULL") {
         return ""
@@ -45,6 +50,12 @@ export default {
         return ""
       }
       return this.task.deadlineTime
+    },
+    selectedStatus() {
+      if (!this.selectedTask) {
+        return false
+      }
+      return this.selectedTask.task.taskId === this.task.taskId
     }
   }
 }
@@ -60,6 +71,10 @@ export default {
   border-radius: 4px;
 
   transition: background-color .2s ease;
+}
+
+.task__content-selected {
+  background-color: rgba(255, 255, 255, .1);
 }
 
 .task__content:hover {

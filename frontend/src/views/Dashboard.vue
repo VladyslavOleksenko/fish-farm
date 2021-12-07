@@ -10,20 +10,8 @@
       </div>
 
       <div class="dashboard__right">
-        <div class="dashboard__info">
-          General info: <br>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto
-          consectetur cum dolor error facere fugiat libero mollitia officia
-          recusandae repellat. Amet animi assumenda commodi culpa delectus dicta
-          enim expedita explicabo facilis, fugit id in, ipsa ipsum libero magnam
-          minima modi molestiae nihil non numquam, odio odit officia officiis
-          quasi quia quibusdam reiciendis repudiandae tempora vel vero.
-          Assumenda deserunt earum nostrum pariatur quam sapiente sequi sit!
-          Cumque cupiditate iste, itaque iusto molestiae natus sint tempore. Aut
-          culpa debitis dolor ex fugit laborum, maxime nesciunt porro.
-          Accusamus, asperiores assumenda in minima nulla numquam officia,
-          pariatur praesentium provident quia quos velit? Placeat, repellendus.
-        </div>
+        <TaskInfo class="dashboard__info"
+                  :task-info="selectedTask"/>
 
         <div class="dashboard__chart"></div>
       </div>
@@ -35,19 +23,23 @@
 import Staff from "@/components/StaffBlock/Staff";
 import Pools from "@/components/PoolsBlock/Pools";
 import {getFarmWorkers} from "@/assets/js/serverRequest";
+import TaskInfo from "@/components/TaskBlock/TaskInfo";
+import {mapState} from "vuex";
 
 export default {
   name: "Dashboard",
-  components: {Pools, Staff},
+  components: {TaskInfo, Pools, Staff},
   data: () => ({
     workerArray: [],
   }),
   computed: {
+    ...mapState({
+      selectedTask: state => state.farms.selectedTask
+    }),
     farmId() {
       return parseInt(this.$route.params.farmId.toString())
     }
   },
-  methods: {},
   async mounted() {
     this.workerArray = await getFarmWorkers(this.farmId)
   }

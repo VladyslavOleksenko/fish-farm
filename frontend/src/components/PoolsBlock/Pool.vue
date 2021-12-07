@@ -76,8 +76,7 @@ export default {
       content: {
         message: "You are about to delete the pool and all associated data"
       }
-    },
-    deleteModalVisibilityStatus: false
+    }
   }),
   methods: {
     validateChangePoolData() {
