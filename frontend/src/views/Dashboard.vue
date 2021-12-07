@@ -4,9 +4,11 @@
       <div class="dashboard__left">
         <Staff class="dashboard__staff"
                category="workers"
-               :user-array="workerArray"/>
+               :user-array="workerArray"
+               :user-permissions="userPermissions"/>
         <Pools class="dashboard__pools"
-               :farm-id="farmId"/>
+               :farm-id="farmId"
+               :user-permissions="userPermissions"/>
       </div>
 
       <div class="dashboard__right">
@@ -22,7 +24,7 @@
 <script>
 import Staff from "@/components/StaffBlock/Staff";
 import Pools from "@/components/PoolsBlock/Pools";
-import {getFarmWorkers} from "@/assets/js/serverRequest";
+import {getFarmWorkers, getUserPermissions} from "@/assets/js/serverRequest";
 import TaskInfo from "@/components/TaskBlock/TaskInfo";
 import {mapState} from "vuex";
 
@@ -31,9 +33,20 @@ export default {
   components: {TaskInfo, Pools, Staff},
   data: () => ({
     workerArray: [],
+    userPermissions: {
+      deleteFarm: false,
+      managePools: false,
+      seeInvites: false,
+      addEmployees: false,
+      deleteEmployees: false,
+      changeAdministrator: false,
+      changeWorker: false,
+      dashboard: false
+    }
   }),
   computed: {
     ...mapState({
+      userId: state => state.user.user.userId,
       selectedTask: state => state.farms.selectedTask
     }),
     farmId() {
@@ -41,6 +54,8 @@ export default {
     }
   },
   async mounted() {
+    this.userPermissions = await getUserPermissions(this.farmId, this.userId)
+
     this.workerArray = await getFarmWorkers(this.farmId)
   }
 }
