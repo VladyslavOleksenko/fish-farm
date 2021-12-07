@@ -22,15 +22,18 @@ async function getFarmArrayByOwnerId(ownerId) {
   return dataBaseResponse.rows
 }
 
-async function getFarmArrayByEmployeeId(ownerId) {
+async function getFarmArrayByEmployeeId(userId) {
   const sqlCommand =
     `SELECT farm.farm_id,
             farm.name,
             farm.description,
             farm.owner_id
      FROM farm,
-          farm_worker
-     WHERE farm_worker.user_id = ${ownerId}
+          farm_worker,
+          farm_administrator
+     WHERE (farm_administrator.user_id = ${userId}
+         OR farm_worker.user_id = ${userId})
+       AND farm_administrator.farm_id = farm.farm_id
        AND farm_worker.farm_id = farm.farm_id`
 
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
@@ -99,14 +102,14 @@ async function getUserPermissions(farmId, userId) {
   async function getAdministratorAccesses() {
     let sqlCommand =
       `SELECT farm_administrator.manage_pools_access,
-            farm_administrator.add_administrator_access,
-            farm_administrator.delete_administrator_access,
-            farm_administrator.change_accesses_access
-     FROM farm,
-          farm_administrator
-     WHERE farm.farm_id = ${farmId}
-       AND farm_administrator.user_id = ${userId}
-       AND farm_administrator.farm_id = farm.farm_id`
+              farm_administrator.add_administrator_access,
+              farm_administrator.delete_administrator_access,
+              farm_administrator.change_accesses_access
+       FROM farm,
+            farm_administrator
+       WHERE farm.farm_id = ${farmId}
+         AND farm_administrator.user_id = ${userId}
+         AND farm_administrator.farm_id = farm.farm_id`
     let dataBaseResponse = await sendDataBaseQuery(sqlCommand)
 
     if (dataBaseResponse.rows) {
@@ -118,11 +121,11 @@ async function getUserPermissions(farmId, userId) {
   function getAdministratorPermissions(administratorAccesses) {
     return {
       deleteFarm: false,
-      managePools: administratorAccesses.managePoolsAccess,
-      seeInvites: true,
-      addEmployees: administratorAccesses.addAdministratorAccess,
-      deleteEmployees: administratorAccesses.deleteAdministratorAccess,
-      changeAdministrator: administratorAccesses.changeAccessesAccess,
+      managePools: !!administratorAccesses["manage_pools_access"],
+      seeInvites: !!administratorAccesses["add_administrator_access"],
+      addEmployees: !!administratorAccesses["add_administrator_access"],
+      deleteEmployees: !!administratorAccesses["delete_administrator_access"],
+      changeAdministrator: !!administratorAccesses["change_accesses_access"],
       changeWorker: true,
       dashboard: true
     }
