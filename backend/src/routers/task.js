@@ -6,9 +6,9 @@ const router = express.Router()
 router.get("/", getTaskRequest)
 router.delete("/", deleteTaskRequest)
 router.get("/byFarmWorker", getTaskArrayByFarmWorkerRequest)
+router.get("/byUserId", getTaskArrayByUserIdRequest)
 router.get("/farm", getTaskByFarmRequest)
 router.get("/pool", getTaskByPoolRequest)
-router.get("/worker", getTaskByWorkerRequest)
 router.post("/", createTaskRequest)
 router.get("/history", getTaskHistoryRequest)
 
@@ -48,6 +48,19 @@ async function getTaskArrayByFarmWorkerRequest(request, response) {
   }
 }
 
+async function getTaskArrayByUserIdRequest(request, response) {
+  try {
+    const userId = request.query.userId
+    const taskArray = await taskController.getTaskArrayByUser(userId)
+    const taskArrayFormatted = taskController.formatTaskArray(taskArray)
+    response.status(200).json(taskArrayFormatted)
+  } catch (exception) {
+    const message = "Can't get task array by user id"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
 async function getTaskByFarmRequest(request, response) {
   try {
     const farmId = request.query.farmId
@@ -61,16 +74,6 @@ async function getTaskByFarmRequest(request, response) {
 async function getTaskByPoolRequest(request, response) {
   try {
 
-  } catch (exception) {
-    const message = "Can't get task by taskId"
-    response.status(500).json({message})
-    logError(message, exception)
-  }
-}
-
-async function getTaskByWorkerRequest(request, response) {
-  try {
-    const workerId = request.query.workerId
   } catch (exception) {
     const message = "Can't get task by taskId"
     response.status(500).json({message})

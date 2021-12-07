@@ -3,6 +3,7 @@ module.exports = {
   getTaskByFarm,
   getTaskByPool,
   getTaskArrayByWorker,
+  getTaskArrayByUser,
   getTaskHistory,
 
   createTask,
@@ -35,6 +36,34 @@ async function getTaskArrayByWorker(farmWorkerId) {
     `SELECT *
      FROM task
      WHERE task.farm_worker_id = ${farmWorkerId}`
+
+  let dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows
+}
+
+async function getTaskArrayByUser(userId) {
+  const candidate = userController.getUserByUserId(userId)
+  if (!candidate) {
+    throw new Error(`No user with id ${userId}`)
+  }
+
+  const sqlCommand =
+    `SELECT task.task_id,
+            task.farm_worker_id,
+            task.title,
+            task.description,
+            task.pool_id,
+            task.create_date,
+            task.create_time,
+            task.deadline_date,
+            task.deadline_time,
+            task.is_recurring,
+            task.recurring_period,
+            task.result_required_status
+     FROM task,
+          farm_worker
+     WHERE task.farm_worker_id = farm_worker.farm_worker_id
+       AND farm_worker.user_id = ${userId}`
 
   let dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows
@@ -120,6 +149,7 @@ function formatTaskArray(taskArray) {
 function formatTask(task) {
   return {
     taskId: task["task_id"],
+    farmWorkerId: task["farm_worker_id"],
     title: task.title,
     description: task.description,
     poolId: task.poolId,
@@ -135,5 +165,6 @@ function formatTask(task) {
 
 
 const workerController = require("./worker")
+const userController = require("./user")
 const poolController = require("./pool")
 const {sendDataBaseQuery} = require("./../dataBase");
