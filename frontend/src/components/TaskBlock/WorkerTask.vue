@@ -16,8 +16,20 @@
       </div>
       <div class="worker-task__data">
         <div class="worker-task__parameter">Deadline:</div>
-        <div class="worker-task__value">
+        <div class="worker-task__value worker-task__deadline">
           {{ deadline }}
+        </div>
+      </div>
+      <div class="worker-task__data">
+        <div class="worker-task__parameter">Recurring:</div>
+        <div class="worker-task__value">
+          {{ recurringStatus }}
+        </div>
+      </div>
+      <div class="worker-task__data">
+        <div class="worker-task__parameter">Result required:</div>
+        <div class="worker-task__value">
+          {{ resultRequiredStatus }}
         </div>
       </div>
     </div>
@@ -65,11 +77,10 @@ export default {
       return this.deadlineDate + " " + this.deadlineTime
     },
     recurringStatus() {
-      const recurringStatus = this.taskInfo.isRecurringStatus
-      if (recurringStatus === 0) {
-        return "NO"
-      }
-      return recurringStatus
+      return this.taskInfo.isRecurringStatus ? "YES" : "NO"
+    },
+    resultRequiredStatus() {
+      return this.taskInfo.resultRequiredStatus ? "YES" : "NO"
     }
   }
 }
@@ -127,5 +138,9 @@ export default {
 
 .worker-task__value {
   color: #aaaaaa;
+}
+
+.worker-task__deadline {
+  color: #aaf;
 }
 </style>

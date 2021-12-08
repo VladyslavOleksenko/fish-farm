@@ -40,7 +40,7 @@
         <div class="task-info__data">
           <div class="task-info__parameter">Result required:</div>
           <div class="task-info__value">
-            {{ taskInfo.task.resultRequiredStatus }}
+            {{ resultRequiredStatus }}
           </div>
         </div>
         <div class="task-info__data">
@@ -124,11 +124,10 @@ export default {
       return this.deadlineDate + " " + this.deadlineTime
     },
     recurringStatus() {
-      const recurringStatus = this.taskInfo.task.isRecurringStatus
-      if (recurringStatus === 0) {
-        return "NO"
-      }
-      return recurringStatus
+      return this.taskInfo.task.isRecurringStatus ? "YES" : "NO"
+    },
+    resultRequiredStatus() {
+      return this.taskInfo.task.resultRequiredStatus ? "YES" : "NO"
     }
   },
   methods: {
