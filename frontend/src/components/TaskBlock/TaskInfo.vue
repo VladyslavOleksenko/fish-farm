@@ -132,7 +132,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      taskUpdated: "farms/taskUpdated"
+      taskUpdated: "farms/taskDeleted"
     }),
     async sendDeleteTaskRequest() {
       try {

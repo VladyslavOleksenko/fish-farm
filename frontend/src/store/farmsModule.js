@@ -13,8 +13,12 @@ export default {
     }
   },
   actions: {
-    taskUpdated({commit}) {
+    taskDeleted({commit}) {
       commit("setNeedToUpdateTasks", true)
+    },
+    taskArrayUpdated({commit}) {
+      commit("setNeedToUpdateTasks", false)
+      commit("setSelectedTask", null)
     }
   }
 }

@@ -27,7 +27,7 @@ import Task from "@/components/TaskBlock/Task";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import AddTaskModal from "@/components/Modal/AddTaskModal";
 import {getTaskArrayByFarmWorker} from "@/assets/js/serverRequest";
-import {mapState} from "vuex";
+import {mapState, mapActions} from "vuex";
 
 
 export default {
@@ -48,6 +48,9 @@ export default {
     })
   },
   methods: {
+    ...mapActions({
+      taskArrayUpdated: "farms/taskArrayUpdated"
+    }),
     async updateTaskArray() {
       this.taskArray =
         await getTaskArrayByFarmWorker(this.farmWorkerId)
@@ -55,7 +58,12 @@ export default {
   },
   watch: {
     async needToUpdateTasks() {
+      if (!this.needToUpdateTasks) {
+        return
+      }
+
       await this.updateTaskArray()
+      this.taskArrayUpdated()
     }
   },
   async mounted() {
