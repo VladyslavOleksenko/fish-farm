@@ -1,36 +1,52 @@
 <template>
   <div class="worker-task">
     <div class="worker-task__content">
-      <div class="worker-task__title">
-        {{ taskInfo.title }}
-      </div>
-      <div class="worker-task__description">
-        {{ description }}
-      </div>
-      <div class="worker-task__data">
-        <div class="worker-task__parameter">Created:</div>
-        <div class="worker-task__value">
-          {{ createDate }}
-          {{ taskInfo.createTime }}
+      <div class="worker-task__info">
+        <div class="worker-task__title">
+          {{ taskInfo.title }}
+        </div>
+        <div class="worker-task__description">
+          {{ description }}
+        </div>
+        <div class="worker-task__data">
+          <div class="worker-task__parameter">Created:</div>
+          <div class="worker-task__value">
+            {{ createDate }}
+            {{ taskInfo.createTime }}
+          </div>
+        </div>
+        <div class="worker-task__data">
+          <div class="worker-task__parameter">Deadline:</div>
+          <div class="worker-task__value worker-task__deadline">
+            {{ deadline }}
+          </div>
+        </div>
+        <div class="worker-task__data">
+          <div class="worker-task__parameter">Recurring:</div>
+          <div class="worker-task__value">
+            {{ recurringStatus }}
+          </div>
+        </div>
+        <div class="worker-task__data">
+          <div class="worker-task__parameter">Result required:</div>
+          <div class="worker-task__value">
+            {{ resultRequiredStatus }}
+          </div>
         </div>
       </div>
-      <div class="worker-task__data">
-        <div class="worker-task__parameter">Deadline:</div>
-        <div class="worker-task__value worker-task__deadline">
-          {{ deadline }}
-        </div>
-      </div>
-      <div class="worker-task__data">
-        <div class="worker-task__parameter">Recurring:</div>
-        <div class="worker-task__value">
-          {{ recurringStatus }}
-        </div>
-      </div>
-      <div class="worker-task__data">
-        <div class="worker-task__parameter">Result required:</div>
-        <div class="worker-task__value">
-          {{ resultRequiredStatus }}
-        </div>
+      <div class="worker-task__result">
+        <MyInput
+          class="worker-task__result-input"
+          :model-value="result"
+          placeholder="task result"
+          :required="taskInfo.resultRequiredStatus"
+        />
+        <MyRectangleButton
+          class="worker-task__done-button"
+          text="done"
+          icon-name="ok"
+          :disabled="taskInfo.resultRequiredStatus && !result"
+        />
       </div>
     </div>
   </div>
@@ -38,12 +54,18 @@
 
 <script>
 import {MyDateClass} from "@/assets/js/microLogic";
+import MyInput from "@/components/UI/MyInput";
+import MyRectangleButton from "@/components/UI/MyRectangleButton";
 
 export default {
   name: "WorkerTask",
+  components: {MyRectangleButton, MyInput},
   props: {
     taskInfo: {type: Object, required: true}
   },
+  data: () => ({
+    result: ""
+  }),
   computed: {
     description() {
       if (this.taskInfo.description.toUpperCase() === "NULL") {
@@ -90,6 +112,9 @@ export default {
 .worker-task__content {
   padding: 10px 20px;
   width: 100%;
+
+  display: flex;
+  justify-content: space-between;
 
   color: #cccccc;
   border-radius: 4px;
@@ -142,5 +167,25 @@ export default {
 
 .worker-task__deadline {
   color: #aaf;
+}
+
+
+.worker-task__result {
+  width: 40%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.worker-task__result-input {
+  width: 100%;
+  margin: 0 0 25px 0;
+}
+
+.worker-task__done-button {
+  height: 50px;
+  width: 200px;
 }
 </style>
