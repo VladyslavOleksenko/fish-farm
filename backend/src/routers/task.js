@@ -108,9 +108,8 @@ async function setTaskDoneRequest(request, response) {
   try {
     const taskId = request.query.taskId
     const result = request.body.result
-    //const resultForClient = await taskController.setTaskDone(taskId, result)
-    const resultForClient = "done"
-    response.status(200).json(resultForClient)
+    const taskHistoryId = await taskController.setTaskDone(taskId, result)
+    response.status(200).json(taskHistoryId)
   } catch (exception) {
     const message = "Can't set task to done"
     response.status(500).json({message})

@@ -132,16 +132,26 @@ async function createTask(newTaskData) {
 }
 
 async function setTaskDone(taskId, result) {
-  const task = getTask(taskId)
+  const task = await getTask(taskId)
   if (!task) {
     throw new Error(`No task with id ${taskId}`)
   }
 
-  const date = new Date().toLocaleDateString()
-  const time = new Date().toLocaleTimeString()
+  const currentDate = dateController.getCurrentDateForDb()
+  const currentTime = dateController.getCurrentTimeForDb()
 
-  getTaskDeadlineDateObject(task)
+  const deadlineDate = parseInt(task["deadline_date"])
+  const deadlineTime = task["deadline_time"]
 
+  let inTime = 1
+  if (currentDate > deadlineDate) {
+    inTime = 0
+  }
+  if (currentDate === deadlineDate &&
+    deadlineTime.toUpperCase() !== 'NULL' &&
+    currentTime > deadlineTime) {
+    inTime = 0
+  }
 
   const sqlCommand = `INSERT
                       INTO task_history (task_id,
@@ -150,10 +160,10 @@ async function setTaskDone(taskId, result) {
                                          result,
                                          in_time)
                       VALUES ('${taskId}',
-                              '${date}',
-                              '${time}',
-                              '${result}'
-                                      '${poolId}')`
+                              '${currentDate}',
+                              '${currentTime}',
+                              '${result}',
+                              '${inTime}')`
 
   let dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows.insertId
@@ -196,25 +206,6 @@ function formatTask(task) {
     recurringPeriod: task["recurring_period"],
     resultRequiredStatus: !!parseInt(task["result_required_status"])
   }
-}
-
-function getTaskDeadlineDateObject(task) {
-  const deadlineDate = task["deadline_date"].split(".")
-  const deadlineTime = task["deadline_time"].split(":")
-
-  const year = deadlineDate[2]
-  const month = deadlineDate[1]
-  const date = deadlineDate[0]
-
-  const hours = deadlineTime[0]
-  const minutes = deadlineTime[1]
-  const seconds = deadlineTime[2]
-
-  const dateObject = new Date(year, month, date, hours, minutes, seconds)
-  console.log(deadlineDate)
-  console.log(deadlineTime)
-  console.log(dateObject)
-  return dateObject
 }
 
 

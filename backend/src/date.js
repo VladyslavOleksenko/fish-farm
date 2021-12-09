@@ -1,9 +1,10 @@
 function prepareDateInputValueForDb(dateInputValue) {
-  return Date.parse(dateInputValue) || "NULL"
+  const dateString = new Date(Date.parse(dateInputValue)).toLocaleDateString()
+  return Date.parse(dateString) || "NULL"
 }
 
 function getCurrentDateForDb() {
-  return Date.parse(new Date().toDateString())
+  return Date.parse(new Date().toLocaleDateString())
 }
 
 function getCurrentTimeForDb() {
