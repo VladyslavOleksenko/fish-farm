@@ -165,6 +165,8 @@ export default {
 
 <style scoped>
 .task-info__content {
+  max-height: 90%;
+
   display: flex;
 }
 
@@ -251,6 +253,8 @@ export default {
 
 .task-info__history {
   width: 50%;
+
+  overflow-y: auto;
 }
 
 
@@ -264,7 +268,17 @@ export default {
 
 
 .history__element {
-  margin: 0 0 20px 0;
+  margin: 0 0 4px 0;
+  padding: 8px 10px;
+
+  border-radius: 3px;
+
+  cursor: pointer;
+  transition: background-color .2s ease;
+}
+
+.history__element:hover {
+  background-color: #919097;
 }
 
 

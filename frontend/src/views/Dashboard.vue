@@ -99,6 +99,7 @@ export default {
 
 .dashboard__info {
   flex: 1 1 50%;
+  overflow: hidden;
 }
 
 .dashboard__chart {
