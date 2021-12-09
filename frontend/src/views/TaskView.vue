@@ -11,6 +11,11 @@
       </div>
 
       <div class="task-view__tasks">
+        <div
+          class="task-view__tasks-plug"
+          v-if="!taskArray.length">
+          You have no active tasks!
+        </div>
         <WorkerTask
           class="task-view__task"
           v-for="(task, i) in taskArray"
@@ -99,6 +104,13 @@ export default {
 .task-view__task {
   margin: 0 0 50px 0;
   overflow: auto;
+}
+
+.task-view__tasks-plug {
+  text-align: center;
+  font-size: 25px;
+
+  color: #cccccc;
 }
 
 
