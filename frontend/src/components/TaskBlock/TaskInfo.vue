@@ -47,7 +47,7 @@
           <div class="task-info__data">
             <div class="task-info__parameter">Status:</div>
             <div class="task-info__value">
-              done
+              {{ parsedTaskInfo.doneStatus }}
             </div>
           </div>
         </div>
@@ -78,9 +78,6 @@
               </div>
               <div class="history__status">
                 {{ getDoneStatus(historyNote) }}
-              </div>
-              <div class="history__in-time">
-                {{ getInTimeStatus(historyNote) }}
               </div>
             </div>
             <div class="history__result">
@@ -151,17 +148,16 @@ export default {
       return MyDateClass.getDateAndTimeString(dateString, timeString)
     },
     getDoneStatus(historyNote) {
-      if (historyNote.inTime === 2) {
-        return "not done"
+      switch (historyNote.inTime) {
+        case 0:
+          return "done in time"
+        case 1:
+          return "done late"
+        case 2:
+          return "not done"
+        default:
+          return "in progress"
       }
-      return "done"
-    },
-    getInTimeStatus(historyNote) {
-      if (historyNote.inTime === 2) {
-        return ""
-      }
-
-      return historyNote ? "not in time" : "in time"
     }
   }
 }

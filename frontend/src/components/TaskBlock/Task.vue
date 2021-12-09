@@ -15,7 +15,7 @@
           </div>
         </div>
         <div class="task__title">{{ task.title }}</div>
-        <div class="task__status">done</div>
+        <div class="task__status">{{ parsedTaskInfo.doneStatus }}</div>
       </div>
     </div>
   </div>
