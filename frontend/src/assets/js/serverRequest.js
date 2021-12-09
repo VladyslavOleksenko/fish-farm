@@ -326,6 +326,15 @@ export async function getTaskArrayByUserId(userId) {
   return await sendServerRequest(requestParams)
 }
 
+export async function getTaskHistory(taskId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/task/history?taskId=" + taskId
+  )
+
+  return await sendServerRequest(requestParams)
+}
+
 export async function createTask(newTaskData) {
   const requestParams = new RequestParams(
     "POST",
