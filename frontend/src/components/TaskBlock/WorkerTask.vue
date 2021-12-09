@@ -41,12 +41,20 @@
           placeholder="task result"
           :required="task.resultRequiredStatus"
         />
-        <MyRectangleButton
-          class="worker-task__done-button"
-          text="done"
-          icon-name="ok"
-          :disabled="task.resultRequiredStatus && !result"
-          @click="sendSetTaskDoneRequest"/>
+        <div class="worker-task__buttons">
+          <MyRectangleButton
+            class="worker-task__button"
+            text="done"
+            icon-name="ok"
+            :disabled="task.resultRequiredStatus && !result"
+            @click="sendSetTaskResultRequest(true)"/>
+          <MyRectangleButton
+            class="worker-task__button"
+            text="not done"
+            icon-name="delete"
+            :disabled="task.resultRequiredStatus && !result"
+            @click="sendSetTaskResultRequest(false)"/>
+        </div>
       </div>
     </div>
   </div>
@@ -55,7 +63,7 @@
 <script>
 import MyInput from "@/components/UI/MyInput";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
-import {setTaskDone} from "@/assets/js/serverRequest";
+import {setTaskResult} from "@/assets/js/serverRequest";
 import {parseTaskInfo} from "@/components/TaskBlock/taskLogic";
 
 export default {
@@ -73,13 +81,13 @@ export default {
     }
   },
   methods: {
-    async sendSetTaskDoneRequest() {
+    async sendSetTaskResultRequest(doneStatus) {
       if (this.task.resultRequiredStatus && !this.result) {
         return
       }
 
       try {
-        await setTaskDone(this.task.taskId, this.result)
+        await setTaskResult(this.task.taskId, this.result, doneStatus)
       } catch (exception) {
         return console.log(exception)
       }
@@ -164,7 +172,13 @@ export default {
   margin: 0 0 25px 0;
 }
 
-.worker-task__done-button {
+.worker-task__buttons {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.worker-task__button {
   height: 50px;
   width: 200px;
 }

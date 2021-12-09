@@ -11,7 +11,7 @@ router.get("/farm", getTaskByFarmRequest)
 router.get("/pool", getTaskByPoolRequest)
 router.post("/", createTaskRequest)
 router.get("/history", getTaskHistoryRequest)
-router.post("/done", setTaskDoneRequest)
+router.post("/done", setTaskResultRequest)
 
 
 async function getTaskRequest(request, response) {
@@ -104,11 +104,13 @@ async function getTaskHistoryRequest(request, response) {
   }
 }
 
-async function setTaskDoneRequest(request, response) {
+async function setTaskResultRequest(request, response) {
   try {
     const taskId = request.query.taskId
     const result = request.body.result
-    const taskHistoryId = await taskController.setTaskDone(taskId, result)
+    const doneStatus = request.body.doneStatus
+    const taskHistoryId =
+      await taskController.setTaskResult(taskId, result, doneStatus)
     response.status(200).json(taskHistoryId)
   } catch (exception) {
     const message = "Can't set task to done"

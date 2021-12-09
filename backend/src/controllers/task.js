@@ -7,7 +7,7 @@ module.exports = {
   getTaskHistory,
 
   createTask,
-  setTaskDone,
+  setTaskResult,
 
   deleteTask,
 
@@ -131,7 +131,7 @@ async function createTask(newTaskData) {
   return dataBaseResponse.rows.insertId
 }
 
-async function setTaskDone(taskId, result) {
+async function setTaskResult(taskId, result, doneStatus) {
   const task = await getTask(taskId)
   if (!task) {
     throw new Error(`No task with id ${taskId}`)
@@ -151,6 +151,10 @@ async function setTaskDone(taskId, result) {
     deadlineTime.toUpperCase() !== 'NULL' &&
     currentTime > deadlineTime) {
     inTime = 0
+  }
+
+  if (!doneStatus) {
+    inTime = 2
   }
 
   const sqlCommand = `INSERT
