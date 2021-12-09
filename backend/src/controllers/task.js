@@ -70,8 +70,17 @@ async function getTaskArrayByUser(userId) {
   return dataBaseResponse.rows
 }
 
-async function getTaskHistory() {
+async function getTaskHistory(taskId) {
+  const task = await getTask(taskId)
+  if (!task) {
+    throw new Error(`No task with id ${taskId}`)
+  }
 
+  const sqlCommand = `SELECT *
+                      FROM task_history
+                      WHERE task_id LIKE '${taskId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows
 }
 
 

@@ -97,8 +97,10 @@ async function createTaskRequest(request, response) {
 async function getTaskHistoryRequest(request, response) {
   try {
     const taskId = request.query.taskId
+    const taskHistory = await taskController.getTaskHistory(taskId)
+    response.status(200).json(taskHistory)
   } catch (exception) {
-    const message = "Can't get task by taskId"
+    const message = "Can't get task history by taskId"
     response.status(500).json({message})
     logError(message, exception)
   }
