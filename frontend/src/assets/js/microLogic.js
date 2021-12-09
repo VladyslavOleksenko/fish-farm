@@ -1,5 +1,3 @@
-import {getFarm} from "@/assets/js/serverRequest";
-
 export class MyDateClass {
   static months = {
     shortForm: [
