@@ -111,7 +111,7 @@ import {
   changeWorker
 } from "@/assets/js/serverRequest";
 import Tasks from "@/components/TaskBlock/Tasks";
-import {mapMutations} from "vuex";
+import {mapActions, mapMutations} from "vuex";
 
 
 export default {
@@ -228,6 +228,9 @@ export default {
     ...mapMutations({
       setSelectedTask: "farms/setSelectedTask"
     }),
+    ...mapActions({
+      updateSelectedTaskHistory: "farms/updateSelectedTaskHistory"
+    }),
     sendDeleteEvent() {
       this.$emit('delete', this.user)
       this.deleteModalVisibilityStatus = false
@@ -309,6 +312,7 @@ export default {
         task: taskInfo,
         worker: this.user
       })
+      this.updateSelectedTaskHistory()
     }
   },
   mounted() {
