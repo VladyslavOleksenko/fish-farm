@@ -344,3 +344,13 @@ export async function deleteTask(taskId) {
 
   return await sendServerRequest(requestParams)
 }
+
+export async function setTaskDone(taskId, result) {
+  const requestParams = new RequestParams(
+    "POST",
+    "http://localhost:5000/api/task/done?taskId=" + taskId,
+    {result}
+  )
+
+  return await sendServerRequest(requestParams)
+}

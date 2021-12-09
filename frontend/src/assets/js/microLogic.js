@@ -1,3 +1,5 @@
+import {getFarm} from "@/assets/js/serverRequest";
+
 export class MyDateClass {
   static months = {
     shortForm: [
@@ -7,7 +9,7 @@ export class MyDateClass {
     ]
   }
 
-  static getDayAndMonth(date) {
+  static getShortDate(date) {
     if (typeof date === "string") {
       date = new Date(date)
     }
@@ -16,12 +18,40 @@ export class MyDateClass {
     return date.getDate() + " " + shortMonthForm
   }
 
-  static getDayAndMonthAndYear(date) {
+  static getFullDate(date) {
     if (typeof date === "string") {
       date = new Date(date)
     }
 
     const year = date.getYear() + 1900
-    return this.getDayAndMonth(date) + " " + year
+    return this.getShortDate(date) + " " + year
+  }
+
+  static getDateStringByDbValue(dbValue, withYear = false) {
+    dbValue = parseInt(dbValue)
+    if (!dbValue) {
+      return ""
+    }
+    const date = new Date(dbValue)
+
+    if (withYear) {
+      return this.getFullDate(date)
+    }
+    return this.getShortDate(date)
+  }
+
+  static getTimeStringByDbValue(dbValue) {
+    if (dbValue.toUpperCase() === "NULL") {
+      return ""
+    }
+
+    return dbValue.substr(0, 5)
+  }
+
+  static getDateAndTimeString(dateString, timeString) {
+    if (!dateString && !timeString) {
+      return "--"
+    }
+    return dateString + " " + timeString
   }
 }

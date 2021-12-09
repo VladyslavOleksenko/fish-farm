@@ -7,6 +7,7 @@ module.exports = {
   getTaskHistory,
 
   createTask,
+  setTaskDone,
 
   deleteTask,
 
@@ -88,10 +89,11 @@ async function createTask(newTaskData) {
 
   const title = newTaskData.title
   const description = newTaskData.description || "NULL"
-  const createDate = new Date().toLocaleDateString()
-  const createTime = new Date().toLocaleTimeString()
+  const createDate = dateController.getCurrentDateForDb()
+  const createTime = dateController.getCurrentTimeForDb()
 
-  const deadlineDate = newTaskData.deadlineDate || "NULL"
+  const deadlineDate =
+    dateController.prepareDateInputValueForDb(newTaskData.deadlineDate)
   let deadlineTime = "NULL"
   if (newTaskData.deadlineTime && deadlineDate !== "NULL") {
     deadlineTime = newTaskData.deadlineTime
@@ -129,8 +131,41 @@ async function createTask(newTaskData) {
   return dataBaseResponse.rows.insertId
 }
 
+async function setTaskDone(taskId, result) {
+  const task = getTask(taskId)
+  if (!task) {
+    throw new Error(`No task with id ${taskId}`)
+  }
+
+  const date = new Date().toLocaleDateString()
+  const time = new Date().toLocaleTimeString()
+
+  getTaskDeadlineDateObject(task)
+
+
+  const sqlCommand = `INSERT
+                      INTO task_history (task_id,
+                                         date,
+                                         time,
+                                         result,
+                                         in_time)
+                      VALUES ('${taskId}',
+                              '${date}',
+                              '${time}',
+                              '${result}'
+                                      '${poolId}')`
+
+  let dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows.insertId
+}
+
 
 async function deleteTask(taskId) {
+  const task = await getTask(taskId)
+  if (!task) {
+    throw new Error(`No task with id ${taskId}`)
+  }
+
   const sqlCommand = `DELETE
                       FROM task
                       WHERE task_id = ${taskId}`
@@ -157,14 +192,34 @@ function formatTask(task) {
     createTime: task["create_time"],
     deadlineDate: task["deadline_date"],
     deadlineTime: task["deadline_time"],
-    isRecurringStatus: task["is_recurring"],
+    isRecurringStatus: !!parseInt(task["is_recurring"]),
     recurringPeriod: task["recurring_period"],
-    resultRequiredStatus: task["result_required_status"]
+    resultRequiredStatus: !!parseInt(task["result_required_status"])
   }
+}
+
+function getTaskDeadlineDateObject(task) {
+  const deadlineDate = task["deadline_date"].split(".")
+  const deadlineTime = task["deadline_time"].split(":")
+
+  const year = deadlineDate[2]
+  const month = deadlineDate[1]
+  const date = deadlineDate[0]
+
+  const hours = deadlineTime[0]
+  const minutes = deadlineTime[1]
+  const seconds = deadlineTime[2]
+
+  const dateObject = new Date(year, month, date, hours, minutes, seconds)
+  console.log(deadlineDate)
+  console.log(deadlineTime)
+  console.log(dateObject)
+  return dateObject
 }
 
 
 const workerController = require("./worker")
 const userController = require("./user")
 const poolController = require("./pool")
-const {sendDataBaseQuery} = require("./../dataBase");
+const {sendDataBaseQuery} = require("./../dataBase")
+const dateController = require("./../date")

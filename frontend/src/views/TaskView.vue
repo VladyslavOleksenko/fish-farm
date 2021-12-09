@@ -15,7 +15,7 @@
           class="task-view__task"
           v-for="(task, i) in taskArray"
           :key="i"
-          :task-info="task"/>
+          :task="task"/>
       </div>
 
       <img class="task-view__image"

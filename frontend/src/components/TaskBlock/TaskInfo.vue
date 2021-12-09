@@ -15,32 +15,32 @@
         {{ taskInfo.task.title }}
       </div>
       <div class="task-info__description">
-        {{ taskDescription }}
+        {{ parsedTaskInfo.description }}
       </div>
       <div class="task-info__data-block">
         <div class="task-info__data">
           <div class="task-info__parameter">issued:</div>
           <div class="task-info__value">
-            {{ createDate }}
-            {{ taskInfo.task.createTime }}
+            {{ parsedTaskInfo.createDate }}
+            {{ parsedTaskInfo.createTime }}
           </div>
         </div>
         <div class="task-info__data">
           <div class="task-info__parameter">deadline:</div>
           <div class="task-info__value">
-            {{ deadline }}
+            {{ parsedTaskInfo.deadlineDateAndTime }}
           </div>
         </div>
         <div class="task-info__data">
           <div class="task-info__parameter">Recurring:</div>
           <div class="task-info__value">
-            {{ recurringStatus }}
+            {{ parsedTaskInfo.recurringStatus }}
           </div>
         </div>
         <div class="task-info__data">
           <div class="task-info__parameter">Result required:</div>
           <div class="task-info__value">
-            {{ resultRequiredStatus }}
+            {{ parsedTaskInfo.resultRequiredStatus }}
           </div>
         </div>
         <div class="task-info__data">
@@ -71,11 +71,11 @@
 </template>
 
 <script>
-import {MyDateClass} from "@/assets/js/microLogic";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import {deleteTask} from "@/assets/js/serverRequest";
 import DeleteModal from "@/components/Modal/DeleteModal";
 import {mapActions} from "vuex";
+import {parseTaskInfo} from "@/components/TaskBlock/taskLogic";
 
 export default {
   name: "TaskInfo",
@@ -92,42 +92,8 @@ export default {
     }
   }),
   computed: {
-    taskDescription() {
-      if (this.taskInfo.task.description.toUpperCase() === "NULL") {
-        return ""
-      }
-      return this.taskInfo.task.description
-    },
-    createDate() {
-      const createDate = this.taskInfo.task.createDate
-      return MyDateClass.getDayAndMonthAndYear(createDate)
-    },
-    deadlineDate() {
-      const deadlineDate = this.taskInfo.task.deadlineDate
-      if (deadlineDate.toUpperCase() === "NULL") {
-        return ""
-      }
-      return MyDateClass.getDayAndMonthAndYear(deadlineDate)
-    },
-    deadlineTime() {
-      const deadlineTime = this.taskInfo.task.deadlineTime
-      if (deadlineTime.toUpperCase() === "NULL") {
-        return ""
-      }
-      return deadlineTime
-    },
-    deadline() {
-      if (!this.deadlineDate && !this.deadlineTime) {
-        return "--"
-      }
-
-      return this.deadlineDate + " " + this.deadlineTime
-    },
-    recurringStatus() {
-      return this.taskInfo.task.isRecurringStatus ? "YES" : "NO"
-    },
-    resultRequiredStatus() {
-      return this.taskInfo.task.resultRequiredStatus ? "YES" : "NO"
+    parsedTaskInfo() {
+      return parseTaskInfo(this.taskInfo.task)
     }
   },
   methods: {

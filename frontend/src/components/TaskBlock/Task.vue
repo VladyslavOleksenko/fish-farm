@@ -9,12 +9,9 @@
       </div>
       <div class="task__body">
         <div class="task__deadline"
-             v-if="deadlineDayAndMonth">
+             v-if="parsedTaskInfo.deadlineDateAndTime !== '--'">
           <div class="task__deadline-date">
-            {{ deadlineDayAndMonth }}
-          </div>
-          <div class="task__deadline-time">
-            {{ deadlineTime }}
+            {{ parsedTaskInfo.deadlineDateAndTime }}
           </div>
         </div>
         <div class="task__title">{{ task.title }}</div>
@@ -26,8 +23,8 @@
 
 <script>
 import MyIcon from "@/components/UI/MyIcon";
-import {MyDateClass} from "@/assets/js/microLogic";
 import {mapState} from "vuex";
+import {parseTaskInfo} from "@/components/TaskBlock/taskLogic";
 
 export default {
   name: "Task",
@@ -39,17 +36,8 @@ export default {
     ...mapState({
       selectedTask: state => state.farms.selectedTask
     }),
-    deadlineDayAndMonth() {
-      if (this.task.deadlineDate.toUpperCase() === "NULL") {
-        return ""
-      }
-      return MyDateClass.getDayAndMonth(this.task.deadlineDate)
-    },
-    deadlineTime() {
-      if (this.task.deadlineTime.toUpperCase() === "NULL") {
-        return ""
-      }
-      return this.task.deadlineTime
+    parsedTaskInfo() {
+      return parseTaskInfo(this.task)
     },
     selectedStatus() {
       if (!this.selectedTask) {

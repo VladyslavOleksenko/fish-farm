@@ -3,106 +3,86 @@
     <div class="worker-task__content">
       <div class="worker-task__info">
         <div class="worker-task__title">
-          {{ taskInfo.title }}
+          {{ task.title }}
         </div>
         <div class="worker-task__description">
-          {{ description }}
+          {{ parsedTaskInfo.description }}
         </div>
         <div class="worker-task__data">
           <div class="worker-task__parameter">Created:</div>
           <div class="worker-task__value">
-            {{ createDate }}
-            {{ taskInfo.createTime }}
+            {{ parsedTaskInfo.createDate }}
+            {{ parsedTaskInfo.createTime }}
           </div>
         </div>
         <div class="worker-task__data">
           <div class="worker-task__parameter">Deadline:</div>
           <div class="worker-task__value worker-task__deadline">
-            {{ deadline }}
+            {{ parsedTaskInfo.deadlineDateAndTime }}
           </div>
         </div>
         <div class="worker-task__data">
           <div class="worker-task__parameter">Recurring:</div>
           <div class="worker-task__value">
-            {{ recurringStatus }}
+            {{ parsedTaskInfo.recurringStatus }}
           </div>
         </div>
         <div class="worker-task__data">
           <div class="worker-task__parameter">Result required:</div>
           <div class="worker-task__value">
-            {{ resultRequiredStatus }}
+            {{ parsedTaskInfo.resultRequiredStatus }}
           </div>
         </div>
       </div>
       <div class="worker-task__result">
         <MyInput
           class="worker-task__result-input"
-          :model-value="result"
+          v-model="result"
           placeholder="task result"
-          :required="taskInfo.resultRequiredStatus"
+          :required="task.resultRequiredStatus"
         />
         <MyRectangleButton
           class="worker-task__done-button"
           text="done"
           icon-name="ok"
-          :disabled="taskInfo.resultRequiredStatus && !result"
-        />
+          :disabled="task.resultRequiredStatus && !result"
+          @click="sendSetTaskDoneRequest"/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import {MyDateClass} from "@/assets/js/microLogic";
 import MyInput from "@/components/UI/MyInput";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
+import {setTaskDone} from "@/assets/js/serverRequest";
+import {parseTaskInfo} from "@/components/TaskBlock/taskLogic";
 
 export default {
   name: "WorkerTask",
   components: {MyRectangleButton, MyInput},
   props: {
-    taskInfo: {type: Object, required: true}
+    task: {type: Object, required: true}
   },
   data: () => ({
     result: ""
   }),
   computed: {
-    description() {
-      if (this.taskInfo.description.toUpperCase() === "NULL") {
-        return ""
-      }
-      return this.taskInfo.description
-    },
-    createDate() {
-      const createDate = this.taskInfo.createDate
-      return MyDateClass.getDayAndMonthAndYear(createDate)
-    },
-    deadlineDate() {
-      const deadlineDate = this.taskInfo.deadlineDate
-      if (deadlineDate.toUpperCase() === "NULL") {
-        return ""
-      }
-      return MyDateClass.getDayAndMonthAndYear(deadlineDate)
-    },
-    deadlineTime() {
-      const deadlineTime = this.taskInfo.deadlineTime
-      if (deadlineTime.toUpperCase() === "NULL") {
-        return ""
-      }
-      return deadlineTime
-    },
-    deadline() {
-      if (!this.deadlineDate && !this.deadlineTime) {
-        return "--"
+    parsedTaskInfo() {
+      return parseTaskInfo(this.task)
+    }
+  },
+  methods: {
+    async sendSetTaskDoneRequest() {
+      if (this.task.resultRequiredStatus && !this.result) {
+        return
       }
 
-      return this.deadlineDate + " " + this.deadlineTime
-    },
-    recurringStatus() {
-      return this.taskInfo.isRecurringStatus ? "YES" : "NO"
-    },
-    resultRequiredStatus() {
-      return this.taskInfo.resultRequiredStatus ? "YES" : "NO"
+      try {
+        await setTaskDone(this.task.taskId, this.result)
+      } catch (exception) {
+        return console.log(exception)
+      }
     }
   }
 }
