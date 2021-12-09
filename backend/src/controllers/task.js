@@ -12,7 +12,9 @@ module.exports = {
   deleteTask,
 
   formatTaskArray,
-  formatTask
+  formatTask,
+  formatTaskHistoryArray,
+  formatTaskHistory,
 }
 
 
@@ -218,6 +220,25 @@ function formatTask(task) {
     isRecurringStatus: !!parseInt(task["is_recurring"]),
     recurringPeriod: task["recurring_period"],
     resultRequiredStatus: !!parseInt(task["result_required_status"])
+  }
+}
+
+function formatTaskHistoryArray(taskHistoryArray) {
+  let newTaskHistoryArray = []
+  for (let taskHistory of taskHistoryArray) {
+    newTaskHistoryArray.push(formatTaskHistory(taskHistory))
+  }
+  return newTaskHistoryArray
+}
+
+function formatTaskHistory(taskHistory) {
+  return {
+    taskHistoryId: taskHistory["task_history_id"],
+    taskId: taskHistory["task_id"],
+    date: taskHistory.date,
+    time: taskHistory.time,
+    result: taskHistory.result,
+    inTime: taskHistory["in_time"]
   }
 }
 
