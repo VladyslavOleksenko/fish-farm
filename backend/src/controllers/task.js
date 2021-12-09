@@ -198,17 +198,30 @@ async function deleteTask(taskId) {
 }
 
 
-function formatTaskArray(taskArray) {
+async function formatTaskArray(taskArray) {
   let newTaskArray = []
   for (let task of taskArray) {
-    newTaskArray.push(formatTask(task))
+    newTaskArray.push(await formatTask(task))
   }
   return newTaskArray
 }
 
-function formatTask(task) {
+async function formatTask(task) {
+  const taskId = task["task_id"]
+  const sqlCommand = `SELECT *
+                      FROM task_history
+                      WHERE task_id LIKE '${taskId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+
+  let inTime = -1
+  const taskHistory = dataBaseResponse.rows
+  if (taskHistory && taskHistory.length) {
+    const lastTaskHistory = taskHistory[taskHistory.length - 1]
+    inTime = lastTaskHistory["in_time"]
+  }
+
   return {
-    taskId: task["task_id"],
+    taskId: taskId,
     farmWorkerId: task["farm_worker_id"],
     title: task.title,
     description: task.description,
@@ -219,7 +232,8 @@ function formatTask(task) {
     deadlineTime: task["deadline_time"],
     isRecurringStatus: !!parseInt(task["is_recurring"]),
     recurringPeriod: task["recurring_period"],
-    resultRequiredStatus: !!parseInt(task["result_required_status"])
+    resultRequiredStatus: !!parseInt(task["result_required_status"]),
+    inTime: inTime
   }
 }
 

@@ -40,7 +40,7 @@ async function getTaskArrayByFarmWorkerRequest(request, response) {
   try {
     const farmWorkerId = request.query.farmWorkerId
     const taskArray = await taskController.getTaskArrayByWorker(farmWorkerId)
-    const taskArrayFormatted = taskController.formatTaskArray(taskArray)
+    const taskArrayFormatted = await taskController.formatTaskArray(taskArray)
     response.status(200).json(taskArrayFormatted)
   } catch (exception) {
     const message = "Can't get task by farm worker id"
@@ -53,7 +53,7 @@ async function getTaskArrayByUserIdRequest(request, response) {
   try {
     const userId = request.query.userId
     const taskArray = await taskController.getTaskArrayByUser(userId)
-    const taskArrayFormatted = taskController.formatTaskArray(taskArray)
+    const taskArrayFormatted = await taskController.formatTaskArray(taskArray)
     response.status(200).json(taskArrayFormatted)
   } catch (exception) {
     const message = "Can't get task array by user id"
