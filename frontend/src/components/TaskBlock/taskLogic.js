@@ -7,7 +7,8 @@ export function parseTaskInfo(task) {
     createTime: getCreateTime(task),
     deadlineDateAndTime: getDeadlineDateAndTime(task),
     recurringStatus: getRecurringStatus(task),
-    resultRequiredStatus: getResultRequiredStatus(task)
+    resultRequiredStatus: getResultRequiredStatus(task),
+    doneStatus: getDoneStatus(task)
   }
 
   function getDescription(task) {
@@ -42,5 +43,18 @@ export function parseTaskInfo(task) {
 
   function getResultRequiredStatus(task) {
     return task.resultRequiredStatus ? "YES" : "NO"
+  }
+
+  function getDoneStatus(task) {
+    switch (task.inTime) {
+      case 0:
+        return "done in time"
+      case 1:
+        return "done late"
+      case 2:
+        return "not done"
+      default:
+        return "in progress"
+    }
   }
 }
