@@ -25,17 +25,18 @@ export class MyDateClass {
     return this.getShortDate(date) + " " + year
   }
 
-  static getDateStringByDbValue(dbValue, withYear = false) {
+  static getDateStringByDbValue(dbValue) {
     dbValue = parseInt(dbValue)
     if (!dbValue) {
       return ""
     }
     const date = new Date(dbValue)
+    const thisYearStatus = date.getFullYear() === new Date().getFullYear()
 
-    if (withYear) {
-      return this.getFullDate(date)
+    if (thisYearStatus) {
+      return this.getShortDate(date)
     }
-    return this.getShortDate(date)
+    return this.getFullDate(date)
   }
 
   static getTimeStringByDbValue(dbValue) {
