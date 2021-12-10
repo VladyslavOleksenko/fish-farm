@@ -150,9 +150,9 @@ export default {
     getDoneStatus(historyNote) {
       switch (historyNote.inTime) {
         case 0:
-          return "done in time"
-        case 1:
           return "done late"
+        case 1:
+          return "done in time"
         case 2:
           return "not done"
         default:
