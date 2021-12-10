@@ -15,7 +15,17 @@
         <TaskInfo class="dashboard__info"
                   :task-info="selectedTask"/>
 
-        <div class="dashboard__chart"></div>
+        <div class="dashboard__chart-block">
+          <div class="dashboard__chart-wrapper">
+            <canvas class="dashboard__canvas" id="task-chart"></canvas>
+          </div>
+          <div class="dashboard__chart-wrapper">
+            <canvas class="dashboard__canvas" id="worker-chart"></canvas>
+          </div>
+          <div class="dashboard__chart-wrapper">
+            <canvas class="dashboard__canvas" id="pool-chart"></canvas>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -27,6 +37,7 @@ import Pools from "@/components/PoolsBlock/Pools";
 import {getFarmWorkers, getUserPermissions} from "@/assets/js/serverRequest";
 import TaskInfo from "@/components/TaskBlock/TaskInfo";
 import {mapState} from "vuex";
+import {startup} from "@/assets/js/dashboardCharts";
 
 export default {
   name: "Dashboard",
@@ -57,6 +68,8 @@ export default {
     this.userPermissions = await getUserPermissions(this.farmId, this.userId)
 
     this.workerArray = await getFarmWorkers(this.farmId)
+
+    startup()
   }
 }
 </script>
@@ -102,11 +115,22 @@ export default {
   overflow: hidden;
 }
 
-.dashboard__chart {
+
+.dashboard__chart-block {
   width: 100%;
   flex: 1 1 50%;
 
-  background-color: var(--blue-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
+.dashboard__chart-wrapper {
+  width: 30%;
+  padding: 10px 0;
+
+  background-color: #eeeeee;
+  box-shadow: 0 3px 6px 3px rgba(238, 238, 238, 0.4);
+  border-radius: 7px;
+}
 </style>
