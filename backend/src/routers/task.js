@@ -3,26 +3,16 @@ const taskController = require("../controllers/task")
 const logError = require("../errorHandler")
 
 const router = express.Router()
-router.get("/", getTaskRequest)
 router.delete("/", deleteTaskRequest)
 router.get("/byFarmWorker", getTaskArrayByFarmWorkerRequest)
 router.get("/byUserId", getTaskArrayByUserIdRequest)
-router.get("/farm", getTaskByFarmRequest)
-router.get("/pool", getTaskByPoolRequest)
 router.post("/", createTaskRequest)
 router.get("/history", getTaskHistoryRequest)
 router.post("/done", setTaskResultRequest)
+router.get("/statistic/task", getStatisticByTaskRequest)
+router.get("/statistic/worker", getStatisticByWorkerRequest)
+router.get("/statistic/pool", getStatisticByPoolRequest)
 
-
-async function getTaskRequest(request, response) {
-  try {
-    const taskId = request.query.taskId
-  } catch (exception) {
-    const message = "Can't get task by taskId"
-    response.status(500).json({message})
-    logError(message, exception)
-  }
-}
 
 async function deleteTaskRequest(request, response) {
   try {
@@ -62,26 +52,6 @@ async function getTaskArrayByUserIdRequest(request, response) {
   }
 }
 
-async function getTaskByFarmRequest(request, response) {
-  try {
-    const farmId = request.query.farmId
-  } catch (exception) {
-    const message = "Can't get task by farmId"
-    response.status(500).json({message})
-    logError(message, exception)
-  }
-}
-
-async function getTaskByPoolRequest(request, response) {
-  try {
-
-  } catch (exception) {
-    const message = "Can't get task by taskId"
-    response.status(500).json({message})
-    logError(message, exception)
-  }
-}
-
 async function createTaskRequest(request, response) {
   try {
     const newTaskData = request.body
@@ -116,6 +86,43 @@ async function setTaskResultRequest(request, response) {
     const taskHistoryId =
       await taskController.setTaskResult(taskId, result, doneStatus)
     response.status(200).json(taskHistoryId)
+  } catch (exception) {
+    const message = "Can't set task to done"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+
+async function getStatisticByTaskRequest(request, response) {
+  try {
+    const taskId = request.query.taskId
+    const statistic = await taskController.getStatisticByTask(taskId)
+    response.status(200).json(statistic)
+  } catch (exception) {
+    const message = "Can't set task to done"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function getStatisticByWorkerRequest(request, response) {
+  try {
+    const farmWorkerId = request.query.taskId
+
+    response.status(200).json("ok")
+  } catch (exception) {
+    const message = "Can't set task to done"
+    response.status(500).json({message})
+    logError(message, exception)
+  }
+}
+
+async function getStatisticByPoolRequest(request, response) {
+  try {
+    const farmWorkerId = request.query.taskId
+
+    response.status(200).json("ok")
   } catch (exception) {
     const message = "Can't set task to done"
     response.status(500).json({message})

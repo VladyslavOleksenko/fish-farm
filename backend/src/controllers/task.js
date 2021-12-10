@@ -6,6 +6,8 @@ module.exports = {
   getTaskArrayByUser,
   getTaskHistory,
 
+  getStatisticByTask,
+
   createTask,
   setTaskResult,
 
@@ -83,6 +85,37 @@ async function getTaskHistory(taskId) {
                       WHERE task_id LIKE '${taskId}'`
   const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
   return dataBaseResponse.rows
+}
+
+
+async function getStatisticByTask(taskId) {
+  const taskHistory = await getTaskHistory(taskId)
+  const taskHistoryFormatted = formatTaskHistoryArray(taskHistory)
+
+  const statistic = [
+    1, // in progress
+    0, // done in time
+    0, // done late
+    0, // not done
+  ]
+
+  for (let taskHistoryElement of taskHistoryFormatted) {
+    switch (taskHistoryElement.inTime) {
+      case 0: // done late
+        statistic[2]++
+        break
+      case 1: // done in time
+        statistic[1]++
+        break
+      case 2: // not done
+        statistic[3]++
+        break
+      default: // in progress
+        statistic[0]++
+    }
+  }
+
+  return statistic
 }
 
 
