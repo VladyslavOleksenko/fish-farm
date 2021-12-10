@@ -363,3 +363,13 @@ export async function setTaskResult(taskId, result, doneStatus) {
 
   return await sendServerRequest(requestParams)
 }
+
+
+export async function getStatisticByTask(taskId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/task/statistic/task?taskId=" + taskId
+  )
+
+  return await sendServerRequest(requestParams)
+}
