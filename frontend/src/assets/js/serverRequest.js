@@ -373,3 +373,13 @@ export async function getStatisticByTask(taskId) {
 
   return await sendServerRequest(requestParams)
 }
+
+export async function getStatisticByWorker(farmWorkerId) {
+  const requestParams = new RequestParams(
+    "GET",
+    "http://localhost:5000/api/task/statistic/worker?farmWorkerId=" +
+    farmWorkerId
+  )
+
+  return await sendServerRequest(requestParams)
+}
