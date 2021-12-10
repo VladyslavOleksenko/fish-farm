@@ -108,9 +108,9 @@ async function getStatisticByTaskRequest(request, response) {
 
 async function getStatisticByWorkerRequest(request, response) {
   try {
-    const farmWorkerId = request.query.taskId
-
-    response.status(200).json("ok")
+    const farmWorkerId = request.query.farmWorkerId
+    const statistic = await taskController.getStatisticByWorker(farmWorkerId)
+    response.status(200).json(statistic)
   } catch (exception) {
     const message = "Can't set task to done"
     response.status(500).json({message})

@@ -7,6 +7,7 @@ module.exports = {
   getTaskHistory,
 
   getStatisticByTask,
+  getStatisticByWorker,
 
   createTask,
   setTaskResult,
@@ -90,6 +91,47 @@ async function getTaskHistory(taskId) {
 
 async function getStatisticByTask(taskId) {
   const taskHistory = await getTaskHistory(taskId)
+  const taskHistoryFormatted = formatTaskHistoryArray(taskHistory)
+
+  const statistic = [
+    1, // in progress
+    0, // done in time
+    0, // done late
+    0, // not done
+  ]
+
+  for (let taskHistoryElement of taskHistoryFormatted) {
+    switch (taskHistoryElement.inTime) {
+      case 0: // done late
+        statistic[2]++
+        break
+      case 1: // done in time
+        statistic[1]++
+        break
+      case 2: // not done
+        statistic[3]++
+        break
+      default: // in progress
+        statistic[0]++
+    }
+  }
+
+  return statistic
+}
+
+async function getStatisticByWorker(farmWorkerId) {
+  const farmWorker = await workerController.getWorker(farmWorkerId)
+  if (!farmWorker) {
+    throw new Error(`No worker with id ${farmWorker}`)
+  }
+
+  const sqlCommand = `SELECT task_history.*
+                      FROM task,
+                           task_history
+                      WHERE task.task_id = task_history.task_id
+                        AND task.farm_worker_id = ${farmWorkerId}`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  const taskHistory = dataBaseResponse.rows
   const taskHistoryFormatted = formatTaskHistoryArray(taskHistory)
 
   const statistic = [
