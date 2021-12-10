@@ -34,10 +34,14 @@
 <script>
 import Staff from "@/components/StaffBlock/Staff";
 import Pools from "@/components/PoolsBlock/Pools";
-import {getFarmWorkers, getUserPermissions} from "@/assets/js/serverRequest";
+import {
+  getFarmWorkers,
+  getStatisticByTask,
+  getUserPermissions
+} from "@/assets/js/serverRequest";
 import TaskInfo from "@/components/TaskBlock/TaskInfo";
 import {mapState} from "vuex";
-import {startup} from "@/assets/js/dashboardCharts";
+import {changeChartDate, startup} from "@/assets/js/dashboardCharts";
 
 export default {
   name: "Dashboard",
@@ -58,10 +62,27 @@ export default {
   computed: {
     ...mapState({
       userId: state => state.user.user.userId,
-      selectedTask: state => state.farms.selectedTask
+      selectedTask: state => state.farms.selectedTask,
+      needToUpdateTasks: state => state.farms.needToUpdateTasks
     }),
     farmId() {
       return parseInt(this.$route.params.farmId.toString())
+    }
+  },
+  watch: {
+    async selectedTask() {
+      if (!this.selectedTask) {
+        return true
+      }
+
+      const selectedTaskId = this.selectedTask.task.taskId
+      const chartTaskData = await getStatisticByTask(selectedTaskId)
+      changeChartDate("task", chartTaskData)
+    }
+  },
+  methods: {
+    async updateChartData() {
+
     }
   },
   async mounted() {

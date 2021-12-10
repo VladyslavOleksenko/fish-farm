@@ -57,6 +57,10 @@ const poolChartConfig = {
 }
 
 
+let taskChart
+let workerChart
+let poolChart
+
 export function startup() {
   const taskChartEl = document.querySelector("#task-chart")
   const workerChartEl = document.querySelector("#worker-chart")
@@ -66,18 +70,21 @@ export function startup() {
   const workerChartCtx = workerChartEl.getContext("2d")
   const poolChartCtx = poolChartEl.getContext("2d")
 
-  const taskChart = new Chart(taskChartCtx, taskChartConfig)
-  const workerChart = new Chart(workerChartCtx, workerChartConfig)
-  const poolChart = new Chart(poolChartCtx, poolChartConfig)
+  taskChart = new Chart(taskChartCtx, taskChartConfig)
+  workerChart = new Chart(workerChartCtx, workerChartConfig)
+  poolChart = new Chart(poolChartCtx, poolChartConfig)
 }
 
 export function changeChartDate(chartName, chartData) {
   switch (chartName) {
     case "task":
-      return taskChartConfig.data.datasets[0].data = chartData
+      taskChartConfig.data.datasets[0].data = chartData
+      return taskChart.update()
     case "worker":
-      return workerChartConfig.data.datasets[0].data = chartData
+      workerChartConfig.data.datasets[0].data = chartData
+      return workerChart.update()
     case "pool":
-      return poolChartConfig.data.datasets[0].data = chartData
+      poolChartConfig.data.datasets[0].data = chartData
+      return poolChart.update()
   }
 }
