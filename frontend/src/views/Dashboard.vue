@@ -17,13 +17,13 @@
 
         <div class="dashboard__chart-block">
           <div class="dashboard__chart-wrapper">
-            <canvas class="dashboard__canvas" id="task-chart"></canvas>
-          </div>
-          <div class="dashboard__chart-wrapper">
             <canvas class="dashboard__canvas" id="worker-chart"></canvas>
           </div>
           <div class="dashboard__chart-wrapper">
             <canvas class="dashboard__canvas" id="pool-chart"></canvas>
+          </div>
+          <div class="dashboard__chart-wrapper">
+            <canvas class="dashboard__canvas" id="task-chart"></canvas>
           </div>
         </div>
       </div>
@@ -78,11 +78,6 @@ export default {
       const selectedTaskId = this.selectedTask.task.taskId
       const chartTaskData = await getStatisticByTask(selectedTaskId)
       changeChartDate("task", chartTaskData)
-    }
-  },
-  methods: {
-    async updateChartData() {
-
     }
   },
   async mounted() {

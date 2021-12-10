@@ -108,10 +108,11 @@ import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";
 import {
   changeAdministrator,
-  changeWorker
+  changeWorker, getStatisticByWorker
 } from "@/assets/js/serverRequest";
 import Tasks from "@/components/TaskBlock/Tasks";
 import {mapActions, mapMutations} from "vuex";
+import {changeChartDate} from "@/assets/js/dashboardCharts";
 
 
 export default {
@@ -307,12 +308,16 @@ export default {
       }
     },
 
-    selectTask(taskInfo) {
+    async selectTask(taskInfo) {
       this.setSelectedTask({
         task: taskInfo,
         worker: this.user
       })
-      this.updateSelectedTaskHistory()
+      await this.updateSelectedTaskHistory()
+
+      const workerChartData =
+        await getStatisticByWorker(this.user.farmWorkerId)
+      changeChartDate("worker", workerChartData)
     }
   },
   mounted() {
