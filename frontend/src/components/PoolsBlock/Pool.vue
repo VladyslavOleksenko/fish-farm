@@ -103,6 +103,7 @@ export default {
     async sendDeletePoolRequest() {
       await deletePool(this.poolInfo.poolId)
       this.$emit("updated")
+      this.deleteModalData.visibilityStatus = false
     }
   },
   mounted() {
