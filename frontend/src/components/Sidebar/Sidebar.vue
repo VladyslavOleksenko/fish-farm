@@ -3,12 +3,14 @@
     <SidebarTitle class="sidebar__title" @click="toggleSidebar"></SidebarTitle>
 
     <div class="sidebar__links">
-      <SidebarLink class="sidebar__link" to="/" icon-name="home">Home</SidebarLink>
-      <SidebarLink class="sidebar__link" to="/tasks" icon-name="tasks">Tasks</SidebarLink>
-      <SidebarLink class="sidebar__link" to="/notifications" icon-name="notifications">
-        Notifications
+      <SidebarLink class="sidebar__link" to="/" icon-name="home">
+        Home
       </SidebarLink>
-      <SidebarLink class="sidebar__link" to="/profile" icon-name="profile">Profile
+      <SidebarLink class="sidebar__link" to="/tasks" icon-name="tasks">
+        Tasks
+      </SidebarLink>
+      <SidebarLink class="sidebar__link" to="/profile" icon-name="profile">
+        Profile
       </SidebarLink>
     </div>
 
@@ -29,7 +31,11 @@
 
 <script>
 import SidebarLink from "./SidebarLink";
-import {collapsed, toggleSidebar, sidebarWidth} from "@/components/Sidebar/state";
+import {
+  collapsed,
+  toggleSidebar,
+  sidebarWidth
+} from "@/components/Sidebar/state";
 import MyIcon from "@/components/UI/MyIcon";
 import SidebarTitle from "@/components/Sidebar/SidebarTitle";
 import {mapActions} from "vuex";

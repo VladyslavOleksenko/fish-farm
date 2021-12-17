@@ -12,11 +12,6 @@ const routes = [
     component: () => import("@/views/TaskView")
   },
   {
-    path: "/notifications",
-    name: "Notifications",
-    component: () => import("@/views/Notifications")
-  },
-  {
     path: "/profile",
     name: "Profile",
     component: () => import("@/views/Profile")
