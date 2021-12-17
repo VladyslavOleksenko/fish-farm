@@ -15,9 +15,24 @@
     </div>
 
     <div class="sidebar__language language">
-      <button class="language__button">EN</button>
-      <button class="language__button">UA</button>
-      <button class="language__button language__button-active">RU</button>
+      <button
+        class="language__button"
+        :class="{'language__button-active': currentLanguage === 'en'}"
+        @click="selectLanguage('en')">
+        EN
+      </button>
+      <button
+        class="language__button"
+        :class="{'language__button-active': currentLanguage === 'ua'}"
+        @click="selectLanguage('ua')">
+        UA
+      </button>
+      <button
+        class="language__button"
+        :class="{'language__button-active': currentLanguage === 'ru'}"
+        @click="selectLanguage('ru')">
+        RU
+      </button>
     </div>
 
     <div class="sidebar__logout-wrapper">
@@ -38,7 +53,7 @@ import {
 } from "@/components/Sidebar/state";
 import MyIcon from "@/components/UI/MyIcon";
 import SidebarTitle from "@/components/Sidebar/SidebarTitle";
-import {mapActions} from "vuex";
+import {mapState, mapActions} from "vuex";
 
 export default {
   fileName: "Sidebar",
@@ -46,9 +61,15 @@ export default {
   setup() {
     return {collapsed, toggleSidebar, sidebarWidth}
   },
+  computed: {
+    ...mapState({
+      currentLanguage: state => state.language.currentLanguage
+    })
+  },
   methods: {
     ...mapActions({
-      logout: "authorization/logout"
+      logout: "authorization/logout",
+      selectLanguage: "language/selectLanguage"
     })
   }
 }
