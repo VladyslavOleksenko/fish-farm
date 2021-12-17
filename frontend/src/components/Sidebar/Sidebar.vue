@@ -12,6 +12,12 @@
       </SidebarLink>
     </div>
 
+    <div class="sidebar__language language">
+      <button class="language__button">EN</button>
+      <button class="language__button">UA</button>
+      <button class="language__button language__button-active">RU</button>
+    </div>
+
     <div class="sidebar__logout-wrapper">
       <SidebarLink class="sidebar__link" to="/logout" icon-name="logout"
                    @click="logout">
@@ -71,5 +77,47 @@ export default {
 
 .sidebar__link {
   margin: 0 0 5px 0;
+}
+
+
+.sidebar__language {
+  margin: 0 0 20px 0;
+
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.language__button {
+  width: 50px;
+  height: 50px;
+  margin: 0 0 10px 0;
+
+  font-size: 23px;
+  font-weight: 400;
+
+  color: var(--sidebar-text-color);
+  border-radius: 5px;
+  border: none;
+  background: none;
+
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  transition: background-color .2s ease;
+}
+
+.language__button:hover {
+  background-color: var(--light-purple-color);
+}
+
+.language__button-active {
+  background-color: var(--blue-color);
+}
+
+.language__button-active:hover {
+  background-color: var(--blue-color);
 }
 </style>
