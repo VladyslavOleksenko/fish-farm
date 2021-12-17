@@ -16,13 +16,12 @@
                   :task-info="selectedTask"/>
 
         <div class="dashboard__chart-block">
-          <div class="dashboard__chart-wrapper">
+          <div class="dashboard__chart-wrapper"
+               id="dashboard__chart-wrapper-worker">
             <canvas class="dashboard__canvas" id="worker-chart"></canvas>
           </div>
-          <div class="dashboard__chart-wrapper">
-            <canvas class="dashboard__canvas" id="pool-chart"></canvas>
-          </div>
-          <div class="dashboard__chart-wrapper">
+          <div class="dashboard__chart-wrapper"
+               id="dashboard__chart-wrapper-task">
             <canvas class="dashboard__canvas" id="task-chart"></canvas>
           </div>
         </div>
@@ -137,12 +136,14 @@ export default {
   flex: 1 1 50%;
 
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 
 .dashboard__chart-wrapper {
+  visibility: hidden;
+
   width: 30%;
+  margin: 0 7% 0 0;
   padding: 10px 0;
 
   background-color: #eeeeee;
