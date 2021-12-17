@@ -4,20 +4,6 @@
       <div class="farm-list-element__name">{{ farmInfo.name }}</div>
       <div class="farm-list-element__description">{{ farmInfo.description }}</div>
     </div>
-    <div class="farm-list-element__additional-info">
-      <div class="farm-list-element__info-row">
-        <div class="farm-list-element__info-parameter">owner:</div>
-        <div class="farm-list-element__info-value">{{ owner }}</div>
-      </div>
-      <div class="farm-list-element__info-row">
-        <div class="farm-list-element__info-parameter">administrators:</div>
-        <div class="farm-list-element__info-value">0</div>
-      </div>
-      <div class="farm-list-element__info-row">
-        <div class="farm-list-element__info-parameter">workers:</div>
-        <div class="farm-list-element__info-value">5</div>
-      </div>
-    </div>
     <div class="farm-list-element__button-wrapper">
       <button class="farm-list-element__button"
               @click="$router.push({name: 'Farm', params: {farmId: this.farmInfo.farmId}})">
@@ -66,7 +52,7 @@ export default {
 
 .farm-list-element__general-info {
   padding: 0 15px 0 0;
-  width: 40%;
+  width: 70%;
 }
 
 .farm-list-element__name {
@@ -80,29 +66,6 @@ export default {
 
   font-size: 19px;
   color: #cccccc;
-}
-
-
-.farm-list-element__additional-info {
-  flex: 1 1 auto;
-}
-
-.farm-list-element__info-row {
-  margin: 0 0 7px 0;
-
-  display: flex;
-
-  font-size: 20px;
-
-  color: var(--light-gray-color);
-}
-
-.farm-list-element__info-parameter {
-  min-width: 160px;
-}
-
-.farm-list-element__info-value {
-  font-weight: 500;
 }
 
 
