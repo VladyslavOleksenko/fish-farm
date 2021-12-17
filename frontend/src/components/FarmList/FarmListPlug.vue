@@ -3,28 +3,25 @@
     <div class="farm-list-plug__container">
       <div class="farm-list-plug__question"
            :class="{'farm-list-plug__question-right': farmsFilter === 'other'}">
-        <span>Fish farm </span>
-        <span class="farm-list-plug__role">{{ role }}</span>
-        <span>?</span>
+        {{ question }}
       </div>
 
       <div class="farm-list-plug__content-row"
            v-if="farmsFilter === 'own'">
         <div class="farm-list-plug__create-button-wrapper">
-          <CreateFarmButton @open-create-farm-modal="$emit('openCreateFarmModal')"/>
+          <CreateFarmButton
+            @open-create-farm-modal="$emit('openCreateFarmModal')"/>
         </div>
-        <img class="farm-list-plug__image" src="../../../public/owner.svg" alt="">
+        <img class="farm-list-plug__image" src="../../../public/owner.svg"
+             alt="">
       </div>
 
       <div class="farm-list-plug__content-row"
            v-else>
-        <img class="farm-list-plug__image" src="../../../public/employee.svg" alt="">
+        <img class="farm-list-plug__image" src="../../../public/employee.svg"
+             alt="">
         <div class="farm-list-plug__employee-advice">
-          <span>You need to get an invitation from </span>
-          <span class="farm-list-plug__role">farm owner </span>
-          <span>or </span>
-          <span class="farm-list-plug__role">manager </span>
-          <span>first</span>
+          {{ textResource.otherInstruction }}
         </div>
       </div>
     </div>
@@ -33,6 +30,8 @@
 
 <script>
 import CreateFarmButton from "@/components/CreateFarm/CreateFarmButton";
+import {mapState} from "vuex";
+
 export default {
   name: "OwnFarmsPlug",
   components: {CreateFarmButton},
@@ -40,8 +39,49 @@ export default {
     farmsFilter: {type: String, required: true}
   },
   computed: {
-    role() {
-      return this.farmsFilter === "own" ? "owner" : "employee"
+    ...mapState({
+      currentLanguage: state => state.language.currentLanguage
+    }),
+    question() {
+      if (this.farmsFilter === "own") {
+        return this.textResource.ownSlogan
+      }
+      return this.textResource.otherSlogan
+    },
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          ownSlogan: "Fish farm owner?",
+          otherButton: "other farms",
+          otherSlogan: "Fish farm employee?",
+          otherInstruction: "You need to get an invitation from farm owner or manager first",
+          modalTitle: "Let`s create your farm!",
+          farmName: "Farm name",
+          farmDescription: "Farm description",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          ownSlogan: "Власник рибного господарства?",
+          otherButton: "інші господарства",
+          otherSlogan: "Працівник господарства?",
+          otherInstruction: "Вам необхідно отримати запрошення від власника чи адміністратора господарства",
+          modalTitle: "Давайте створимо ваше господарство!",
+          farmName: "Назва",
+          farmDescription: "Короткий опис",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          ownSlogan: "Собственник рыбного хозяйства?",
+          otherButton: "другие хозяйства",
+          otherSlogan: "Сотрудник хозяйства?",
+          otherInstruction: "Вам нужно получить приглашение от собственника или администратора хозяйства",
+          modalTitle: "Давайте создадим ваше хозяйство!",
+          farmName: "Название",
+          farmDescription: "Краткое описание",
+        }
+      }
     }
   }
 }

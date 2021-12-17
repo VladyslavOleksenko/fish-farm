@@ -1,19 +1,24 @@
 <template>
   <form action="" class="create-farm-from">
-    <div class="create-farm-form__slogan">Let`s create your farm!</div>
+    <div class="create-farm-form__slogan">
+      {{ textResource.modalTitle }}
+    </div>
 
-    <input class="create-farm-form__input"
-           type="text"
-           placeholder="Farm name *"
-           v-model="farmName">
-    <textarea class="create-farm-form__textarea"
-              placeholder="Farm description"
-              v-model="farmDescription"></textarea>
-    <input class="create-farm-form__submit"
-           type="submit"
-           value="Create farm"
-           :disabled="!farmName"
-           @click.prevent="sendRequest">
+    <input
+      class="create-farm-form__input"
+      type="text"
+      :placeholder="textResource.farmName"
+      v-model="farmName">
+    <textarea
+      class="create-farm-form__textarea"
+      :placeholder="textResource.farmDescription"
+      v-model="farmDescription"></textarea>
+    <input
+      class="create-farm-form__submit"
+      type="submit"
+      :value="textResource.createButton"
+      :disabled="!farmName"
+      @click.prevent="sendRequest">
   </form>
 </template>
 
@@ -29,8 +34,35 @@ export default {
   }),
   computed: {
     ...mapState({
-      userId: state => state.user.user.userId
-    })
+      userId: state => state.user.user.userId,
+      currentLanguage: state => state.language.currentLanguage
+    }),
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          modalTitle: "Let`s create your farm!",
+          farmName: "Farm name *",
+          farmDescription: "Farm description",
+          createButton: "create farm",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          modalTitle: "Давайте створимо ваше господарство!",
+          farmName: "Назва *",
+          farmDescription: "Короткий опис",
+          createButton: "створити господарство",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          modalTitle: "Давайте создадим ваше хозяйство!",
+          farmName: "Название *",
+          farmDescription: "Краткое описание",
+          createButton: "создать хозяйство",
+        }
+      }
+    }
   },
   methods: {
     async sendRequest() {

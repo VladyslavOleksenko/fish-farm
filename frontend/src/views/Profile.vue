@@ -5,11 +5,15 @@
       <div class="profile__exit-button exit-button"
            @click="logout">
         <MyIcon class="exit-button__icon" icon-name="logout" path-color="#ccc"/>
-        <p class="exit-button__text">Exit</p>
+        <p class="exit-button__text">{{ textResource.exit }}</p>
       </div>
 
-      <div class="profile__greeting">Hello, Vladyslav</div>
-      <div class="profile__slogan">It is your profile page</div>
+      <div class="profile__greeting">
+        <span>{{ textResource.greeting }}</span>
+        <span>, </span>
+        <span>{{ user.firstName }}</span>
+      </div>
+      <div class="profile__slogan">{{ textResource.pageDescription }}</div>
 
       <div class="profile__data-block">
         <div class="profile__data-header">
@@ -18,19 +22,19 @@
                :src="user.avatar"
                alt="">
           <NoAvatar class="profile__no-avatar" v-else/>
-          <p>Your personal data</p>
+          <p>{{ textResource.dataHeader }}</p>
         </div>
 
         <div class="profile__data-row">
-          <div class="profile__data-parameter">First name:</div>
+          <div class="profile__data-parameter">{{ textResource.firstName }}:</div>
           <div class="profile__data-value">{{ user.firstName }}</div>
         </div>
         <div class="profile__data-row">
-          <div class="profile__data-parameter">Last name:</div>
+          <div class="profile__data-parameter">{{ textResource.lastName }}:</div>
           <div class="profile__data-value">{{ user.lastName }}</div>
         </div>
         <div class="profile__data-row">
-          <div class="profile__data-parameter">Email:</div>
+          <div class="profile__data-parameter">{{ textResource.email }}:</div>
           <div class="profile__data-value">{{ user.email }}</div>
         </div>
         <div class="profile__change-data-button-wrapper">
@@ -45,7 +49,7 @@
     <MyModal v-if="changeModalVisibilityStatus"
              @hide="changeModalVisibilityStatus = false">
       <MyForm class="profile__change-data-form"
-              title-text="You can change your personal data here"
+              :title-text="textResource.modalTitle"
               submit-text="Apply"
               :submit-disabled="!validateFormData"
               :message="formData.message"
@@ -54,7 +58,7 @@
         <FormRow>
           <FormInput
             type="text"
-            placeholder="First name"
+            :placeholder="textResource.firstName"
             required
             v-model="formData.firstName"
             @updated="formDataUpdated"/>
@@ -62,7 +66,7 @@
         <FormRow>
           <FormInput
             type="text"
-            placeholder="Last name"
+            :placeholder="textResource.lastName"
             required
             v-model="formData.lastName"
             @updated="formDataUpdated"/>
@@ -81,7 +85,7 @@ import MyModal from "@/components/Modal/MyModal";
 import MyForm from "@/components/Form/MyForm";
 import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";
-import {changeUserData, changeUserAvatar} from "@/assets/js/serverRequest";
+import {changeUserData} from "@/assets/js/serverRequest";
 
 export default {
   name: "Profile",
@@ -106,7 +110,8 @@ export default {
   }),
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      currentLanguage: state => state.language.currentLanguage
     }),
     validateFormData() {
       if (!this.formData.firstName) {
@@ -118,6 +123,44 @@ export default {
         return false
       }
       return true
+    },
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          exit: "Exit",
+          greeting: "Hello",
+          pageDescription: "It is your profile page",
+          dataHeader: "Your personal data",
+          firstName: "First name",
+          lastName: "Last name",
+          email: "Email",
+          modalTitle: "You can change your personal data here",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          exit: "Вийти",
+          greeting: "Вітаємо",
+          pageDescription: "Це сторінка вашого профілю",
+          dataHeader: "Ваша особиста інформація",
+          firstName: "Ім'я",
+          lastName: "Прізвище",
+          email: "Електронна пошта",
+          modalTitle: "Ви можете змінити вашу особисту інформацію тут",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          exit: "Выйти",
+          greeting: "Приветствуем",
+          pageDescription: "Это страница вашего профиля",
+          dataHeader: "Ваша личная информация",
+          firstName: "Имя",
+          lastName: "Фамилия",
+          email: "Электронная почта",
+          modalTitle: "Вы можете изменить ваши личные данные здесь",
+        }
+      }
     }
   },
   methods: {

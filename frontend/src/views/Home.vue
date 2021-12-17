@@ -7,8 +7,8 @@
     <Switcher class="home__switcher"
               left-name="own"
               right-name="other"
-              left-value="my own farms"
-              right-value="other farms"
+              :left-value="textResource.ownButton"
+              :right-value="textResource.otherButton"
               v-model="farmsFilter"/>
 
     <FarmListPlug class="home__farm-list-plug"
@@ -42,7 +42,8 @@ export default {
   }),
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      currentLanguage: state => state.language.currentLanguage
     }),
     farmListIsEmptyStatus() {
       return (
@@ -54,6 +55,47 @@ export default {
         return [].concat(this.ownFarmArray)
       }
       return [].concat(this.otherFarmArray)
+    },
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          ownButton: "my own farms",
+          ownSlogan: "Fish farm owner?",
+          createButton: "create farm",
+          otherButton: "other farms",
+          otherSlogan: "Fish farm employee?",
+          otherInstruction: "You need to get an invitation from farm owner or manager first",
+          modalTitle: "Let`s create your farm!",
+          farmName: "Farm name",
+          farmDescription: "Farm description",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          ownButton: "власні господарства",
+          ownSlogan: "Власник рибного господарства?",
+          createButton: "створити господарство",
+          otherButton: "інші господарства",
+          otherSlogan: "Працівник господарства?",
+          otherInstruction: "Вам необхідно отримати запрошення від власника чи адміністратора господарства",
+          modalTitle: "Давайте створимо ваше господарство!",
+          farmName: "Назва",
+          farmDescription: "Короткий опис",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          ownButton: "собственные хозяйства",
+          ownSlogan: "Собственник рыбного хозяйства?",
+          createButton: "создать хозяйство",
+          otherButton: "другие хозяйства",
+          otherSlogan: "Работник хозяйства?",
+          otherInstruction: "Вам нужно получить приглашение от собственника или администратора хозяйства",
+          modalTitle: "Давайте создадим ваше хозяйство!",
+          farmName: "Название",
+          farmDescription: "Краткое описание",
+        }
+      }
     }
   },
   methods: {

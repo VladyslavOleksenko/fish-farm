@@ -4,13 +4,13 @@
 
     <div class="sidebar__links">
       <SidebarLink class="sidebar__link" to="/" icon-name="home">
-        Home
+        {{ textResource.home }}
       </SidebarLink>
       <SidebarLink class="sidebar__link" to="/tasks" icon-name="tasks">
-        Tasks
+        {{ textResource.tasks }}
       </SidebarLink>
       <SidebarLink class="sidebar__link" to="/profile" icon-name="profile">
-        Profile
+        {{ textResource.profile }}
       </SidebarLink>
     </div>
 
@@ -38,7 +38,7 @@
     <div class="sidebar__logout-wrapper">
       <SidebarLink class="sidebar__link" to="/logout" icon-name="logout"
                    @click="logout">
-        Logout
+        {{ textResource.logout }}
       </SidebarLink>
     </div>
   </div>
@@ -64,7 +64,33 @@ export default {
   computed: {
     ...mapState({
       currentLanguage: state => state.language.currentLanguage
-    })
+    }),
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          home: "Home",
+          tasks: "Tasks",
+          profile: "Profile",
+          logout: "Logout",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          home: "Головна",
+          tasks: "Задачі",
+          profile: "Профіль",
+          logout: "Вийти",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          home: "Главная",
+          tasks: "Задачи",
+          profile: "Профиль",
+          logout: "Выйти",
+        }
+      }
+    }
   },
   methods: {
     ...mapActions({

@@ -1,13 +1,37 @@
 <template>
   <button class="create-farm-button"
           @click="$emit('openCreateFarmModal')">
-    Create farm
+    {{ textResource.createButton }}
   </button>
 </template>
 
 <script>
+import {mapState} from "vuex";
+
 export default {
-  name: "CreateFarmButton"
+  name: "CreateFarmButton",
+  computed: {
+    ...mapState({
+      currentLanguage: state => state.language.currentLanguage
+    }),
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          createButton: "create farm",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          createButton: "створити господарство",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          createButton: "создать хозяйство",
+        }
+      }
+    }
+  }
 }
 </script>
 
