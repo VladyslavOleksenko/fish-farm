@@ -1,6 +1,8 @@
 <template>
   <div class="pools">
-    <div class="pools__title">Pools</div>
+    <div class="pools__title">
+      {{ textResource.pools }}
+    </div>
 
     <div class="pools__pool-list">
       <Pool class="pools__pool"
@@ -16,7 +18,7 @@
         v-if="userPermissions.managePools"
         class="pools__add-button"
         icon-name="add"
-        text="Add pool"
+        :text="textResource.addButton"
         @clicked="addModalVisibilityStatus = true"/>
     </div>
 
@@ -50,6 +52,8 @@ import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import MyForm from "@/components/Form/MyForm";
 import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";
+import {mapState} from "vuex";
+
 
 export default {
   name: "Pools",
@@ -69,8 +73,32 @@ export default {
     addModalVisibilityStatus: false
   }),
   computed: {
+    ...mapState({
+      user: state => state.user.user,
+      currentLanguage: state => state.language.currentLanguage
+    }),
     addModalDataValidStatus() {
       return !!this.addModalData.poolName
+    },
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          pools: "Pools",
+          addButton: "Add pool",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          pools: "Басейни",
+          addButton: "Додати басейн",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          pools: "Бассейны",
+          addButton: "Добавить бассейн",
+        }
+      }
     }
   },
   methods: {
@@ -138,68 +166,5 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-
-.add-modal__title {
-  margin: 0 0 30px 0;
-
-  font-size: 22px;
-  text-align: center;
-
-  color: #eeeeee;
-}
-
-
-.add-modal__input {
-  width: 100%;
-  height: 53px;
-  margin: 0 0 15px 0;
-  padding: 0 15px;
-
-  font-size: 22px;
-
-  color: #fff;
-  background-color: var(--light-purple-color);
-  border: none;
-  border-radius: 4px;
-  outline: none;
-}
-
-.add-modal__input::placeholder {
-  color: var(--light-gray-color);
-}
-
-
-.add-modal__submit {
-  margin: 40px 0 0 0;
-  height: 50px;
-  padding: 0 50px;
-
-  font-size: 22px;
-  font-weight: 500;
-
-  color: #eee;
-  background-color: var(--blue-color);
-
-  border: none;
-  border-radius: 4px;
-  outline: none;
-
-  transition: background-color .2s ease;
-  cursor: pointer;
-}
-
-.add-modal__submit:hover {
-  background-color: #6fa360;
-}
-
-.add-modal__submit:active {
-  background-color: #5e8b52;
-}
-
-.add-modal__submit[disabled] {
-  color: #7f7f7f;
-  background: var(--light-purple-color);
 }
 </style>

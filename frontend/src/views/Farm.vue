@@ -47,7 +47,7 @@
             <MyRectangleButton
               class="dashboard__button"
               icon-name="statistics"
-              text="Welcome to dashboard"
+              :text="textResource.dashboardButton"
               @click="$router.push({
                 name: 'Dashboard',
                 params: {
@@ -61,7 +61,7 @@
       <MyRectangleButton
         v-if="userPermissions.deleteFarm"
         class="farm__delete-button"
-        text="Delete farm"
+        :text="textResource.deleteButton"
         icon-name="delete"
         @click="deleteModalData.visibilityStatus = true"/>
 
@@ -69,7 +69,7 @@
     </div>
 
     <DeleteModal v-if="deleteModalData.visibilityStatus"
-                 :content="deleteModalData.content"
+                 :content="{message: textResource.deleteModalMessage}"
                  @hide="deleteModalData.visibilityStatus = false"
                  @delete="deleteFarm"/>
   </div>
@@ -103,10 +103,7 @@ export default {
     workerArray: [],
     workerInviteArray: [],
     deleteModalData: {
-      visibilityStatus: false,
-      content: {
-        message: "You are about to delete the farm and all associated data"
-      }
+      visibilityStatus: false
     },
     userPermissions: {
       deleteFarm: false,
@@ -121,10 +118,34 @@ export default {
   }),
   computed: {
     ...mapState({
-      userId: state => state.user.user.userId
+      userId: state => state.user.user.userId,
+      currentLanguage: state => state.language.currentLanguage
     }),
     farmId() {
       return parseInt(this.$route.params.farmId.toString())
+    },
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          deleteButton: "Delete farm",
+          dashboardButton: "Welcome to dashboard",
+          deleteModalMessage: "You are about to delete the farm and all associated data"
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          deleteButton: "Видалити господарство",
+          dashboardButton: "Панель управління",
+          deleteModalMessage: "Ви збираєтесь видалити господарство, і всю пов'язану інформацію"
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          deleteButton: "Удалить хозяйство",
+          dashboardButton: "Панель управления",
+          deleteModalMessage: "Вы собираетесь удалить хозяйство, и всю связанную информацию"
+        }
+      }
     }
   },
   methods: {
@@ -161,7 +182,7 @@ export default {
     await this.updateAdministratorInviteArray()
     await this.updateWorkerArray()
     await this.updateWorkerInviteArray()
-  },
+  }
 }
 </script>
 

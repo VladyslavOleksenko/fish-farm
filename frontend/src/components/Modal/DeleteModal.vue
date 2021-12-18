@@ -3,17 +3,21 @@
     <MyModal @hide="$emit('hide')">
       <div class="delete-modal__content">
         <p class="delete-modal__message">{{ content.message }}</p>
-        <p class="delete-modal__warning">This action cannot be undone!</p>
-        <p class="delete-modal__warning">Are you sure?</p>
+        <p class="delete-modal__warning">
+          {{ textResource.warning }}
+        </p>
+        <p class="delete-modal__warning">
+          {{ textResource.question }}
+        </p>
         <div class="delete-modal__buttons">
           <MyRectangleButton
             class="delete-modal__button"
-            :text="content.cancelButtonText || 'cancel'"
+            :text="content.cancelButtonText || textResource.cancel"
             icon-name="back"
             @click="$emit('hide')"/>
           <MyRectangleButton
             class="delete-modal__button"
-            :text="content.deleteButtonText || 'delete'"
+            :text="content.deleteButtonText || textResource.delete"
             icon-name="delete"
             @click="$emit('delete')"/>
         </div>
@@ -26,6 +30,7 @@
 import MyModal from "@/components/Modal/MyModal";
 import MyRectangleButton from "@/components/UI/MyRectangleButton";
 import MyRoundButton from "@/components/UI/MyRoundButton";
+import {mapState} from "vuex";
 
 export default {
   name: "DeleteModal",
@@ -39,6 +44,37 @@ export default {
         cancelButtonText: "Cancel"
       },
       required: true
+    }
+  },
+  computed: {
+    ...mapState({
+      currentLanguage: state => state.language.currentLanguage
+    }),
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          warning: "This action cannot be undone!",
+          question: "Are you sure?",
+          delete: "Delete",
+          cancel: "Cancel",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          warning: "Цю дію не можливо буде повернути!",
+          question: "Ви впевнені?",
+          delete: "Видалити",
+          cancel: "Відмінити",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          warning: "Это действие не возможно будет вернуть!",
+          question: "Вы уверенны?",
+          delete: "Удалить",
+          cancel: "Отменить",
+        }
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="staff">
     <div class="staff__content">
-      <div class="staff__category">{{ category }}</div>
+      <div class="staff__category">{{ categoryText }}</div>
 
       <div class="staff__users">
         <Employee class="staff__user"
@@ -29,7 +29,7 @@
         <MyRectangleButton class="staff__add-button"
                            v-if="category !== 'owner'"
                            icon-name="add"
-                           :text="'Add ' + categoryInSingular"
+                           :text="addEmployeeButtonText"
                            @click="showInviteModal"/>
       </div>
 
@@ -123,6 +123,7 @@ import Invite from "@/components/StaffBlock/Invite";
 import MyForm from "@/components/Form/MyForm";
 import FormRow from "@/components/Form/FormRow";
 import FormInput from "@/components/Form/FormInput";
+import {mapState} from "vuex";
 
 export default {
   name: "Staff",
@@ -158,12 +159,66 @@ export default {
     }
   }),
   computed: {
-    categoryInSingular() {
+    ...mapState({
+      currentLanguage: state => state.language.currentLanguage
+    }),
+    categoryText() {
+      if (this.category === "owner") {
+        if (this.currentLanguage === "en") {
+          return "owner"
+        }
+        if (this.currentLanguage === "ua") {
+          return "власник"
+        }
+        if (this.currentLanguage === "ru") {
+          return "владелец"
+        }
+      }
       if (this.category === "administrators") {
-        return "administrator"
+        if (this.currentLanguage === "en") {
+          return "administrators"
+        }
+        if (this.currentLanguage === "ua") {
+          return "адміністратори"
+        }
+        if (this.currentLanguage === "ru") {
+          return "администраторы"
+        }
       }
       if (this.category === "workers") {
-        return "worker"
+        if (this.currentLanguage === "en") {
+          return "workers"
+        }
+        if (this.currentLanguage === "ua") {
+          return "працівники"
+        }
+        if (this.currentLanguage === "ru") {
+          return "сотрудники"
+        }
+      }
+    },
+    addEmployeeButtonText() {
+      if (this.category === "administrators") {
+        if (this.currentLanguage === "en") {
+          return "Add administrator"
+        }
+        if (this.currentLanguage === "ua") {
+          return "Додати адміністратора"
+        }
+        if (this.currentLanguage === "ru") {
+          return "Добавить администратора"
+        }
+      }
+      if (this.category === "workers") {
+        if (this.currentLanguage === "en") {
+          return "Add worker"
+        }
+        if (this.currentLanguage === "ua") {
+          return "Додати працівника"
+        }
+        if (this.currentLanguage === "ru") {
+          return "Добавить сотрудника"
+        }
       }
     },
     validateInviteAdministratorModalData() {

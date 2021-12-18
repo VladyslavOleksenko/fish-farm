@@ -7,7 +7,7 @@
     <div class="farm-list-element__button-wrapper">
       <button class="farm-list-element__button"
               @click="$router.push({name: 'Farm', params: {farmId: this.farmInfo.farmId}})">
-        See more
+        {{ textResource.seeMore }}
       </button>
     </div>
   </div>
@@ -23,13 +23,31 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      currentLanguage: state => state.language.currentLanguage
     }),
     owner() {
       if (this.farmInfo.ownerId === this.user.userId) {
         return "You"
       } else {
         return "smb else"
+      }
+    },
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          seeMore: "See more",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          seeMore: "Дізнатись більше",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          seeMore: "Узнать больше",
+        }
       }
     }
   }
