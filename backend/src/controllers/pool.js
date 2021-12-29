@@ -2,7 +2,9 @@ module.exports = {
   createPool,
   getPoolArray,
   getPoolByPoolId,
+  getPoolByDeviceId,
   changePoolData,
+  updateDeviceIndicators,
 
   deletePool,
   deleteAllFarmPools,
@@ -56,6 +58,14 @@ async function getPoolByPoolId(poolId) {
   return dataBaseResponse.rows[0]
 }
 
+async function getPoolByDeviceId(deviceId) {
+  const sqlCommand = `SELECT *
+                      FROM pool
+                      WHERE device_id LIKE '${deviceId}'`
+  const dataBaseResponse = await sendDataBaseQuery(sqlCommand)
+  return dataBaseResponse.rows[0]
+}
+
 async function changePoolData(poolData) {
   const poolId = poolData.poolId
   const candidate = await getPoolByPoolId(poolId)
@@ -73,6 +83,16 @@ async function changePoolData(poolData) {
   await sendDataBaseQuery(sqlCommand)
 
   return getPoolByPoolId(poolId)
+}
+
+async function updateDeviceIndicators(deviceData) {
+  const deviceId = deviceData.deviceId
+  const temperature = deviceData.poolData.temperature
+
+  const sqlCommand = `UPDATE pool
+                      SET temperature = '${temperature}'
+                      WHERE device_id = ${deviceId}`
+  await sendDataBaseQuery(sqlCommand)
 }
 
 
@@ -103,7 +123,9 @@ function formatPool(pool) {
   return {
     poolId: pool["pool_id"],
     name: pool.name,
-    farmId: pool["farm_id"]
+    farmId: pool["farm_id"],
+    deviceId: pool["device_id"],
+    temperature: pool.temperature
   }
 }
 
