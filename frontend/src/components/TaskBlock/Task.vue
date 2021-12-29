@@ -34,10 +34,11 @@ export default {
   },
   computed: {
     ...mapState({
-      selectedTask: state => state.farms.selectedTask
+      selectedTask: state => state.farms.selectedTask,
+      currentLanguage: state => state.language.currentLanguage
     }),
     parsedTaskInfo() {
-      return parseTaskInfo(this.task)
+      return parseTaskInfo(this.task, this.currentLanguage)
     },
     selectedStatus() {
       if (!this.selectedTask) {

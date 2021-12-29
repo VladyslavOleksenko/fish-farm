@@ -20,32 +20,42 @@
         </div>
         <div class="task-info__data-block">
           <div class="task-info__data">
-            <div class="task-info__parameter">issued:</div>
+            <div class="task-info__parameter">
+              {{ textResource.issued }}
+            </div>
             <div class="task-info__value">
               {{ parsedTaskInfo.createDate }}
               {{ parsedTaskInfo.createTime }}
             </div>
           </div>
           <div class="task-info__data">
-            <div class="task-info__parameter">deadline:</div>
+            <div class="task-info__parameter">
+              {{ textResource.deadline }}
+            </div>
             <div class="task-info__value">
               {{ parsedTaskInfo.deadlineDateAndTime }}
             </div>
           </div>
           <div class="task-info__data">
-            <div class="task-info__parameter">Recurring:</div>
+            <div class="task-info__parameter">
+              {{ textResource.recurring }}
+            </div>
             <div class="task-info__value">
               {{ parsedTaskInfo.recurringStatus }}
             </div>
           </div>
           <div class="task-info__data">
-            <div class="task-info__parameter">Result required:</div>
+            <div class="task-info__parameter">
+              {{ textResource.resultRequired }}
+            </div>
             <div class="task-info__value">
               {{ parsedTaskInfo.resultRequiredStatus }}
             </div>
           </div>
           <div class="task-info__data">
-            <div class="task-info__parameter">Status:</div>
+            <div class="task-info__parameter">
+              {{ textResource.status }}
+            </div>
             <div class="task-info__value">
               {{ parsedTaskInfo.doneStatus }}
             </div>
@@ -55,17 +65,17 @@
           <MyRectangleButton
             class="task-info__button"
             icon-name="delete"
-            text="Delete task"
+            :text="textResource.deleteTask"
             @click="deleteModalData.visibilityStatus = true"/>
           <MyRectangleButton
             class="task-info__button"
             icon-name="edit"
-            text="Edit task"/>
+            :text="textResource.editTask"/>
         </div>
       </div>
       <div class="task-info__history history">
         <div class="history__title">
-          Task history
+          {{ textResource.taskHistory }}
         </div>
         <div class="history__list">
           <div
@@ -119,10 +129,49 @@ export default {
   }),
   computed: {
     ...mapState({
-      selectedTaskHistory: state => state.farms.selectedTaskHistory
+      selectedTaskHistory: state => state.farms.selectedTaskHistory,
+      currentLanguage: state => state.language.currentLanguage
     }),
     parsedTaskInfo() {
-      return parseTaskInfo(this.taskInfo.task)
+      return parseTaskInfo(this.taskInfo.task, this.currentLanguage)
+    },
+    textResource() {
+      if (this.currentLanguage === "en") {
+        return {
+          issued: "Issued:",
+          deadline: "Deadline:",
+          recurring: "Recurring:",
+          resultRequired: "Result required:",
+          status: "Status",
+          taskHistory: "Task history",
+          deleteTask: "Delete task",
+          editTask: "Edit task",
+        }
+      }
+      if (this.currentLanguage === "ua") {
+        return {
+          issued: "Видано:",
+          deadline: "Кінцевий термін:",
+          recurring: "Повторюване:",
+          resultRequired: "Обов'язковий результат:",
+          status: "Статус",
+          taskHistory: "Історія завдання",
+          deleteTask: "Видалити завдання",
+          editTask: "Редагувати завдання",
+        }
+      }
+      if (this.currentLanguage === "ru") {
+        return {
+          issued: "Выдано:",
+          deadline: "Конечный срок:",
+          recurring: "Повторяемое:",
+          resultRequired: "Обязательный результат:",
+          status: "Статус",
+          taskHistory: "История задания",
+          deleteTask: "Удалить задание",
+          editTask: "Изменить задание",
+        }
+      }
     }
   },
   methods: {
@@ -141,21 +190,50 @@ export default {
       this.deleteModalData.visibilityStatus = false
     },
     getDateAndTimeString(historyNote) {
+      const date = historyNote.date
+      const language = this.currentLanguage
+
       const dateString =
-        MyDateClass.getDateStringByDbValue(historyNote.date)
+        MyDateClass.getDateStringByDbValue(date, language)
       const timeString =
         MyDateClass.getTimeStringByDbValue(historyNote.time)
       return MyDateClass.getDateAndTimeString(dateString, timeString)
     },
     getDoneStatus(historyNote) {
+      const language = this.currentLanguage
+
       switch (historyNote.inTime) {
         case 0:
+          if (language === "ua") {
+            return "виконано пізно"
+          }
+          if (language === "ru") {
+            return "выполнено поздно"
+          }
           return "done late"
         case 1:
+          if (language === "ua") {
+            return "виконано вчасно"
+          }
+          if (language === "ru") {
+            return "выполнено вовремя"
+          }
           return "done in time"
         case 2:
+          if (language === "ua") {
+            return "не виконано"
+          }
+          if (language === "ru") {
+            return "не выполнено"
+          }
           return "not done"
         default:
+          if (language === "ua") {
+            return "у процесі"
+          }
+          if (language === "ru") {
+            return "в процессе"
+          }
           return "in progress"
       }
     }
