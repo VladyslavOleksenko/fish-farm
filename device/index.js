@@ -1,7 +1,6 @@
 const SerialPort = require("serialport")
 const ReadLine = require("@serialport/parser-readline")
-const RequestParams = require("./RequestParams")
-const sendServerRequest = require("./serverRequest")
+const http = require('http')
 
 const port = new SerialPort("COM5", { baudRate: 9600 })
 
@@ -13,26 +12,46 @@ parser.on("data", async portLine => await processPortLine(portLine))
 
 
 async function processPortLine(portLine) {
-  const temperature = getTemperatureByPortLine(portLine)
-  if (temperature) {
-    await sendTemperatureToServer(temperature)
+  const deviceData = getDeviceData(portLine)
+  console.log(deviceData)
+  await sendDeviceDataToServer(deviceData)
+}
+
+function getDeviceData(portLine) {
+  const portDataArray = portLine.split(";")
+  return {
+    deviceId: parseInt(portDataArray[0]),
+    temperature: parseFloat(portDataArray[1]),
+    temperatureMark: parseInt(portDataArray[2])
   }
 }
 
-function getTemperatureByPortLine(portLine) {
-  if (portLine[0] !== "T") {
-    return
+async function sendDeviceDataToServer(deviceData) {
+  const body = {
+    deviceId: deviceData.deviceId,
+    poolData: {
+      temperature: deviceData.temperature
+    }
+  }
+  const data = new TextEncoder().encode(JSON.stringify(body))
+
+  const options = {
+    hostname: 'localhost',
+    port: 5000,
+    path: '/api/pool/indicators',
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length
+    }
   }
 
-  return parseFloat(portLine.substr(1))
-}
+  const req = http.request(options, () => console.log("sent"))
 
-async function sendTemperatureToServer(temperature) {
-  const requestParams = new RequestParams(
-    "POST",
-    "http://localhost:5000/api/",
-    {temperature}
-  )
+  req.on('error', error => {
+    console.error(error)
+  })
 
-  await sendServerRequest(requestParams)
+  req.write(data)
+  req.end()
 }
