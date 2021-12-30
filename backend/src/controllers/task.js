@@ -54,25 +54,25 @@ async function getTaskArrayByUser(userId) {
   }
 
   const sqlCommand =
-    `SELECT task.task_id,
-            task.farm_worker_id,
-            task.title,
-            task.description,
-            task.pool_id,
-            task.create_date,
-            task.create_time,
-            task.deadline_date,
-            task.deadline_time,
-            task.is_recurring,
-            task.recurring_period,
-            task.result_required_status
+    `SELECT task.*
      FROM task,
           farm_worker
      WHERE task.farm_worker_id = farm_worker.farm_worker_id
        AND farm_worker.user_id = ${userId}`
 
   let dataBaseResponse = await sendDataBaseQuery(sqlCommand)
-  return dataBaseResponse.rows
+  const allTaskArray = dataBaseResponse.rows
+
+  const inProgressTaskArray = []
+  for (let task of allTaskArray) {
+    const taskId = task["task_id"]
+    const taskHistory = await getTaskHistory(taskId)
+    if (!taskHistory.length) {
+      inProgressTaskArray.push(task)
+    }
+  }
+
+  return inProgressTaskArray
 }
 
 async function getTaskHistory(taskId) {
