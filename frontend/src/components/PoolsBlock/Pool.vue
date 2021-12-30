@@ -2,6 +2,7 @@
   <div class="pool">
     <div class="pool__content">
       <div class="pool__name">{{ poolInfo.name }}</div>
+      <div class="pool__temperature">{{ temperature }}</div>
       <div class="pool__buttons"
            v-if="userPermissions.managePools && $route.name !== 'Dashboard'">
         <MyRoundButton class="pool__button"
@@ -79,6 +80,17 @@ export default {
       }
     }
   }),
+  computed: {
+    temperature() {
+      const temperature = this.poolInfo.temperature
+      if (!temperature) {
+        return ""
+      }
+
+      const roundedTemperature = parseFloat(temperature).toFixed(1)
+      return roundedTemperature + "°C"
+    }
+  },
   methods: {
     validateChangePoolData() {
       if (!this.changeModalData.name) {

@@ -70,7 +70,9 @@ export default {
     addModalData: {
       poolName: ""
     },
-    addModalVisibilityStatus: false
+    addModalVisibilityStatus: false,
+    lastUpdatedTime: performance.now(),
+    delayBetweenUpdatingInMs: 5000
   }),
   computed: {
     ...mapState({
@@ -110,10 +112,21 @@ export default {
       await this.updatePools()
       this.addModalVisibilityStatus = false
       this.addModalData.poolName = ""
+    },
+    async loop() {
+      const currentTime = performance.now()
+      if (currentTime - this.lastUpdatedTime < this.delayBetweenUpdatingInMs) {
+        return requestAnimationFrame(await this.loop)
+      }
+
+      await this.updatePools()
+      this.lastUpdatedTime = currentTime
+      requestAnimationFrame(await this.loop)
     }
   },
   async mounted() {
     await this.updatePools()
+    requestAnimationFrame(await this.loop)
   }
 }
 </script>
